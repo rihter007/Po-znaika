@@ -1,0 +1,15 @@
+﻿<Page x:Class="ru.po_znaika.alphabet.ObjectImageHintPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="800"
+	Title="ObjectImageHintPage">
+
+    <Grid Width="750" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Image Height="450"  Width="450" HorizontalAlignment="Left" Margin="169,50,0,0" Name="ui_objectHintImage" Stretch="Fill" VerticalAlignment="Top" />
+        <TextBlock Height="31" HorizontalAlignment="Left" Margin="169,13,0,0" Name="textBlock1" FontSize="24" Text="Какой предмет изобаржён на картинке?" VerticalAlignment="Top" />
+        <Button Content="Вернуться" FontSize="24" Height="37" HorizontalAlignment="Left" Margin="334,506,0,0" Name="ui_returnButton" VerticalAlignment="Top" Width="118" Click="ui_returnButton_Click" />
+    </Grid>
+</Page>

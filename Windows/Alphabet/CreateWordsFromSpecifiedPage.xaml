@@ -1,0 +1,72 @@
+﻿<Page x:Class="ru.po_znaika.alphabet.CreateWordsFromSpecifiedPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="570" d:DesignWidth="750"
+	Title="CreateWordsFromSpecifiedPage">
+
+    <Grid>
+        <Canvas Name="ui_charMoveCanvas" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Height="570" Width="730" MouseMove="ui_charMoveCanvas_MouseMove" MouseLeftButtonDown="ui_charMoveCanvas_MouseLeftButtonDown" MouseLeftButtonUp="ui_charMoveCanvas_MouseLeftButtonUp">
+
+            <TextBlock Text="Составьте слово из заданного:" Height="31" HorizontalAlignment="Left" Name="ui_captionLabel" VerticalAlignment="Top" FontSize="24" FontStyle="Italic" Width="360" Canvas.Left="180" Canvas.Top="20"/>
+            <Button Canvas.Left="10" Canvas.Top="274" Content="создать слово" Name="ui_addWordButton" FontSize="20" FontWeight="Normal" FontStyle="Italic" Click="ui_addWordButton_Click" Height="39" Width="144" />
+
+            <TextBlock Text="Осталось слов:" FontSize="24" FontStyle="Italic" Height="46" HorizontalAlignment="Center" Name="ui_remainWordsTextBlock" VerticalAlignment="Top" Canvas.Top="274" Canvas.Left="217" />
+
+            <ListBox Canvas.Left="153" Canvas.Top="326" Name="ui_foundWordsListBox" Height="230" Width="433">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="MaxHeight" Value="50"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>              
+
+            <Button Canvas.Left="607" Canvas.Top="526" Content="Проверить" FontSize="20" FontStyle="Italic" FontWeight="Normal" Name="ui_checkButton" Click="ui_checkButton_Click" HorizontalAlignment="Right" Width="115" />
+            <Button Canvas.Left="10" Canvas.Top="526" Content="Назад" FontSize="20" FontStyle="Italic" FontWeight="Normal" Name="ui_backButton" Click="ui_backButton_Click" Width="115" />
+            <Grid Height="60" Name="ui_newWordGrid" Width="692" Canvas.Left="21" Canvas.Top="177">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+            </Grid>
+        
+        <Grid Height="60" Name="ui_initialWordGrid" Width="692" Canvas.Left="21" Canvas.Top="76">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>            
+        </Grid>
+
+            <Rectangle Name="ui_canvasMoveRectangle" Stroke="Black" Canvas.Left="10" Canvas.Top="57" Height="197" Width="712" />
+            <Button Canvas.Left="569" Canvas.Top="277" Content="подсказка" FontSize="20" FontStyle="Italic" FontWeight="Normal" Height="39" Name="ui_hintButton" Width="144" Click="ui_hintButton_Click" />
+        </Canvas>
+    </Grid>
+</Page>

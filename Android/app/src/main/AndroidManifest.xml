@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ru.po_znaika.alphabet" >
+
+    <application
+        android:allowBackup="true"
+        android:debuggable="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".MainMenuActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".CharacterExerciseMenuActivity"
+            android:label="@string/title_activity_character_exercise_menu">
+        </activity>
+
+        <activity
+            android:name="ru.po_znaika.alphabet.SingleCharacterExerciseMenuActivity"
+            android:label="@string/title_activity_single_character_exercise_menu">
+        </activity>
+
+        <activity
+            android:name=".CharacterExerciseItemActivity"
+            android:label="@string/title_activity_character_exercise_item" >
+        </activity>
+        <activity
+            android:name=".DiaryActivity"
+            android:label="@string/title_activity_diary" >
+        </activity>
+        <activity
+            android:name=".WordGatherActivity"
+            android:label="@string/title_activity_word_gather" >
+        </activity>
+        <activity
+            android:name=".CreateWordsFromSpecifiedActivity"
+            android:label="@string/title_activity_create_words_from_specified" >
+        </activity>
+    </application>
+
+</manifest>

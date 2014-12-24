@@ -1,0 +1,54 @@
+private const string CreateUrlsTable =
+            "CREATE TABLE Url (" +
+            "Id INTEGER PRIMARY KEY ASC AUTOINCREMENT," +
+            "UrlName TEXT UNIQUE);";
+
+        private const string CreateContentTypeTable =
+            "CREATE TABLE ContentType (" +
+            "Id INTEGER PRIMARY KEY ASC AUTOINCREMENT, " +
+            "TypeName TEXT UNIQUE);";
+
+        private const string CreateIncidentTable =
+            "CREATE TABLE Incident (" +
+            "Id INTEGER PRIMARY KEY ASC AUTOINCREMENT," +
+            "Date DATE," +
+            "UrlId INTEGER," +
+            "SandboxTaskId INTEGER," +
+            "Path TEXT," +
+            "FOREIGN KEY(UrlId) REFERENCES Url(Id));";
+
+
+  private const string CreateFileAnomalyTable =
+            "CREATE TABLE FileAnomaly (" +
+            "Id INTEGER PRIMARY KEY ASC AUTOINCREMENT," +
+            "IncidentId INTEGER," +
+            "AnomalyDescription TEXT NOT NULL," +
+            "HostUrlId INTEGER," +
+            "ContentTypeId INTEGER," +
+            "EtalonId INTEGER," +
+            "OldSize INTEGER," +
+            "NewSize INTEGER," +
+            "ContentHash TEXT NOT NULL," +
+            "FileName TEXT," +
+            "FilePath TEXT," +
+            "FileData BLOB," +
+            "FOREIGN KEY(HostUrlId) REFERENCES TrustedHost(Id)" +
+            "FOREIGN KEY(IncidentId) REFERENCES Incident(Id)," +
+            "FOREIGN KEY(ContentTypeId) REFERENCES ContentType(Id));";
+
+
+ private const string CreateEtalonContentTable =
+            "CREATE TABLE EtalonContent (" +
+            "Id INTEGER PRIMARY KEY ASC AUTOINCREMENT," +
+            "UrlId INTEGER NOT NULL," +
+            "ContentTypeId INTEGER NOT NULL," +
+            "FileName TEXT," +
+            "FileSize INTEGER," +
+            "ContentHash TEXT NOT NULL," +
+            "ContentData BLOB NOT NULL," +
+            "FOREIGN KEY(UrlId) REFERENCES Url(Id)," +
+            "FOREIGN KEY(ContentTypeId) REFERENCES ContentType(Id)," +
+            "UNIQUE (UrlId, ContentTypeId, ContentHash) ON CONFLICT IGNORE);";
+
+SQLiteCommand tablesNamesSelect = new SQLiteCommand(SelectFromSystemTableTablesNames, databaseConnection);
+                tablesNamesReader = tablesNamesSelect.ExecuteReader();

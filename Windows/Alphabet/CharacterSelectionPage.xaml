@@ -1,0 +1,46 @@
+﻿<Page x:Class="ru.po_znaika.alphabet.CharacterSelectionPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="570" d:DesignWidth="750"
+	Title="CharacterSelectionPage">
+
+    <Grid>
+            <!--ScrollViewer -->
+            <Grid HorizontalAlignment="Left" Margin="12,59,0,57" Name="ui_textGrid" Width="726" Height="450">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+        </Grid>
+
+            <!--/ScrollViewer-->
+
+        <Button Content="Проверить" FontSize="24" Height="39" HorizontalAlignment="Left" Margin="600,519,0,0" Name="ui_checkButton" VerticalAlignment="Top" Width="138" Click="button1_Click" />
+        <Label Content="Выдели букву: " Height="41" HorizontalAlignment="Left" Margin="12,12,0,0" Name="ui_taskLabel" VerticalAlignment="Top" FontSize="24" FontStyle="Italic" />
+    </Grid>
+</Page>

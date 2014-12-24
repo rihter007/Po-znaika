@@ -1,0 +1,59 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="#ff87e100"
+    tools:context="ru.po_znaika.alphabet.SingleCharacterExerciseMenuActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical|left">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/abc_action_bar_default_height"
+                android:text=""
+                android:id="@+id/charcterTextView"
+                android:textColor="#fffff000"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/abc_action_bar_default_height"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/main_menu_caption"
+                android:id="@+id/menuCaptionTextView"
+                android:layout_marginLeft="10dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical|start">
+                <ListView
+                    android:layout_width="500dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/menuListView"
+                    android:layout_weight="1"
+                    android:background="#ffffffff"/>
+            </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

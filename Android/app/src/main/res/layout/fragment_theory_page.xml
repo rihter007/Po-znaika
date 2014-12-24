@@ -1,0 +1,74 @@
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/small_margin">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/button_previous"
+            android:id="@+id/backButton"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/button_next"
+            android:id="@+id/forwardButton"/>
+    </RelativeLayout>
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical|left">
+
+            <ImageView
+                android:layout_width="@dimen/large_image_size"
+                android:layout_height="@dimen/large_image_size"
+                android:id="@+id/theoryImageView"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:scrollbars="vertical"
+                android:layout_gravity="center_horizontal"
+                android:text=""
+                android:id="@+id/theoryTextView"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_vertical|left">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/playSoundButton"
+                    android:focusableInTouchMode="false"
+                    android:src="@android:drawable/ic_media_play"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxHeight="@dimen/medium_image_size"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/play_title"
+                    android:id="@+id/playSoundTextView"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+</LinearLayout>

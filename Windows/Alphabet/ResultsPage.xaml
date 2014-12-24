@@ -1,0 +1,18 @@
+﻿<Page x:Class="ru.po_znaika.alphabet.ResultsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="550" d:DesignWidth="750"
+	Title="ResultsPage">
+    
+    <Grid>
+        <Canvas HorizontalAlignment="Center" VerticalAlignment="Center" Height="526" Margin="12" Width="726">
+            <Button Canvas.Left="300" Canvas.Top="384" FontSize="32" Content="Далее" Height="53" Name="ui_nextButton" Width="145" Click="ui_nextButton_Click" />
+            <TextBlock Name="ui_generalTextBlock" Canvas.Left="15" Canvas.Top="118" Height="77" FontSize="34" Text="Поздравляем с прохождением упражнения" Width="698" />
+            <TextBlock Canvas.Left="185" Canvas.Top="202" FontSize="34" Height="77" Name="ui_resultTextBlock" Text="Заработано: 0 баллов" />
+        </Canvas>
+        
+    </Grid>
+</Page>
