@@ -1,0 +1,99 @@
+Протокол взаимодействия клиента с серверной стороной:
+
+Все действия идут поверх протокола HTTP.
+Условный URL обращения помечен как [URL] (например software.po-znaika.ru)
+
+Решено отделить сессию клиента при использовании браузера и программного обеспечения,
+чтобы не возникало недоразумений. (например при log-out) клиента всё равно хранится кеш в браузере 
++ позволяет красиво разделять урлы!
+
+Вычисление идентификатора упражнения:
+Id = crc32('po-znaika.alphabet.russian.Ch1'); (Решение.Программа.Язык.имя_упражнения)
+
+1. Аутентификация (на базе NTLM). По сути NTLM без session: keep-alive. Надо провести исследование для django
+(на базе HTTP без поддержки взаимодействия)
+
+****
+
+Запрос токена аутентнтцикации
+
+****
+
+Запрос случайного числа аутентификации
+
+Клиент: 
+Url: [URL]\authenticate
+Headers:
+Login: [UserName]
+
+Сервер:
+401 Unauthorized
+Heaeders:
+Authorization: [random 8-byte number for exp.: 1234]
+
++ remembers the sended number
+
+Аутентификация с маскировкой пароля случайным числом
+
+Клиент:
+Url: [URL]\authenticate
+Login: [UserName]
+Secret: [SHA1(password + (concatinated) + random number)]
+
+Сервер:
+if valid login and password:
+200 OK
+Auth-Token: (Base64 encoded token )
+
+if not valid login and password:
+401 Unauthorized
+
+2. Выставление оценки за упражнение
+
+Клиент:
+Url: [URL]\diary_mark
+Headers:
+Auth-Token: [authentification token]
+Action_Unique_Id: [SHA1(Логин.Решение.Программа.Язык.имя_упражнения.дата.оценка] // уникальный идентификатор действия, чтобы не дай бог одно и тоже не послать 100 раз
+Exercise_Id: [id, see above]
+Score: [score]
+Date: [Date GMT UTC]
+
+Сервер:
+
+Некорректный токен аунетнтификации:
+401 Unauthorized
+
+200 OK - запись добавлена (возможно такая уже была)
+400 - запись существует и не совпадает с хешом, некорректный Action_Uniqie_Id
+Headers: (варианты)
+Internal_Status:
+crc32(po-znaika.internal_error.eAlreadyExists)
+сrc32(eNotFound (нет такого упражнения))
+crc32(eInvalidArgument (некорректный хеш))
+
+3. Получение результатов выполнения упражнения
+
+Клиент:
+Url: [URL]\diary
+Headers:
+Exercise_Id: [id, see above]
+Start_Date: [GMT UTC]
+End_Date: [Optional]
+
+Сервер:
+
+Некорректный токен аунетнтификации:
+401 Unauthorized
+
+200 OK
+Internal_Status: 0 (sOk)
+\r\n\r\n
+/*(json)*/
+{
+ item
+ {
+    date: "GMT UTC"
+    score: ""
+ }
+}
