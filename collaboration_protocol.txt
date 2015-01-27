@@ -1,99 +1,99 @@
 Протокол взаимодействия клиента с серверной стороной:
 
-Все действия идут поверх протокола HTTP.
+Все действия идут поверх протокола HTTPS
 Условный URL обращения помечен как [URL] (например software.po-znaika.ru)
 
-Решено отделить сессию клиента при использовании браузера и программного обеспечения,
-чтобы не возникало недоразумений. (например при log-out) клиента всё равно хранится кеш в браузере 
-+ позволяет красиво разделять урлы!
+Внутренние коды ошибок сервера:
+crc32(po-znaika.internal_status.eAlreadyExists)   // данное действие записи уже выполнено
+сrc32(po-znaika.internal_status.eNotFound)        // нет такого параметра (например упражнения)
+crc32(po-znaika.internal_status.eInvalidArgument) // некорректный параметр
 
-Вычисление идентификатора упражнения:
-Id = crc32('po-znaika.alphabet.russian.Ch1'); (Решение.Программа.Язык.имя_упражнения)
-
-1. Аутентификация (на базе NTLM). По сути NTLM без session: keep-alive. Надо провести исследование для django
-(на базе HTTP без поддержки взаимодействия)
-
-****
-
-Запрос токена аутентнтцикации
-
-****
-
-Запрос случайного числа аутентификации
-
-Клиент: 
-Url: [URL]\authenticate
-Headers:
-Login: [UserName]
-
-Сервер:
-401 Unauthorized
-Heaeders:
-Authorization: [random 8-byte number for exp.: 1234]
-
-+ remembers the sended number
-
-Аутентификация с маскировкой пароля случайным числом
+1. Запрос лицензирования
+Url: [URL]\license
 
 Клиент:
-Url: [URL]\authenticate
-Login: [UserName]
-Secret: [SHA1(password + (concatinated) + random number)]
+{Headers:}
+Login: login
+Password: password
 
 Сервер:
-if valid login and password:
 200 OK
-Auth-Token: (Base64 encoded token )
+{Headers:}
+License: Commercial - текущая коммерческая лицензия активна
+         Expired - была коммерческая лицензия, но на текущий момент закончилась
 
-if not valid login and password:
-401 Unauthorized
+401 - некорректный логин/пароль
 
 2. Выставление оценки за упражнение
+Url: [URL]\exercise_score
 
 Клиент:
-Url: [URL]\diary_mark
-Headers:
-Auth-Token: [authentification token]
-Action_Unique_Id: [SHA1(Логин.Решение.Программа.Язык.имя_упражнения.дата.оценка] // уникальный идентификатор действия, чтобы не дай бог одно и тоже не послать 100 раз
+{Headers:}
+Login: login
+Password: password
 Exercise_Id: [id, see above]
 Score: [score]
-Date: [Date GMT UTC]
+Date: [Http date format] (Example: Wed, 15 Nov 1995 06:25:24 GMT)
+
+For future usage: Action_Unique_Id: [SHA1(Логин.Решение.Программа.Язык.имя_упражнения.дата.оценка] // уникальный идентификатор действия, чтобы не дай бог одно и тоже не послать 100 раз
 
 Сервер:
 
-Некорректный токен аунетнтификации:
-401 Unauthorized
-
 200 OK - запись добавлена (возможно такая уже была)
-400 - запись существует и не совпадает с хешом, некорректный Action_Uniqie_Id
+401 - некорректный логин/пароль
+400 - некорректные данные (See internal status header)
 Headers: (варианты)
-Internal_Status:
-crc32(po-znaika.internal_error.eAlreadyExists)
-сrc32(eNotFound (нет такого упражнения))
-crc32(eInvalidArgument (некорректный хеш))
+Internal_Status: code (см. коды ошибок сервера)
 
 3. Получение результатов выполнения упражнения
 
-Клиент:
 Url: [URL]\diary
-Headers:
-Exercise_Id: [id, see above]
-Start_Date: [GMT UTC]
-End_Date: [Optional]
+
+Клиент:
+{Headers:}
+Login: login
+Password: password
+Exercise: Внутреннее имя упражнения или группы упражнений (по принципу совпадения exercise_name* - т.е. любые упражнения, входящие в данную группу)
+Start_Date: [Optional] Дата, начиная с которой требуются оценки
+End_Date: [Optional] Дата, заканчивая которой требуется получить оценки
 
 Сервер:
 
-Некорректный токен аунетнтификации:
-401 Unauthorized
+401 - некорректный токен аунетнтификации
+400 - некорректные данные (See internal status header)
+Internal_Status: code (см. коды ошибок сервера)
 
 200 OK
-Internal_Status: 0 (sOk)
 \r\n\r\n
 /*(json)*/
+
+Example: (use full name of the exercise in group
+
 {
- item
- {
-    date: "GMT UTC"
-    score: ""
- }
+	"po-znaika":
+	{
+		"alphabet":
+		{
+			"russian":
+			{
+				"character_1":
+				{
+					"date" : "UTC GMT",
+					"score" : "integer"
+				},
+				
+				"character_1":
+				{
+					"date" : "UTC GMT",
+					"score" : "integer"
+				},
+				
+				"character_2":
+				{
+					"date" : "UTC GMT",
+					"score" : "integer"
+				}
+			}
+		}
+	}
 }
