@@ -11,5 +11,5 @@ import ru.po_znaika.common.CommonException;
 public interface IAuthenticationProvider
 {
     AuthenticationToken getAuthenticationToken() throws NetworkException, CommonException;
-    LoginPasswordCredentials getLogicPasswordCredentials() throws CommonException;
+    LoginPasswordCredentials getLoginPasswordCredentials() throws CommonException;
 }

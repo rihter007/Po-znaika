@@ -14,5 +14,5 @@ public interface ILicensing
      * @return
      * @throws CommonException
      */
-    LicenseType getCurrentLicenseInfo() throws CommonException, NetworkException;
+    LicenseType getCurrentLicenseInfo() throws CommonException;
 }

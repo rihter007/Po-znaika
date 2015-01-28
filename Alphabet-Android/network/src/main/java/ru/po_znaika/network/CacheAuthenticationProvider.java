@@ -13,7 +13,7 @@ public class CacheAuthenticationProvider implements IAuthenticationProvider
         throw new UnsupportedOperationException();
     }
 
-    public LoginPasswordCredentials getLogicPasswordCredentials() throws CommonException
+    public LoginPasswordCredentials getLoginPasswordCredentials() throws CommonException
     {
         throw new UnsupportedOperationException();
     }
