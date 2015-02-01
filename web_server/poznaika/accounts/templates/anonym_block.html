@@ -1,0 +1,14 @@
+New user? Please <A href="/accounts/registration">register</A>!<BR><BR>
+
+Already have an account? Please login:<BR>
+
+{% include 'login_block.html' %}
+
+Already registered users:<BR>
+<ul>
+{% for user in users %}
+<li>
+{{user.username}} ({{user.password}})
+</li>
+{%endfor%}
+</ul>

@@ -1,0 +1,20 @@
+<html>
+
+<head>
+<title>Po-znaika - {% block title %}{% endblock %}</title>
+<style type="text/css">
+  .errorlist { color: red }
+</style>
+</head>
+
+<body>
+
+{% include "header.html" %}
+{% include "menu.html" %}
+
+{% block content %} {% endblock %}
+
+{% include "footer.html" %}
+
+</body>
+</html>

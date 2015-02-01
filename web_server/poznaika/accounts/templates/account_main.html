@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Компания+{% endblock %}
+{% block content %}
+
+{% if is_logged %}
+    Cur user is '{{user}}'<BR><BR>
+    {% include 'logged_block.html' %}
+{% else %}
+    {% include 'anonym_block.html' %}
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,25 @@
+Your diary:
+<font size=+1>
+<pre>
+{{ diariesList }}
+</pre>
+</font>
+
+Exercises:<BR>
+{% for exercise in exercises %}
+{{ exercise.Name}} ({{ exercise.Description}})<BR>
+{%endfor%}
+
+<BR>Courses:<BR>
+{% for course in courses %}
+{{ course.Name}} ({{ course.Description}})<BR>
+{%endfor%}
+
+<BR>Marks:<BR>
+{% for mark in marks %}
+{{ mark.Score}} ({{ mark.DateTime}})<BR>
+{%endfor%}
+
+<BR>
+
+<A href="/accounts/logout/">Logout</A>
