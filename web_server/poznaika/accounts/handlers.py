@@ -17,105 +17,118 @@ from models import Exercise
 from models import Course
 from models import Mark
 from models import License
-import add
 
 # Create your views here.
 
-def MakeResponse(code, reason):
-    response = HttpResponse()
-    response.status_code = code
-    response.reason_phrase = reason
-    return response
+def DiaryRequest(request):
+    return CreateResponse(DiaryHandler(request))
 
 def MarkRequest(request):
+    return CreateResponse(MarkHandler(request))
+    
+def LicenseRequest(request):
+    return CreateResponse(LicenseHandler(request))
+    
+def CreateResponse(handler):
     try:
-        userStr = request.META['HTTP_LOGIN']
-        exerStr = request.META['HTTP_EXERCISE']
-        scoreStr = request.META['HTTP_SCORE']
-        dateStr = request.META['HTTP_DATE']
-        score = int(scoreStr)
-        date = datetime.datetime.strptime(dateStr, "%a, %d %b %Y %H:%M:%S %Z")
+        userStr = handler.request.META['HTTP_LOGIN'] # required for all requests
+        pwdStr = handler.request.META['HTTP_PASSWORD'] # same
+        handler.ParseRequestData()
     except Exception as e:
         print "Data error:", e
         return MakeResponse(400, e)
     
     try:
-        user = User.objects.get(username=userStr)
-        exer = Exercise.objects.get(Name=exerStr)
+        handler.user = User.objects.get(username=userStr)
+        handler.FindRequiredObjects()
     except Exception as e:
         print "Find error:", e
         return MakeResponse(404, e)
+        
+    try:
+        valid = handler.user.check_password(pwdStr)
+        if not valid:
+            return MakeResponse(401, "Bad password")
+    except Exception as e:
+        print "Auth error:", e
+        return MakeResponse(401, e)
 
     try:
-        updateValues = { 'Score': score, 'DateTime': date }
-        mark, created = Mark.objects.get_or_create(
-            ForUser=user, ForExercise=exer, defaults=updateValues)
-        if not created:
-            mark.Score = score
-            mark.DateTime = date
-            mark.save()
-    except Exception as e:
-        print "Processing error:", e
-        return MakeResponse(403, e)
-    
-    return MakeResponse(200, "OK")
-
-def DiaryRequest(request):
-    try:
-        userStr = request.META['HTTP_LOGIN']
-        exerStr = request.META.get('HTTP_EXERCISE')
-        startStr = request.META.get('HTTP_START-DATE')
-        endStr = request.META.get('HTTP_END-DATE')
-        #start = datetime.datetime.strptime(dateStr, "%a, %d %b %Y %H:%M:%S %Z")
-    except Exception as e:
-        print "Data error:", e
-        return MakeResponse(400, e)
-    
-    try:
-        user = User.objects.get(username=userStr)
-        exer = Exercise.objects.get(Name=exerStr)
-    except Exception as e:
-        print "Find error:", e
-        return MakeResponse(404, e)
-
-    try:
-        data = '[{'
-        data += '"User":"' + user.username + '",'
-        data += '"Exercise":"' + exer.Name + '",'
-        data += '"Score":'
-        try:
-            mark = Mark.objects.get(ForUser=user, ForExercise=exer)
-        except Exception as e:
-            data += '"-1"'
-        else:
-            data += '"' + str(mark.Score) + '",'
-            data += '"Date":"' + str(mark.DateTime) + '"'
-        data += '}]'
+        data = handler.FormResponseData()
     except Exception as e:
         print "Processing error:", e
         return MakeResponse(403, e)
     
     return HttpResponse(data)
 
-def LicenseRequest(request):
-    try:
-        userStr = request.META['HTTP_LOGIN']
-    except Exception as e:
-        print "Data error:", e
-        return MakeResponse(400, e)
-    
-    try:
-        user = User.objects.get(username=userStr)
-    except Exception as e:
-        print "Find error:", e
-        return MakeResponse(404, e)
+############################################
 
-    try:
+class BaseHandler(object):
+    def __init__(self, rq):
+        self.request = rq
+        
+class MarkHandler(BaseHandler):
+    def ParseRequestData(self):
+        self.exerStr = self.request.META['HTTP_EXERCISE']
+        scoreStr = self.request.META['HTTP_SCORE']
+        dateStr = self.request.META['HTTP_DATE']
+
+        self.score = int(scoreStr)
+        self.date = datetime.datetime.strptime(dateStr, "%a, %d %b %Y %H:%M:%S %Z")
+    
+    def FindRequiredObjects(self):
+        self.exer = Exercise.objects.get(Name=self.exerStr)
+
+    def FormResponseData(self):
+        updateValues = { 'Score': self.score, 'DateTime': self.date }
+        mark, created = Mark.objects.get_or_create(
+            ForUser=self.user, ForExercise=self.exer, defaults=updateValues)
+        if not created:
+            mark.Score = self.score
+            mark.DateTime = self.date
+            mark.save()
+        return "OK"
+
+class DiaryHandler(BaseHandler):
+    def ParseRequestData(self):
+        self.exerStr = self.request.META.get('HTTP_EXERCISE')
+        self.startStr = self.request.META.get('HTTP_START-DATE')
+        self.endStr = self.request.META.get('HTTP_END-DATE')
+        valid = self.exerStr or (self.startStr and self.endStr)
+        if not valid:
+            raise IndexError("No exercise number or dates")
+
+    def FindRequiredObjects(self):
+        self.exer = Exercise.objects.get(Name=self.exerStr)
+
+    def FormResponseData(self):
+        data = '[{'
+        data += '"User":"' + self.user.username + '",'
+        data += '"Exercise":"' + self.exer.Name + '",'
+        data += '"Score":'
+        try:
+            mark = Mark.objects.get(ForUser=self.user, ForExercise=self.exer)
+        except Exception as e:
+            data += '"-1"'
+        else:
+            data += '"' + str(mark.Score) + '",'
+            data += '"Date":"' + str(mark.DateTime) + '"'
+        data += '}]'
+        return data
+
+class LicenseHandler(BaseHandler):
+    def ParseRequestData(self):
+        pass
+        
+    def FindRequiredObjects(self):
+        pass
+
+    def FormResponseData(self):
         data = '{"Type":'
         try:
-            license = License.objects.get(ForUser=user)
+            license = License.objects.get(ForUser=self.user)
         except Exception as e:
-            print e
+            #print e - this string fails at real server
             data += '"Trial"'
         else:
             data += '"Commerce",'
@@ -126,9 +139,11 @@ def LicenseRequest(request):
             active = license.StartDate <= now and now <= license.EndDate
             data += active and '"Active"' or '"Expired"'
         data += '}'
-    except Exception as e:
-        print "Processing error:", e
-        return MakeResponse(403, e)
-    
-    return HttpResponse(data)
+        return data
+
+def MakeResponse(code, reason):
+    response = HttpResponse()
+    response.status_code = code
+    response.reason_phrase = reason
+    return response
     
