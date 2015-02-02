@@ -19,7 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import ru.po_znaika.common.IExercise;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 public class MainMenuActivity extends ActionBarActivity
 {

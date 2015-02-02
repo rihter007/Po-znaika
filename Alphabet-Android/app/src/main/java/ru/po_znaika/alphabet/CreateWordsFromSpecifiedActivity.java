@@ -13,9 +13,9 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import ru.po_znaika.common.IExerciseStepCallback;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
-import ru.po_znaika.server_feedback.IServerFeedback;
-import ru.po_znaika.server_feedback.ServerCacheFeedback;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+//import ru.po_znaika.server_feedback.IServerFeedback;
+//import ru.po_znaika.server_feedback.ServerCacheFeedback;
 
 public class CreateWordsFromSpecifiedActivity extends Activity implements IExerciseStepCallback, IScoreNotification
 {
@@ -110,7 +110,8 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
         else
             m_state = savedInstanceState.getParcelable(StateTag);
 
-        m_serverFeedback = new ServerCacheFeedback(this);
+        // TODO:
+        //m_serverFeedback = new ServerCacheFeedback(this);
     }
 
     private void constructUserInterface(Bundle savedInstanceState)
@@ -164,7 +165,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     public void setScore(int score)
     {
         m_state.totalScore = score;
-        m_serverFeedback.reportExerciseResult(m_exerciseId, m_state.totalScore);
+        //TODO: m_serverFeedback.reportExerciseResult(m_exerciseId, m_state.totalScore);
     }
 
     @Override
@@ -201,5 +202,5 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
 
     private CreateWordsFromSpecifiedActivityState m_state;
 
-    private IServerFeedback m_serverFeedback;
+    //private IServerFeedback m_serverFeedback;
 }

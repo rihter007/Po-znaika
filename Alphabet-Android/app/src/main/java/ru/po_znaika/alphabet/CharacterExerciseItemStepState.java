@@ -3,7 +3,7 @@ package ru.po_znaika.alphabet;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
  * Created by Rihter on 14.08.2014.

@@ -27,7 +27,7 @@ public class NetworkConnectionLicenseUpdater extends BroadcastReceiver
         if ((network == null) || (network.getState() != NetworkInfo.State.CONNECTED))
             return;
 
-        Licensing licensing = new Licensing(m_authProvider);
+        Licensing licensing = new Licensing(context, m_authProvider);
 
         try
         {

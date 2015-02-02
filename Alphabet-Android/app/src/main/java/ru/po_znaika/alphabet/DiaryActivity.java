@@ -14,9 +14,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
-import ru.po_znaika.database.diary.DiaryDatabase;
-
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
 
 public class DiaryActivity extends ActionBarActivity
 {

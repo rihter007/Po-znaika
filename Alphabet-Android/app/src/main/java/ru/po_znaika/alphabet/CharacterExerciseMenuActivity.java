@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import ru.po_znaika.common.IExercise;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 public class CharacterExerciseMenuActivity extends Activity
 {

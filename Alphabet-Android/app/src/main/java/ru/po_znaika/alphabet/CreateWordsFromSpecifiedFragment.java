@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import ru.po_znaika.common.IExerciseStepCallback;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
  * A fragment for the Game: Create sub words from the given

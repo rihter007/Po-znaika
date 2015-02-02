@@ -17,10 +17,8 @@ import android.content.res.Resources;
 import android.os.Bundle;
 
 import ru.po_znaika.common.IExerciseStepCallback;
-import ru.po_znaika.database.DatabaseConstant;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
-import ru.po_znaika.server_feedback.IServerFeedback;
-import ru.po_znaika.server_feedback.ServerCacheFeedback;
+import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 public class CharacterExerciseItemActivity extends Activity implements IExerciseStepCallback, IScoreNotification
 {
@@ -233,11 +231,11 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
 
             switch (m_state.characterExerciseItemType)
             {
-                case SoundGeneral:
+                case General:
                     factory = new SoundGeneralExerciseFactory();
                     break;
 
-                case SoundPronunciation:
+                case Sound:
                     factory = new SoundPronunciationExerciseFactory();
                     break;
             }
@@ -293,11 +291,11 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
                         totalScore += singleScore;
                 }
 
-                // save score
-                {
+                // TODO: save score
+                /*{
                     IServerFeedback serverFeedback = new ServerCacheFeedback(this);
                     serverFeedback.reportExerciseResult(m_state.characterExerciseItemId, totalScore);
-                }
+                }*/
 
                 // Show result fragment
                 {

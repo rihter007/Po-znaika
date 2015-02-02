@@ -16,8 +16,8 @@ import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import ru.po_znaika.database.DatabaseConstant;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 
 public class SingleCharacterExerciseMenuActivity extends Activity

@@ -53,11 +53,15 @@ public class ServerOperationsManager implements IServerOperations, IAuthenticati
     ///
     /// Implementation of IAuthenticationTokenSetter
     ///
-
     @Override
-    public void SetAuthenticationToken(@NonNull AuthenticationToken token)
+    public AuthenticationToken getAuthenticationToken() throws NetworkException, CommonException
     {
-        m_token = token;
+        throw new UnsupportedOperationException();
+    }
+
+    public LoginPasswordCredentials getLoginPasswordCredentials() throws CommonException
+    {
+        throw new UnsupportedOperationException();
     }
 
     ///

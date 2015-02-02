@@ -21,7 +21,7 @@ import android.widget.TextView;
 import java.io.IOException;
 
 import ru.po_znaika.common.IExerciseStepCallback;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
  * Fragment for processing word gather exercise

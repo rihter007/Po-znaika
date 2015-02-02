@@ -91,9 +91,9 @@ public class AlphabetDatabase
 
     public static enum CharacterExerciseItemType
     {
-        SoundGeneral(-1081850258),           // a crc32 of 'SoundGeneral'
-        SoundPronunciation(1538820439),      // a crc32 of 'SoundPronunciation'
-        Letter(-1985025220);                 // a ccr32 of 'Letter'
+        General(26480598),      // a crc32 of 'General'
+        Sound(961539200),       // a crc32 of 'SoundPronunciation'
+        Letter(-1985025220);    // a ccr32 of 'Letter'
 
         private int m_value;
 
@@ -102,8 +102,8 @@ public class AlphabetDatabase
 
         private static final Map<Integer, CharacterExerciseItemType> ValuesMap = new HashMap<Integer, CharacterExerciseItemType>()
         {{
-                put(-1081850258, SoundGeneral);
-                put(1538820439, SoundPronunciation);
+                put(-1081850258, General);
+                put(1538820439, Sound);
                 put(-1985025220, Letter);
         }};
 

@@ -233,13 +233,17 @@ INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(
 character_exercise_item table
 Here:
 type column is hardcoded character_exercise_item type
--1081850258 a crc32 of 'SoundGeneral'
-1538820439 a crc32 of 'SoundPronunciation'
+26480598 a crc32 of 'General'
+961539200 a crc32 of 'Sound'
 -1985025220 a ccr32 of 'Letter'
 ***************************
 */
 INSERT INTO character_exercise_item(_id, character_exercise_id, type, menu_position, name, display_name)
-    VALUES(-614874078, 1, -1081850258, 0, 'Russian.Alphabet.Ch1.Sound', 'Звук А');
+    VALUES(-614874078, 1, 26480598, 0, 'Alphabet.Russian.Character1.General', 'Буква А');
+INSERT INTO character_exercise_item(_id, character_exercise_id, type, menu_position, name, display_name)
+    VALUES(-614874078, 2, 961539200, 1, 'Alphabet.Russian.Character1.Sound', 'Звук буквы А');
+INSERT INTO character_exercise_item(_id, character_exercise_id, type, menu_position, name, display_name)
+    VALUES(-614874078, 2, -1985025220, 1, 'Alphabet.Russian.Character1.Letter', 'Написание буквы А');
 	
 /* 
 ***************************

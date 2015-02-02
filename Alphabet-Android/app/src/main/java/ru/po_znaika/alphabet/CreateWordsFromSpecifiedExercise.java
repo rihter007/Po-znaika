@@ -6,8 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 
 import ru.po_znaika.common.IExercise;
-import ru.po_znaika.database.DatabaseConstant;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
  * Represents an exercise for creation sub words from the main

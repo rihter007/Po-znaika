@@ -13,10 +13,8 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import ru.po_znaika.common.IExerciseStepCallback;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
-import ru.po_znaika.server_feedback.IServerFeedback;
-import ru.po_znaika.server_feedback.ServerCacheFeedback;
-
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+import ru.po_znaika.network.IServerOperations;
 
 public class WordGatherActivity extends Activity implements IExerciseStepCallback, IScoreNotification
 {
@@ -167,8 +165,8 @@ public class WordGatherActivity extends Activity implements IExerciseStepCallbac
 
             // Save score
             {
-                IServerFeedback serverFeedback = new ServerCacheFeedback(this);
-                serverFeedback.reportExerciseResult(m_exerciseId, m_state.totalScore);
+                // serverFeedback = new ServerCacheFeedback(this);
+                //serverFeedback.reportExerciseResult(m_exerciseId, m_state.totalScore);
             }
 
             // process score fragment
