@@ -8,9 +8,16 @@ namespace network_test_client.network
 {
     class ExerciseScoreAction : INetworkAction
     {
+        private const string DefaultUrl = NetworkConstants.PoZnaikaDomainName + "/score";
+
         public void SetUrl(string url)
         {
             m_url = url;
+        }
+
+        public string GetUrl()
+        {
+            return m_url;
         }
 
         public void SetLogin(string login)
@@ -30,7 +37,7 @@ namespace network_test_client.network
 
             HttpWebRequest request = NetworkHelpers.CreateHttpGetWebRequest(m_url, m_login, m_password);
             CommonHelpers.PrintColored("Enter exercise literal id: ", ConsoleColor.Yellow);
-            request.Headers.Add(CommonHttpHeaders.ExerciseHeader, Console.ReadLine());            
+            request.Headers.Add(NetworkConstants.ExerciseHeader, Console.ReadLine());            
             CommonHelpers.PrintColored("Enter score: ", ConsoleColor.Yellow);
             request.Headers.Add("Score", Console.ReadLine());
             request.Date = DateTime.UtcNow;
@@ -46,7 +53,7 @@ namespace network_test_client.network
             }
         }
 
-        private string m_url;
+        private string m_url = DefaultUrl;
         private string m_login;
         private string m_password;
     }

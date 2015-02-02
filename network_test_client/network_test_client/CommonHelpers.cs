@@ -9,6 +9,11 @@ namespace network_test_client
 {
     static class CommonHelpers
     {
+        public static string ReturnEmptyIfNull(string s)
+        {
+            return (s == null) ? string.Empty : s;
+        }
+
         public static bool ProcessYesNoChoise()
         {
             bool result = false;
@@ -30,13 +35,10 @@ namespace network_test_client
             return result;
         }
 
-        public static void PrintAsciiStream(Stream stream, long streamLength)
+        public static void PrintAsciiStream(Stream stream)
         {
             Debug.Assert(stream != null);
-
-            if (streamLength <= 0)
-                return;
-
+            
             try
             {
                 // fuck the System.Net.ConnectStream
@@ -46,13 +48,24 @@ namespace network_test_client
                 }
                 catch { }
 
-                byte[] buffer = new byte[streamLength];
-                stream.Read(buffer, 0, buffer.Length);
-                string textBuffer = ASCIIEncoding.ASCII.GetString(buffer, 0, buffer.Length);
-
-                using (ConsoleColorGuard colorGuard = new ConsoleColorGuard(ConsoleColor.Yellow))
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    Console.WriteLine(textBuffer);
+                    const int readBufferLength = 1024;
+                    byte[] buffer = new byte[readBufferLength];
+                    for (; ; )
+                    {
+                        int readBytes = stream.Read(buffer, 0, buffer.Length);
+                        if (readBytes <= 0)
+                            break;
+                        ms.Write(buffer, 0, readBytes);
+                    }
+                    byte[] resultBuffer = ms.ToArray();
+                    string textBuffer = ASCIIEncoding.ASCII.GetString(resultBuffer, 0, resultBuffer.Length);
+
+                    using (ConsoleColorGuard colorGuard = new ConsoleColorGuard(ConsoleColor.Yellow))
+                    {
+                        Console.WriteLine(textBuffer);
+                    }
                 }
             }
             catch (Exception exp)

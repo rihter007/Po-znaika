@@ -50,8 +50,18 @@ namespace network_test_client
 
                 try
                 {
-                    CommonHelpers.PrintColored("Input url: ", ConsoleColor.Yellow);
-                    networkAction.SetUrl(Console.ReadLine());
+                    CommonHelpers.PrintColoredLine("Skip url input Y/N?", ConsoleColor.Yellow);
+                    CommonHelpers.PrintColoredLine(string.Format("Current url: {0}",
+                        CommonHelpers.ReturnEmptyIfNull(networkAction.GetUrl())), ConsoleColor.Green);
+                    if (!CommonHelpers.ProcessYesNoChoise())
+                    {
+                        CommonHelpers.PrintColoredLine("Input url: ", ConsoleColor.Yellow);
+                        networkAction.SetUrl(Console.ReadLine());
+                    }
+                    else
+                    {
+                        CommonHelpers.PrintColoredLine("Url was skipped", ConsoleColor.Red);
+                    }
                     networkAction.SetLogin(InputDecider.ProcessInput(InputType.Login));
                     networkAction.SetPassword(InputDecider.ProcessInput(InputType.Password));
                     networkAction.Run();
