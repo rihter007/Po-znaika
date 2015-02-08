@@ -60,6 +60,7 @@ class LicensingCache
         SharedPreferences.Editor editor = m_cacheFile.edit();
         editor.putInt(LicenseKey, licenseType.getValue());
         editor.putLong(CheckDateKey, currentDate.getTime());
+        editor.apply();
     }
 
     private SharedPreferences m_cacheFile;
@@ -95,7 +96,7 @@ public class Licensing implements ILicensing
         //
 
         LoginPasswordCredentials credentials = m_authProvider.getLoginPasswordCredentials();
-        if ((credentials == null) || (!credentials.isValid()))
+        if ((credentials != null) && (credentials.isValid()))
         {
             Log.i(LogTag, "Login/Password credentials are provided. Try to renew license");
             try

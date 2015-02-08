@@ -7,8 +7,11 @@ import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
 
 import ru.po_znaika.common.CommonException;
+
 import ru.po_znaika.licensing.ILicensing;
 import ru.po_znaika.licensing.Licensing;
+
+import ru.po_znaika.network.CacheAuthenticationProvider;
 import ru.po_znaika.network.IServerOperations;
 
 /**
@@ -21,7 +24,9 @@ public class CoreServiceLocator
     {
         m_alphabetDatabase = new AlphabetDatabase(_context, false);
         m_diaryDatabase = new DiaryDatabase(_context);
-        //m_licensing = new Licensing(_context);
+
+        CacheAuthenticationProvider authProvider = new CacheAuthenticationProvider(_context);
+        m_licensing = new Licensing(_context, authProvider);
     }
 
     public AlphabetDatabase getAlphabetDatabase()
