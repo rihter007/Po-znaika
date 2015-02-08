@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
@@ -50,7 +51,7 @@ public class CharacterExerciseMenuActivity extends Activity
         }
     }
 
-    private void restoreInternalState() throws IOException
+    private void restoreInternalState() throws CommonException
     {
         AlphabetDatabase alphabetDatabase = new AlphabetDatabase(this, false);
         AlphabetDatabase.ExerciseShortInfo[] characterExercisesInfo = alphabetDatabase.getAllExercisesShortInfoByType(AlphabetDatabase.ExerciseType.Character);

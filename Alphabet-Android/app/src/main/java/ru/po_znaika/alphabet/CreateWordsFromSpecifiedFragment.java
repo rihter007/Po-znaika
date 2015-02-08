@@ -19,9 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
+import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
@@ -169,7 +169,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         // Required empty public constructor
     }
 
-    private void restoreInternalState(Bundle savedInstanceState) throws IOException
+    private void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         NoSelectionColor = getResources().getColor(android.R.color.holo_blue_light);
         SelectionColor = getResources().getColor(android.R.color.holo_green_light);

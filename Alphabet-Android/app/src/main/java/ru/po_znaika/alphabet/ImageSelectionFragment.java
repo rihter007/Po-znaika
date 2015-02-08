@@ -15,10 +15,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
@@ -82,7 +82,7 @@ public class ImageSelectionFragment extends Fragment
      * Restores all internal objects
      * @param savedInstanceState activity saved state
      */
-    void restoreInternalState(Bundle savedInstanceState) throws IOException
+    void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         m_alphabetDatabase = new AlphabetDatabase(getActivity(), false);
 

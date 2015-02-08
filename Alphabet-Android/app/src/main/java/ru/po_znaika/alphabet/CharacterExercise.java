@@ -5,8 +5,11 @@ import java.lang.String;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.IExercise;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
@@ -17,10 +20,13 @@ import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
  */
 public class CharacterExercise implements IExercise
 {
-    public CharacterExercise(Context _context, AlphabetDatabase _databaseConnection, int _exerciseId)
+    public CharacterExercise(@NonNull Context _context, @NonNull AlphabetDatabase _databaseConnection, int _exerciseId)
     {
-        if ((_context == null) || (_databaseConnection == null) || (_exerciseId == DatabaseConstant.InvalidDatabaseIndex))
+        if (_exerciseId == DatabaseConstant.InvalidDatabaseIndex)
+        {
+            Log.e(CharacterExercise.class.getName(), "Exercise id is invalid");
             throw new IllegalArgumentException();
+        }
 
         // Initialize internal variables from constructor parameters
         {
@@ -40,12 +46,11 @@ public class CharacterExercise implements IExercise
 
             if (exerciseInfo.imageId != DatabaseConstant.InvalidDatabaseIndex)
             {
-                final String ResourceFileName = m_alphabetDatabase.getImageFileNameById(exerciseInfo.imageId);
-                if (TextUtils.isEmpty(ResourceFileName))
+                final String resourceFileName = m_alphabetDatabase.getImageFileNameById(exerciseInfo.imageId);
+                if (TextUtils.isEmpty(resourceFileName))
                     throw new IllegalArgumentException();
 
-                m_exerciseDisplayImageResourceId = m_context.getResources().getIdentifier(ResourceFileName,
-                        Constant.DrawableResourcesTag, m_context.getPackageName());
+                m_exerciseDisplayImageResourceId = DatabaseHelpers.getDrawableIdByName(m_context.getResources(), resourceFileName);
                 if (m_exerciseDisplayImageResourceId == 0)
                     throw new IllegalArgumentException();
             }

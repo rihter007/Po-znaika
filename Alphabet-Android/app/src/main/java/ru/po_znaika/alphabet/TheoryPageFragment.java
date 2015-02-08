@@ -1,8 +1,5 @@
 package ru.po_znaika.alphabet;
 
-import java.lang.String;
-import java.io.IOException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -19,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -49,9 +47,9 @@ public class TheoryPageFragment extends Fragment
     /**
      * Restores all internal objects
      * @param savedInstanceState activity saved state
-     * @throws java.io.IOException
+     * @throws ru.po_znaika.common.CommonException
     */
-    void restoreInternalState(Bundle savedInstanceState) throws IOException
+    void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         m_alphabetDatabase = new AlphabetDatabase(getActivity(), false);
 

@@ -16,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 
+import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -179,7 +180,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
      * @param savedInstanceState activity saved state
      * @throws java.io.IOException
      */
-    void restoreInternalState(Bundle savedInstanceState) throws IOException
+    void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         // Restore state
         {

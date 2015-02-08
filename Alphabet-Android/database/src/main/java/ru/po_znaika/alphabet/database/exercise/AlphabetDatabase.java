@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileOutputStream;
 
-import java.lang.String;
-import java.lang.Exception;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
@@ -16,22 +14,23 @@ import java.util.Set;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 import android.util.Pair;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.common.CommonException;
+import ru.po_znaika.common.CommonResultCode;
 
 /**
  * Created by Rihter on 07.08.2014.
  * Help tutorial = http://www.reigndesign.com/blog/using-your-own-sqlite-database-in-android-applications/
  */
-public class AlphabetDatabase
+public final class AlphabetDatabase
 {
     /**
      *  Types declarations
      */
-
     public static enum SoundType
     {
         Correct(78467623),                     // crc32 of 'Correct'
@@ -140,7 +139,7 @@ public class AlphabetDatabase
 
     public static enum AlphabetType
     {
-        Russian(2092928056);               // crc32 of 'ru'
+        Russian(-345575051);               // crc32 of 'russian'
 
         private int m_value;
 
@@ -291,22 +290,6 @@ public class AlphabetDatabase
     private final int DatabaseVersion = 0;
     private final String DatabaseName = "alphabet.db";
 
-    /*private final String IdParameter = "@Id";
-    private final String ExerciseIdParameter = "@ExerciseId";
-    private final String CharacterExerciseIdParameter = "@CharacterExerciseId";
-    private final String SoundTypeParameter = "@SoundType";
-    private final String HashParamater = "@hash";
-    private final String DataParameter = "@data";
-    private final String CountParamter = "@count";
-    private final String CommentParameter = "@comment";
-    private final String AlphabetIdParameter = "@alphabetId";
-    private final String MaxLengthParameter = "@maxLength";
-    private final String MinLengthParameter = "@minLength";
-    private final String LikeParameter1 = "@like1";
-    private final String LikeParameter2 = "@like2";
-    private final String AccessoryFlagParameter = "@accessory_flag";
-    private final String IntArrayParmater = "@idArray";*/
-
     /**
      * SQL-expressions from exercise table
      */
@@ -412,7 +395,7 @@ public class AlphabetDatabase
     private static final String ExtractRandomSoundNameByTypeSqlStatement = "SELECT s.file_name FROM sound s, special_sound ss " +
             "WHERE (s._id = ss.sound_id) AND (ss.sound_type = ?) ORDER BY RANDOM() LIMIT 1";
 
-    public AlphabetDatabase(Context _context, boolean _failIfNotFound) throws IOException
+    public AlphabetDatabase(Context _context, boolean _failIfNotFound) throws CommonException
     {
         ///
         /// Initialize connection to database
@@ -447,12 +430,12 @@ public class AlphabetDatabase
         }
 
         if (!isSucceededOpeningDatabase)
-            throw new SQLiteCantOpenDatabaseException();
+            throw new CommonException(CommonResultCode.UnknownReason);
     }
 
     private SQLiteDatabase createNewDatabaseConnection()
     {
-        String pathToDatabase = getDatabasePath();
+        final String pathToDatabase = getDatabasePath();
 
         SQLiteDatabase databaseConnection = null;
         try
@@ -461,6 +444,7 @@ public class AlphabetDatabase
         }
         catch (SQLiteException exp)
         {
+            Log.e(AlphabetDatabase.class.getName(), String.format("Failed to open database, error=\"%s\"", exp.getMessage()));
         }
 
         return databaseConnection;
@@ -469,7 +453,7 @@ public class AlphabetDatabase
      * Gets database from assets folder
      * @return
      */
-    private boolean createDatabase(Context context) throws IOException
+    private boolean createDatabase(Context context)
     {
         boolean result = false;
         InputStream assetsDatabaseFileStream = null;
@@ -508,20 +492,27 @@ public class AlphabetDatabase
         }
         finally
         {
-            if (assetsDatabaseFileStream != null)
-                assetsDatabaseFileStream.close();
-
-            if (localFileDatabaseStream != null)
+            try
             {
-                localFileDatabaseStream.flush();
-                localFileDatabaseStream.close();
+                if (assetsDatabaseFileStream != null)
+                    assetsDatabaseFileStream.close();
+
+                if (localFileDatabaseStream != null)
+                {
+                    localFileDatabaseStream.flush();
+                    localFileDatabaseStream.close();
+                }
+            }
+            catch (IOException ioExp)
+            {
+                // might never happen
             }
         }
 
         return result;
     }
 
-    private boolean updateDatabase(Context context, int oldVersion) throws IOException
+    private boolean updateDatabase(Context context, int oldVersion)
     {
         m_databaseConnection.close();
 
@@ -611,7 +602,7 @@ public class AlphabetDatabase
         return result;
     }
 
-    public ExerciseShortInfo[] getAllExercisesShortInfoNotByType(ExerciseType exerciseType)
+    public ExerciseShortInfo[] getAllExercisesShortInfoExceptType(ExerciseType exerciseType)
     {
         ExerciseShortInfo[] result = null;
         Cursor dataReader = null;

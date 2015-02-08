@@ -1,8 +1,5 @@
 package ru.po_znaika.alphabet;
 
-import java.lang.String;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +19,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -53,7 +51,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
      * Restores all internal objects
      * @param savedInstanceState activity saved state
      */
-    private void restoreInternalState(Bundle savedInstanceState) throws IOException
+    private void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         AlphabetDatabase alphabetDatabase = new AlphabetDatabase(getActivity(), false);
 
@@ -106,7 +104,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
     /**
      * Constructs parts of user interface
      */
-    void constructUserInterface(View fragmentView) throws IOException
+    void constructUserInterface(View fragmentView)
     {
         // modify caption
         {

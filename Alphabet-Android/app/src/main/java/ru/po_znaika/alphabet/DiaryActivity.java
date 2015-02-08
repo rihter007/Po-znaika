@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import java.util.Map;
 
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
+import ru.po_znaika.common.CommonException;
 
 public class DiaryActivity extends ActionBarActivity
 {
@@ -43,7 +43,7 @@ public class DiaryActivity extends ActionBarActivity
         return true;
     }
 
-    private void constructUserInterface() throws IOException
+    private void constructUserInterface() throws CommonException
     {
         TextAdapter textAdapter = new TextAdapter(this);
 

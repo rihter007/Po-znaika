@@ -2,22 +2,23 @@ package ru.po_znaika.alphabet;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.io.IOException;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.app.Activity;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+import ru.po_znaika.common.CommonException;
 
 
 public class SingleCharacterExerciseMenuActivity extends Activity
@@ -30,7 +31,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
 
         try
         {
-            restoreInternalState(savedInstanceState);
+            restoreInternalState();
             constructUserInterface();
         }
         catch (Exception exp)
@@ -51,10 +52,9 @@ public class SingleCharacterExerciseMenuActivity extends Activity
 
     /**
      * Restores all internal objects
-     * @param savedInstanceState activity saved state
-     * @throws java.io.IOException
+     * @throws ru.po_znaika.common.CommonException
      */
-    void restoreInternalState(Bundle savedInstanceState) throws IOException
+    void restoreInternalState() throws CommonException
     {
         // Restore exercise id from Bundle
         {
@@ -84,7 +84,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
 
             // Sort exercises in m_characterExerciseItems according to menu_position
             {
-                Map<Integer, AlphabetDatabase.CharacterExerciseItemInfo> sortedExercises = new HashMap<Integer, AlphabetDatabase.CharacterExerciseItemInfo>();
+                Map<Integer, AlphabetDatabase.CharacterExerciseItemInfo> sortedExercises = new HashMap<>();
 
                 for (AlphabetDatabase.CharacterExerciseItemInfo exerciseInfo : exercises)
                     sortedExercises.put(exerciseInfo.menuPosition, exerciseInfo);
@@ -109,7 +109,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
         }
         // process menu items list view
         {
-            ArrayAdapter<String> menuItems = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+            ArrayAdapter<String> menuItems = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
             for (AlphabetDatabase.CharacterExerciseItemInfo characterExerciseInfo : m_characterExerciseItems)
                 menuItems.add(characterExerciseInfo.displayName);
@@ -140,7 +140,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState)
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState)
     {
         super.onSaveInstanceState(savedInstanceState);
     }

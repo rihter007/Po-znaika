@@ -169,12 +169,15 @@ INSERT INTO image(_id, file_name) VALUES(6, 'database_ch2_handwrite');
 INSERT INTO image(_id, file_name) VALUES(7, 'database_ch3_handwrite');
 INSERT INTO image(_id, file_name) VALUES(8, 'database_ch4_handwrite');
 
+/*
 INSERT INTO image(_id, file_name) VALUES(9, 'database_ch1_verse1');
 INSERT INTO image(_id, file_name) VALUES(10, 'database_ch1_verse2');
 INSERT INTO image(_id, file_name) VALUES(11, 'database_ch2_verse1');
 INSERT INTO image(_id, file_name) VALUES(12, 'database_ch4_verse1');
+*/
 
 /*Place objects*/
+/*
 INSERT INTO image(_id, file_name) VALUES(13, 'database_antelope');
 INSERT INTO image(_id, file_name) VALUES(14, 'database_asters');
 INSERT INTO image(_id, file_name) VALUES(15, 'database_beads');
@@ -188,6 +191,7 @@ INSERT INTO image(_id, file_name) VALUES(22, 'database_raven');
 INSERT INTO image(_id, file_name) VALUES(23, 'database_sun');
 INSERT INTO image(_id, file_name) VALUES(24, 'database_watermelon');
 INSERT INTO image(_id, file_name) VALUES(25, 'database_wolf');
+*/
 
 /*
 ***************************
@@ -220,13 +224,13 @@ INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(1264890976,
 character_exercise table
 Here:
 alphabet_id is column of hardocded alphabet identifier
-92928056 - crc32 of 'ru'
+-345575051- crc32 of 'russian'
 ***************************
 */
-INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(1, 699588759,   'а', 2092928056); 
-INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(2, -1329876691, 'б', 2092928056); 
-INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(3, -943947333,  'в', 2092928056); 
-INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(4, 1507333144,  'г', 2092928056);
+INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(1, 699588759,   'а', -345575051); 
+INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(2, -1329876691, 'б', -345575051); 
+INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(3, -943947333,  'в', -345575051); 
+INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(4, 1507333144,  'г', -345575051);
 
 /* 
 ***************************
@@ -309,6 +313,7 @@ INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(26,    2092928056, '
 word_image_description table
 ***************************
 */
+/*
 INSERT INTO word_image_description(word_id, image_id) VALUES(14, 13);
 INSERT INTO word_image_description(word_id, image_id) VALUES(15, 24);
 INSERT INTO word_image_description(word_id, image_id) VALUES(16, 14);
@@ -321,12 +326,14 @@ INSERT INTO word_image_description(word_id, image_id) VALUES(23, 19);
 INSERT INTO word_image_description(word_id, image_id) VALUES(24, 20);
 INSERT INTO word_image_description(word_id, image_id) VALUES(25, 22);
 INSERT INTO word_image_description(word_id, image_id) VALUES(26, 23);
+*/
 
 /* 
 ***************************
 word_sound_description table
 ***************************
 */
+/*
 INSERT INTO word_sound_description(word_id, sound_id) VALUES(14, 1);
 INSERT INTO word_sound_description(word_id, sound_id) VALUES(15, 1);
 INSERT INTO word_sound_description(word_id, sound_id) VALUES(16, 1);
@@ -339,6 +346,7 @@ INSERT INTO word_sound_description(word_id, sound_id) VALUES(23, 1);
 INSERT INTO word_sound_description(word_id, sound_id) VALUES(24, 1);
 INSERT INTO word_sound_description(word_id, sound_id) VALUES(25, 1);
 INSERT INTO word_sound_description(word_id, sound_id) VALUES(26, 1);
+*/
 
 /* 
 ***************************

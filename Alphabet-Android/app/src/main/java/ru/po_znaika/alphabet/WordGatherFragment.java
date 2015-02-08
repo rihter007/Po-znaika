@@ -18,8 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
-
+import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
@@ -151,7 +150,7 @@ public class WordGatherFragment extends Fragment
         savedInstanceState.putParcelable(StateTag, m_state);
     }
 
-    private void restoreInternalState(Bundle savedInstanceState) throws IOException
+    private void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         if (savedInstanceState == null)
         {

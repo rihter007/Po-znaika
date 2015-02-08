@@ -1,8 +1,5 @@
 package ru.po_znaika.alphabet;
 
-import java.io.IOException;
-import java.lang.String;
-
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
@@ -17,7 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.util.Log;
 
+import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
@@ -31,7 +30,8 @@ public class MainMenuActivity extends ActionBarActivity
 
         try
         {
-            restoreInternalState(savedInstanceState);
+            m_serviceLocator = new CoreServiceLocator(this);
+            restoreInternalState();
             constructUserInterface();
         }
         catch (Exception exp)
@@ -40,45 +40,47 @@ public class MainMenuActivity extends ActionBarActivity
         }
     }
 
-    void restoreInternalState(Bundle savedInstanceState) throws IOException
+    void restoreInternalState() throws CommonException
     {
-        m_alphabetDatabase = new AlphabetDatabase(this, false);
-        m_exerciseFactory = new ExerciseFactory(this, m_alphabetDatabase);
+        ExerciseFactory exerciseFactory = new ExerciseFactory(this, m_serviceLocator.getAlphabetDatabase());
 
         // contains processed exercises in sorted order
-        Map<String, ArrayList<IExercise>> collectedExercises = new TreeMap<String, ArrayList<IExercise>>();
+        Map<String, ArrayList<IExercise>> collectedExercises = new TreeMap<>();
 
         // contains all exercises
-        AlphabetDatabase.ExerciseShortInfo[] exercisesShortInfo = m_alphabetDatabase.getAllExercisesShortInfoNotByType(AlphabetDatabase.ExerciseType.Character);
+        AlphabetDatabase.ExerciseShortInfo[] exercisesShortInfo = m_serviceLocator.getAlphabetDatabase().getAllExercisesShortInfoExceptType(AlphabetDatabase.ExerciseType.Character);
         if (exercisesShortInfo != null)
         {
             for (AlphabetDatabase.ExerciseShortInfo exerciseInfo : exercisesShortInfo)
             {
-                IExercise exercise = m_exerciseFactory.CreateExerciseFromId(exerciseInfo.id, exerciseInfo.type);
+                IExercise exercise = exerciseFactory.CreateExerciseFromId(exerciseInfo.id, exerciseInfo.type);
                 if (exercise != null)
                 {
-                    // Set tracer
-
                     final String exerciseDisplayName = exercise.getDisplayName();
+
                     // Add exercise to list
-                    ArrayList<IExercise> displayNameExercises = null;
+                    ArrayList<IExercise> displayNameExercises;
                     if (collectedExercises.containsKey(exerciseDisplayName))
                     {
                         displayNameExercises = collectedExercises.get(exerciseDisplayName);
                     }
                     else
                     {
-                        displayNameExercises = new ArrayList<IExercise>();
+                        displayNameExercises = new ArrayList<>();
                         collectedExercises.put(exerciseDisplayName, displayNameExercises);
                     }
 
                     displayNameExercises.add(exercise);
                 }
+                else
+                {
+                    Log.e(MainMenuActivity.class.getName(), String.format("Failed to create exercise with id \"%d\"", exerciseInfo.id));
+                }
             }
         }
 
         // Place exercises in sorted order
-        m_menuExercises = new ArrayList<IExercise>();
+        m_menuExercises = new ArrayList<>();
         for (Map.Entry<String, ArrayList<IExercise>> sortedExercise : collectedExercises.entrySet())
         {
             m_menuExercises.addAll(sortedExercise.getValue());
@@ -162,8 +164,6 @@ public class MainMenuActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private AlphabetDatabase m_alphabetDatabase;
-    private ExerciseFactory m_exerciseFactory;
-
+    private CoreServiceLocator m_serviceLocator;
     private List<IExercise> m_menuExercises;
 }
