@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="assert_error">Ошибка времени исполнения</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="main_menu_caption">Выбери упражнение:</string>

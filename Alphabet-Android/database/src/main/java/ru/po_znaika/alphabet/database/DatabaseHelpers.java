@@ -9,11 +9,15 @@ import android.support.annotation.NonNull;
  */
 public final class DatabaseHelpers
 {
-    private static final String DatabasePackageName = DatabaseHelpers.class.getPackage().getName(); // "ru.po_znaika.alphabet.database";
+    /**
+     * All resources at last are collected to the root namespace of the [app] project
+     * Thats why here is 'ru.po_znaika.alphabet' instead of 'ru.po_znaika.alphabet.database'
+     */
+    private static final String ResourcesPackageName = "ru.po_znaika.alphabet";
 
     public static int getDrawableIdByName(@NonNull Resources resources, @NonNull String imageName)
     {
-        return resources.getIdentifier(imageName, "drawable-content", DatabasePackageName);
+        return resources.getIdentifier(imageName, "drawable", ResourcesPackageName);
     }
 
     public static int getSoundIdByName(@NonNull Resources resources, @NonNull String soundName)

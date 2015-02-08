@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Log;
 
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -35,11 +37,15 @@ public class CreateWordsFromSpecifiedExercise implements IExercise
 
             if (exerciseInfo.imageId != DatabaseConstant.InvalidDatabaseIndex)
             {
-                final String DisplayImageFileName = _alphabetDatabase.getImageFileNameById(exerciseInfo.imageId);
-                if (TextUtils.isEmpty(DisplayImageFileName))
+                final String displayImageFileName = _alphabetDatabase.getImageFileNameById(exerciseInfo.imageId);
+                if (TextUtils.isEmpty(displayImageFileName))
+                {
+                    Log.e(CreateWordsFromSpecifiedExercise.class.getName(),
+                            String.format("Could not get image file name with id: %d", exerciseInfo.imageId));
                     throw new IllegalArgumentException();
+                }
 
-                m_exerciseDisplayImageResourceId = m_context.getResources().getIdentifier(DisplayImageFileName, Constant.DrawableResourcesTag, m_context.getPackageName());
+                m_exerciseDisplayImageResourceId = DatabaseHelpers.getDrawableIdByName(m_context.getResources(), displayImageFileName);
                 if (m_exerciseDisplayImageResourceId == 0)
                     throw new IllegalArgumentException();
             }

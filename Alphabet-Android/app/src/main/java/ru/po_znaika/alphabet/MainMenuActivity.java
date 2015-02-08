@@ -34,9 +34,14 @@ public class MainMenuActivity extends ActionBarActivity
             restoreInternalState();
             constructUserInterface();
         }
+        catch (CommonException exp)
+        {
+            MessageBox.Show(this, exp.getMessage(), getResources().getString(R.string.assert_error));
+        }
         catch (Exception exp)
         {
-            MessageBox.Show(this, exp.getMessage(), exp.getMessage());
+            Log.e(MainMenuActivity.class.getName(), "onCreate: Unknown exception occurred");
+            MessageBox.Show(this, exp.getMessage(), getResources().getString(R.string.assert_error));
         }
     }
 

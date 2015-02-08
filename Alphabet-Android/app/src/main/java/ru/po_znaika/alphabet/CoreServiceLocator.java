@@ -17,20 +17,21 @@ import ru.po_znaika.network.IServerOperations;
  */
 public class CoreServiceLocator
 {
-    public CoreServiceLocator(@NonNull Context context) throws CommonException
+    public CoreServiceLocator(@NonNull Context _context) throws CommonException
     {
-        m_alphabetDatabase = new AlphabetDatabase(context, false);
-        m_diaryDatabase = new DiaryDatabase(context);
+        m_alphabetDatabase = new AlphabetDatabase(_context, false);
+        m_diaryDatabase = new DiaryDatabase(_context);
+        //m_licensing = new Licensing(_context);
     }
 
     public AlphabetDatabase getAlphabetDatabase()
     {
-        throw new UnsupportedOperationException();
+        return m_alphabetDatabase;
     }
 
     public DiaryDatabase getDiaryDatabase()
     {
-        throw new UnsupportedOperationException();
+        return m_diaryDatabase;
     }
 
     public IServerOperations getServerOperations()
@@ -40,9 +41,10 @@ public class CoreServiceLocator
 
     public ILicensing getLicensing()
     {
-        throw new UnsupportedOperationException();
+        return m_licensing;
     }
 
     private AlphabetDatabase m_alphabetDatabase;
     private DiaryDatabase m_diaryDatabase;
+    private ILicensing m_licensing;
 }

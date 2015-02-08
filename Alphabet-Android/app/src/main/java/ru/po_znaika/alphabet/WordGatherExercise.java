@@ -3,7 +3,9 @@ package ru.po_znaika.alphabet;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -13,9 +15,9 @@ import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
  */
 public class WordGatherExercise implements IExercise
 {
-    public WordGatherExercise(Context _context, AlphabetDatabase _databaseConnection, int _exerciseId)
+    public WordGatherExercise(@NonNull Context _context, @NonNull AlphabetDatabase _databaseConnection, int _exerciseId)
     {
-        if ((_context == null) || (_databaseConnection == null) || (_exerciseId == DatabaseConstant.InvalidDatabaseIndex))
+        if (_exerciseId == DatabaseConstant.InvalidDatabaseIndex)
             throw new IllegalArgumentException();
 
         {
@@ -29,10 +31,8 @@ public class WordGatherExercise implements IExercise
 
         m_exerciseName = exerciseInfo.name;
         m_exerciseDisplayName = exerciseInfo.displayName;
-        m_exerciseDisplayImageResourceId = m_context.getResources().getIdentifier(
-                _databaseConnection.getImageFileNameById(exerciseInfo.imageId),
-                Constant.DrawableResourcesTag,
-                m_context.getPackageName());
+        m_exerciseDisplayImageResourceId = DatabaseHelpers.getDrawableIdByName(m_context.getResources(),
+                _databaseConnection.getImageFileNameById(exerciseInfo.imageId));
 
         if (m_exerciseDisplayImageResourceId == 0)
             throw new IllegalArgumentException();
