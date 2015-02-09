@@ -6,13 +6,17 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.net.MalformedURLException;
+import org.apache.http.util.EncodingUtils;
+
 import java.util.Date;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.HttpURLConnection;
-
-import java.io.IOException;
 
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.network.IAuthenticationProvider;
@@ -107,12 +111,46 @@ public class Licensing implements ILicensing
                 if (!TextUtils.isEmpty(credentials.password))
                     request.setRequestProperty(NetworkConstant.PasswordHeader, credentials.password);
 
-                final String currentLicenseLiteral = request.getHeaderField("License");
-                if (currentLicenseLiteral != null)
+                InputStream requestBody = request.getInputStream();
+
+                String responseEncoding = request.getContentEncoding();
+                responseEncoding = TextUtils.isEmpty(responseEncoding) ? "UTF-8" : responseEncoding;
+
+                if (requestBody.available() > 0)
                 {
-                    final LicenseType currentLicense = ParseLicenseType(currentLicenseLiteral);
-                    m_licensingCache.updateLicense(currentLicense);
-                    return currentLicense;
+                    String normalizedResponse;
+                    ByteArrayOutputStream totalStream = new ByteArrayOutputStream();
+                    try
+                    {
+                        byte[] chunk = new byte[512];
+
+                        for (; ; )
+                        {
+                            final int bytesRead = requestBody.read(chunk);
+                            if (bytesRead == 0)
+                                break;
+
+                            totalStream.write(chunk, 0, bytesRead);
+                        }
+
+                        normalizedResponse = EncodingUtils.getString(totalStream.toByteArray(), responseEncoding);
+                    }
+                    finally
+                    {
+                        totalStream.close();
+                    }
+
+                    // TODO: parse as json
+                    if (normalizedResponse != null)
+                    {
+                        final LicenseType currentLicense = ParseLicenseType(normalizedResponse);
+                        m_licensingCache.updateLicense(currentLicense);
+                        return currentLicense;
+                    }
+                }
+                else
+                {
+                    Log.e(LogTag, "Server returned empty response body");
                 }
             }
             catch (IOException exp)
