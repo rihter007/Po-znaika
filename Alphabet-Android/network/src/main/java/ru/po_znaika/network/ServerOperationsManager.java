@@ -41,27 +41,13 @@ class ServerOperationsCache extends SQLiteOpenHelper
     }
 }
 
-public class ServerOperationsManager implements IServerOperations, IAuthenticationProvider
+public class ServerOperationsManager implements IServerOperations
 {
     //private static final String ServerAddressUri = "";
 
     public ServerOperationsManager(Context context)
     {
         m_operationsCache = new ServerOperationsCache(context);
-    }
-
-    ///
-    /// Implementation of IAuthenticationTokenSetter
-    ///
-    @Override
-    public AuthenticationToken getAuthenticationToken() throws NetworkException, CommonException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public LoginPasswordCredentials getLoginPasswordCredentials() throws CommonException
-    {
-        throw new UnsupportedOperationException();
     }
 
     ///
