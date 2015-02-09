@@ -15,6 +15,8 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExerciseStepCallback;
@@ -37,6 +39,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         }
     }
 
+    private static final String LogTag = CharacterExerciseItemActivity.class.getName();
     private static final String StateTag = "State";
     private static final String FragmentTag = "MainWindowFragment";
 
@@ -98,8 +101,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
                                 int otherObjectsIndex = 0;
                                 for (int imageIndex = 0; imageIndex < ImageSelectionFragment.ImagesCount; ++imageIndex)
                                 {
-                                    int imageIdentifier = DatabaseConstant.InvalidDatabaseIndex;
-                                    int soundIdentifier = DatabaseConstant.InvalidDatabaseIndex;
+                                    int imageIdentifier, soundIdentifier;
                                     if (imageIndex == singleExerciseState.answer)
                                     {
                                         imageIdentifier = thisSoundObjects[subExerciseIndex].imageId;
@@ -178,7 +180,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
     /**
      * Restores all internal objects
      * @param savedInstanceState activity saved state
-     * @throws java.io.IOException
+     * @throws ru.po_znaika.common.CommonException
      */
     void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
@@ -211,7 +213,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
                 m_alphabetDatabase = new AlphabetDatabase(this, false);
                 AlphabetDatabase.CharacterExerciseItemStepInfo[] exerciseSteps = m_alphabetDatabase.getAllCharacterExerciseStepsByCharacterExerciseItemId(CharacterExerciseItemId);
 
-                Map<Integer, CharacterExerciseItemStepState> sortedExerciseSteps = new HashMap<Integer, CharacterExerciseItemStepState>();
+                Map<Integer, CharacterExerciseItemStepState> sortedExerciseSteps = new HashMap<>();
                 for (AlphabetDatabase.CharacterExerciseItemStepInfo exerciseStepInfo : exerciseSteps)
                 {
                     sortedExerciseSteps.put(exerciseStepInfo.stepNumber,
@@ -255,7 +257,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState)
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState)
     {
         super.onSaveInstanceState(savedInstanceState);
 
@@ -275,6 +277,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         }
         catch (Exception exp)
         {
+            Log.e(LogTag, String.format("Failed to process fragment, exp: \"%s\"", exp.getMessage()));
         }
     }
 

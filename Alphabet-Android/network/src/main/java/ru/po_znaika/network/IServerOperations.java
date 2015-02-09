@@ -16,12 +16,13 @@ public interface IServerOperations
 {
     /**
      * Sends student score on server
-     * @param exerciseId unique exercise id
+     * @param date date of the operation in GMT
+     * @param exerciseName unique exercise id
      * @param score exercise score
      * @throws CommonException
      * @throws NetworkException
      */
-    void reportExerciseScore(int exerciseId, int score)
+    void reportExerciseScore(@NonNull Date date, @NonNull String exerciseName, int score)
             throws CommonException, NetworkException;
 
     /**

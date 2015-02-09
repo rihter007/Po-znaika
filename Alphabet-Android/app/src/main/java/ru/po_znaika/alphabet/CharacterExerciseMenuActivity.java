@@ -58,9 +58,9 @@ public class CharacterExerciseMenuActivity extends Activity
         if (characterExercisesInfo == null)
             throw new IllegalArgumentException();
 
-        ExerciseFactory exerciseFactory = new ExerciseFactory(this, alphabetDatabase);
+        final ExerciseFactory exerciseFactory = new ExerciseFactory(this, alphabetDatabase);
 
-        Map<String, IExercise> exerciseMap = new TreeMap<String, IExercise>();
+        Map<String, IExercise> exerciseMap = new TreeMap<>();
         for (AlphabetDatabase.ExerciseShortInfo exerciseShortInfo : characterExercisesInfo)
         {
             IExercise characterExercise = exerciseFactory.CreateExerciseFromId(exerciseShortInfo.id, exerciseShortInfo.type);

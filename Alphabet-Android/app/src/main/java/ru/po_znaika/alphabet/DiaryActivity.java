@@ -17,7 +17,7 @@ import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
 import ru.po_znaika.common.CommonException;
 
-public class DiaryActivity extends ActionBarActivity
+public final class DiaryActivity extends ActionBarActivity
 {
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,7 +38,7 @@ public class DiaryActivity extends ActionBarActivity
         }
         catch (Exception exp)
         {
-
+            return false;
         }
         return true;
     }
@@ -59,12 +59,12 @@ public class DiaryActivity extends ActionBarActivity
         AlphabetDatabase alphabetDatabase = new AlphabetDatabase(this, false);
 
         DiaryDatabase diaryDatabase = new DiaryDatabase(this);
-        DiaryDatabase.ExerciseDiaryShortInfo diaryNotes[] = diaryDatabase.getAllDiaryRecordsOrderedByDate();
+        DiaryDatabase.ExerciseDiaryInfo diaryNotes[] = diaryDatabase.getAllDiaryRecordsOrderedByDate();
 
         if ((diaryNotes != null) && (diaryNotes.length > 0))
         {
-            Map<Integer, String> exerciseNamesMap = new HashMap<Integer, String>();
-            for (DiaryDatabase.ExerciseDiaryShortInfo diaryNote : diaryNotes)
+            Map<String, String> exerciseNamesMap = new HashMap<>();
+            for (DiaryDatabase.ExerciseDiaryInfo diaryNote : diaryNotes)
             {
                 Calendar noteTime = new GregorianCalendar();
                 noteTime.setTime(diaryNote.date);
@@ -77,17 +77,17 @@ public class DiaryActivity extends ActionBarActivity
                         noteTime.get(Calendar.MINUTE)
                 ));
 
-                String exerciseTitle = null;
-                if (exerciseNamesMap.containsKey(diaryNote.exerciseId))
+                String exerciseTitle;
+                if (exerciseNamesMap.containsKey(diaryNote.exerciseName))
                 {
-                    exerciseTitle = exerciseNamesMap.get(diaryNote.exerciseId);
+                    exerciseTitle = exerciseNamesMap.get(diaryNote.exerciseName);
                 }
                 else
                 {
-                    exerciseTitle = alphabetDatabase.getExerciseDisplayNameById(diaryNote.exerciseId);
+                    exerciseTitle = alphabetDatabase.getExerciseDisplayNameByIdName(diaryNote.exerciseName);
                     if (exerciseTitle == null)
-                        exerciseTitle = alphabetDatabase.getCharacterItemDisplayNameById(diaryNote.exerciseId);
-                    exerciseNamesMap.put(diaryNote.exerciseId, exerciseTitle);
+                        exerciseTitle = alphabetDatabase.getCharacterItemDisplayNameByIdName(diaryNote.exerciseName);
+                    exerciseNamesMap.put(diaryNote.exerciseName, exerciseTitle);
                 }
 
                 if (!TextUtils.isEmpty(exerciseTitle))

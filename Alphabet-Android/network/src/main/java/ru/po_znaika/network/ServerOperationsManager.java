@@ -1,8 +1,5 @@
 package ru.po_znaika.network;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
 import java.util.Date;
@@ -12,62 +9,38 @@ import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.ExerciseScore;
 
 /**
- * Created by Rihter 19.01.2015
- * Implements feedback with server with caching results in Diary database
+ * Created by Rihter on 10.02.2015.
+ * Provides implementation for all server operations
  */
-
-class ServerOperationsCache extends SQLiteOpenHelper
-{
-    private static final String DatabaseName = "server_operations_cache.db";
-    private static final int DatabaseVersion = 0;
-
-
-
-    public ServerOperationsCache(Context context)
-    {
-        super(context, DatabaseName, null, DatabaseVersion);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase database)
-    {
-
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion)
-    {
-
-    }
-}
-
 public class ServerOperationsManager implements IServerOperations
 {
-    //private static final String ServerAddressUri = "";
-
-    public ServerOperationsManager(Context context)
-    {
-        m_operationsCache = new ServerOperationsCache(context);
-    }
-
-    ///
-    /// Implementation of IServerOperations
-    ///
-
-    @Override
-    public void reportExerciseScore(int exerciseId, int score)
+    /**
+     * Sends student score on server
+     * @param date date of the operation in GMT
+     * @param exerciseName unique exercise id
+     * @param score exercise score
+     * @throws ru.po_znaika.common.CommonException
+     * @throws NetworkException
+     */
+    public void reportExerciseScore(@NonNull Date date, @NonNull String exerciseName, int score)
             throws CommonException, NetworkException
     {
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
     }
 
-    @Override
-    public List<ExerciseScore> getExercisesScores(int exerciseGroupId, Date startDate, Date endDate)
+    /**
+     * Returns obtained scores for specified time period
+     * @param exerciseGroupId id of the single exercise or logical group of exercises, if 0 - all alphabet exercises
+     * @param startDate start date of exercise completion in GMT. If null - no start date
+     * @param endDate end date of exercise completion n GMT. If null - no end date
+     * @return
+     * @throws CommonException
+     * @throws NetworkException
+     */
+   public List<ExerciseScore> getExercisesScores(int exerciseGroupId, Date startDate, Date endDate)
             throws CommonException, NetworkException
     {
-        throw new UnsupportedOperationException();
+        return null;
+        //throw new UnsupportedOperationException();
     }
-
-    private ServerOperationsCache m_operationsCache;
-    private AuthenticationToken m_token;
 }

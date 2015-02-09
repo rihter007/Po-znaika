@@ -13,6 +13,7 @@ import ru.po_znaika.licensing.Licensing;
 
 import ru.po_znaika.network.CacheAuthenticationProvider;
 import ru.po_znaika.network.IServerOperations;
+import ru.po_znaika.network.ServerOperationsManager;
 
 /**
  * Created by Rihter on 08.02.2015.
@@ -24,6 +25,8 @@ public class CoreServiceLocator
     {
         m_alphabetDatabase = new AlphabetDatabase(_context, false);
         m_diaryDatabase = new DiaryDatabase(_context);
+        m_serverOperations = new ServerOperationsManager();
+        m_exerciseScoreProcessor = new ExerciseScoreProcessor(_context, m_serverOperations);
 
         CacheAuthenticationProvider authProvider = new CacheAuthenticationProvider(_context);
         m_licensing = new Licensing(_context, authProvider);
@@ -39,9 +42,14 @@ public class CoreServiceLocator
         return m_diaryDatabase;
     }
 
+    public IExerciseScoreProcessor getexerciseScoreProcessor()
+    {
+        return m_exerciseScoreProcessor;
+    }
+
     public IServerOperations getServerOperations()
     {
-        throw new UnsupportedOperationException();
+        return m_serverOperations;
     }
 
     public ILicensing getLicensing()
@@ -51,5 +59,7 @@ public class CoreServiceLocator
 
     private AlphabetDatabase m_alphabetDatabase;
     private DiaryDatabase m_diaryDatabase;
+    IServerOperations m_serverOperations;
+    private IExerciseScoreProcessor m_exerciseScoreProcessor;
     private ILicensing m_licensing;
 }

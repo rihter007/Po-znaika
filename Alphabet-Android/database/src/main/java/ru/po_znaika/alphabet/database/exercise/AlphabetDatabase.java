@@ -15,6 +15,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Pair;
 
@@ -29,7 +30,7 @@ import ru.po_znaika.common.CommonResultCode;
 public final class AlphabetDatabase
 {
     /**
-     *  Types declarations
+     * Types declarations
      */
     public static enum SoundType
     {
@@ -39,15 +40,22 @@ public final class AlphabetDatabase
 
         private int m_value;
 
-        private SoundType(int _value) { this.m_value = _value; }
-        public int getValue() { return m_value; }
+        private SoundType(int _value)
+        {
+            this.m_value = _value;
+        }
 
-        private static final Map<Integer, SoundType> ValuesMap = new HashMap<Integer,SoundType>()
+        public int getValue()
+        {
+            return m_value;
+        }
+
+        private static final Map<Integer, SoundType> ValuesMap = new HashMap<Integer, SoundType>()
         {{
-             put(78467623, Correct);
-             put(-1022835248, Praise);
-             put(2010528955, TryAgain);
-        }};
+                put(78467623, Correct);
+                put(-1022835248, Praise);
+                put(2010528955, TryAgain);
+            }};
 
         public static SoundType getTypeByValue(int value)
         {
@@ -56,7 +64,7 @@ public final class AlphabetDatabase
     }
 
     /**
-     *  Represents hardcoded type of an exercise in Alphabet studies
+     * Represents hardcoded type of an exercise in Alphabet studies
      */
     public static enum ExerciseType
     {
@@ -70,6 +78,7 @@ public final class AlphabetDatabase
         {
             this.m_value = _value;
         }
+
         public int getValue()
         {
             return m_value;
@@ -77,10 +86,10 @@ public final class AlphabetDatabase
 
         private static final Map<Integer, ExerciseType> ValuesMap = new HashMap<Integer, ExerciseType>()
         {{
-            put(294335127, Character);
-            put(402850721, WordGather);
-            put(-858355490, CreateWordsFromSpecified);
-        }};
+                put(294335127, Character);
+                put(402850721, WordGather);
+                put(-858355490, CreateWordsFromSpecified);
+            }};
 
         public static ExerciseType getTypeByValue(int value)
         {
@@ -96,15 +105,22 @@ public final class AlphabetDatabase
 
         private int m_value;
 
-        private CharacterExerciseItemType(int _value) { this.m_value = _value; }
-        public int getValue() { return m_value; }
+        private CharacterExerciseItemType(int _value)
+        {
+            this.m_value = _value;
+        }
+
+        public int getValue()
+        {
+            return m_value;
+        }
 
         private static final Map<Integer, CharacterExerciseItemType> ValuesMap = new HashMap<Integer, CharacterExerciseItemType>()
         {{
                 put(-1081850258, General);
                 put(1538820439, Sound);
                 put(-1985025220, Letter);
-        }};
+            }};
 
         public static CharacterExerciseItemType getTypeByValue(int value)
         {
@@ -119,17 +135,21 @@ public final class AlphabetDatabase
 
         private int m_value;
 
-        private CharacterExerciseActionType(int _value) { m_value = _value; }
+        private CharacterExerciseActionType(int _value)
+        {
+            m_value = _value;
+        }
+
         public int getValue()
-    {
-        return m_value;
-    }
+        {
+            return m_value;
+        }
 
         private static final Map<Integer, CharacterExerciseActionType> ValuesMap = new HashMap<Integer, CharacterExerciseActionType>()
         {{
                 put(1986991965, TheoryPage);
                 put(291784361, CustomAction);
-        }};
+            }};
 
         public static CharacterExerciseActionType getTypeByValue(int value)
         {
@@ -147,6 +167,7 @@ public final class AlphabetDatabase
         {
             this.m_value = _value;
         }
+
         public int getValue()
         {
             return m_value;
@@ -155,7 +176,7 @@ public final class AlphabetDatabase
         private static final Map<Integer, AlphabetType> ValuesMap = new HashMap<Integer, AlphabetType>()
         {{
                 put(2092928056, Russian);
-        }};
+            }};
 
         public static AlphabetType getTypeByValue(int value)
         {
@@ -303,6 +324,8 @@ public final class AlphabetDatabase
             "SELECT type, name, display_name, image_id FROM exercise WHERE _id = ?";
     private static final String ExtractExerciseDisplayNameByIdSqlStatement =
             "SELECT display_name FROM exercise WHERE _id = ?";
+    private static final String ExtractExerciseDisplayNameByIdNameSqlStatement =
+            "SELECT display_name FROM exercise WHERE name = ?";
 
     /**
      * SQL-expressions form character_exercise and relative tables
@@ -315,6 +338,8 @@ public final class AlphabetDatabase
             "SELECT _id, step_number, action, value FROM character_exercise_item_step WHERE character_exercise_item_id = ?";
     private static final String ExtractCharacterItemDisplayNameByIdSqlStatement =
             "SELECT display_name FROM character_exercise_item WHERE _id = ?";
+    private static final String ExtractCharacterItemDisplayNameByIdNameSqlStatement =
+            "SELECT display_name FROM character_exercise_item WHERE name = ?";
 
     /**
      * SQL-expressions from sound_words table
@@ -354,21 +379,20 @@ public final class AlphabetDatabase
      */
     private static final String ExtractWordsByLengthAndAlphabetId =
             "SELECT _id, alphabet_id, complexity, word " +
-            "FROM word " +
-            "WHERE (alphabet_id = ?) AND (length(word) >= %d) AND (length(word) <= %d)";
+                    "FROM word " +
+                    "WHERE (alphabet_id = ?) AND (length(word) >= %d) AND (length(word) <= %d)";
     private static final String ExtractRandomWordByAlphabetIdAndLength =
             "SELECT _id, alphabet_id, complexity, word " +
-            "FROM word " +
-            "WHERE (alphabet_id = ?) AND (length(word) >= %d) AND (length(word) <= %d) ORDER BY RANDOM() LIMIT 1";
+                    "FROM word " +
+                    "WHERE (alphabet_id = ?) AND (length(word) >= %d) AND (length(word) <= %d) ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomWordCreationExerciseByAlphabetAndLength =
             "SELECT w._id, w.complexity, w.word " +
-            "FROM word_creation_exercise wce, word w " +
-            "WHERE (wce.word_id = w._id) AND (w.alphabet_id = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) ORDER BY RANDOM() LIMIT 1"
-            ;
+                    "FROM word_creation_exercise wce, word w " +
+                    "WHERE (wce.word_id = w._id) AND (w.alphabet_id = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomWordAndImageByAlphabetAndLength =
             "SELECT w._id, w.word, w.complexity, wid.image_id " +
-            "FROM word w, word_image_description wid " +
-            "WHERE (w.alphabet_id = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) AND (w._id = wid.word_id) ORDER BY RANDOM() LIMIT 1";
+                    "FROM word w, word_image_description wid " +
+                    "WHERE (w.alphabet_id = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) AND (w._id = wid.word_id) ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomImageIdByWordId = "SELECT image_id FROM word_image_description wid " +
             "WHERE wid.word_id = ? ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomSoundIdByWordId = "SELECT sound_id FROM word_sound_description wsd " +
@@ -440,7 +464,7 @@ public final class AlphabetDatabase
         SQLiteDatabase databaseConnection = null;
         try
         {
-           databaseConnection = SQLiteDatabase.openDatabase(pathToDatabase, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            databaseConnection = SQLiteDatabase.openDatabase(pathToDatabase, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
         }
         catch (SQLiteException exp)
         {
@@ -449,8 +473,10 @@ public final class AlphabetDatabase
 
         return databaseConnection;
     }
-     /**
+
+    /**
      * Gets database from assets folder
+     *
      * @return
      */
     private boolean createDatabase(Context context)
@@ -474,7 +500,7 @@ public final class AlphabetDatabase
             localFileDatabaseStream = new FileOutputStream(localFileDatabase);
 
             {
-                byte[] buffer = new byte[10*1024];
+                byte[] buffer = new byte[10 * 1024];
                 int length = 0;
                 while ((length = assetsDatabaseFileStream.read(buffer)) > 0)
                 {
@@ -570,7 +596,7 @@ public final class AlphabetDatabase
         try
         {
             dataReader = m_databaseConnection.rawQuery(ExtractAllExercisesShortInfoByTypeSqlStatement,
-                    new String[] { ((Integer)exerciseType.getValue()).toString() });
+                    new String[]{((Integer) exerciseType.getValue()).toString()});
 
             if (dataReader.moveToFirst())
             {
@@ -610,7 +636,7 @@ public final class AlphabetDatabase
         try
         {
             dataReader = m_databaseConnection.rawQuery(ExtractAllExercisesShortInfoNotByTypeSqlStatement,
-                    new String[] { ((Integer)exerciseType.getValue()).toString() });
+                    new String[]{((Integer) exerciseType.getValue()).toString()});
 
             if (dataReader.moveToFirst())
             {
@@ -676,7 +702,12 @@ public final class AlphabetDatabase
 
     public String getExerciseDisplayNameById(int exerciseId)
     {
-        return getStringBySqlExpressionAndId(ExtractExerciseDisplayNameByIdSqlStatement, exerciseId);
+        return getStringBySqlExpressionAndInteger(ExtractExerciseDisplayNameByIdSqlStatement, exerciseId);
+    }
+
+    public String getExerciseDisplayNameByIdName(@NonNull String exerciseName)
+    {
+        return getStringBySqlExpressionAndString(ExtractExerciseDisplayNameByIdNameSqlStatement, exerciseName);
     }
 
     public CharacterExerciseInfo getCharacterExerciseByExerciseId(int exerciseId)
@@ -688,7 +719,7 @@ public final class AlphabetDatabase
         {
             final Integer exerciseIdObject = exerciseId;
             dataReader = m_databaseConnection.rawQuery(ExtractCharacterExerciseByExerciseIdSqlStatement,
-                    new String[]{ exerciseIdObject.toString() });
+                    new String[]{exerciseIdObject.toString()});
 
             if (dataReader.moveToFirst())
             {
@@ -709,7 +740,7 @@ public final class AlphabetDatabase
                 dataReader.close();
         }
 
-        return  result;
+        return result;
     }
 
     public CharacterExerciseItemInfo[] getAllCharacterExerciseItemsByCharacterExerciseId(int characterExerciseId)
@@ -719,7 +750,7 @@ public final class AlphabetDatabase
         try
         {
             final Integer characterExerciseIdObject = characterExerciseId;
-            dataReader = m_databaseConnection.rawQuery(ExtractAllCharacterExerciseItemsByCharacterExerciseIdSqlStatement, new String[] { characterExerciseIdObject.toString()});
+            dataReader = m_databaseConnection.rawQuery(ExtractAllCharacterExerciseItemsByCharacterExerciseIdSqlStatement, new String[]{characterExerciseIdObject.toString()});
 
             if (dataReader.moveToFirst())
             {
@@ -758,7 +789,12 @@ public final class AlphabetDatabase
 
     public String getCharacterItemDisplayNameById(int characterExerciseItemId)
     {
-        return getStringBySqlExpressionAndId(ExtractCharacterItemDisplayNameByIdSqlStatement, characterExerciseItemId);
+        return getStringBySqlExpressionAndInteger(ExtractCharacterItemDisplayNameByIdSqlStatement, characterExerciseItemId);
+    }
+
+    public String getCharacterItemDisplayNameByIdName(@NonNull String characterExerciseName)
+    {
+        return getStringBySqlExpressionAndString(ExtractCharacterItemDisplayNameByIdNameSqlStatement, characterExerciseName);
     }
 
     public CharacterExerciseItemStepInfo[] getAllCharacterExerciseStepsByCharacterExerciseItemId(int characterExerciseItemId)
@@ -770,11 +806,11 @@ public final class AlphabetDatabase
         {
             final Integer characterExerciseItemIdObject = characterExerciseItemId;
             dataReader = m_databaseConnection.rawQuery(ExtractAllCharacterExerciseStepsByCharacterExerciseItemIdSqlStatement,
-                    new String[] {characterExerciseItemIdObject.toString()});
+                    new String[]{characterExerciseItemIdObject.toString()});
 
             if (dataReader.moveToFirst())
             {
-                List<CharacterExerciseItemStepInfo> resultsList = new ArrayList<CharacterExerciseItemStepInfo>();
+                List<CharacterExerciseItemStepInfo> resultsList = new ArrayList<>();
                 do
                 {
                     CharacterExerciseItemStepInfo item = new CharacterExerciseItemStepInfo();
@@ -812,7 +848,7 @@ public final class AlphabetDatabase
         try
         {
             final Integer theoryPageIdObject = theoryPageId;
-            dataReader = m_databaseConnection.rawQuery(ExtractTheoryPageById, new String[] { theoryPageIdObject.toString() });
+            dataReader = m_databaseConnection.rawQuery(ExtractTheoryPageById, new String[]{theoryPageIdObject.toString()});
 
             if (dataReader.moveToFirst())
             {
@@ -857,7 +893,7 @@ public final class AlphabetDatabase
         try
         {
             dataReader = m_databaseConnection.rawQuery(String.format(ExtractRandomWordByAlphabetIdAndLength, minWordLength, maxWordLength),
-                    new String[] { ((Integer)alphabetType.getValue()).toString() });
+                    new String[]{((Integer) alphabetType.getValue()).toString()});
 
             if (dataReader.moveToFirst())
             {
@@ -889,7 +925,7 @@ public final class AlphabetDatabase
         try
         {
             dataReader = m_databaseConnection.rawQuery(String.format(ExtractRandomWordCreationExerciseByAlphabetAndLength, minWordLength, maxWordLength),
-                    new String[] { ((Integer)alphabetType.getValue()).toString() });
+                    new String[]{((Integer) alphabetType.getValue()).toString()});
 
             if (dataReader.moveToFirst())
             {
@@ -960,7 +996,7 @@ public final class AlphabetDatabase
         try
         {
             dataReader = m_databaseConnection.rawQuery(String.format(ExtractWordsByLengthAndAlphabetId, 0, wordInfo.word.length()),
-                    new String[] { ((Integer)wordInfo.alphabetType.getValue()).toString() });
+                    new String[]{((Integer) wordInfo.alphabetType.getValue()).toString()});
 
             if (dataReader.moveToFirst())
             {
@@ -1034,7 +1070,7 @@ public final class AlphabetDatabase
         try
         {
             dataReader = m_databaseConnection.rawQuery(ExtractRandomSoundNameByTypeSqlStatement,
-                    new String[] { ((Integer)soundType.getValue()).toString() });
+                    new String[]{((Integer) soundType.getValue()).toString()});
 
             if (dataReader.moveToFirst())
             {
@@ -1056,12 +1092,12 @@ public final class AlphabetDatabase
 
     public String getSoundFileNameById(int soundId)
     {
-        return getStringBySqlExpressionAndId(ExtractSoundNameByIdSqlStatement, soundId);
+        return getStringBySqlExpressionAndInteger(ExtractSoundNameByIdSqlStatement, soundId);
     }
 
     public String getImageFileNameById(int imageId)
     {
-        return getStringBySqlExpressionAndId(ExtractImageNameByIdSqlStatement, imageId);
+        return getStringBySqlExpressionAndInteger(ExtractImageNameByIdSqlStatement, imageId);
     }
 
     private int getIntegerBySqlExpressionAndId(final String sqlExpression, int id)
@@ -1092,20 +1128,25 @@ public final class AlphabetDatabase
         return result;
     }
 
-    private String getStringBySqlExpressionAndId(final String sqlExpression, int id)
+    private String getStringBySqlExpressionAndInteger(@NonNull String sqlExpression, int value)
+    {
+        final Integer integerObj = value;
+        return getStringBySqlExpressionAndString(sqlExpression, integerObj.toString());
+    }
+
+    private String getStringBySqlExpressionAndString(@NonNull String sqlExpression, @NonNull String value)
     {
         String resultName = null;
         Cursor dataReader = null;
 
         try
         {
-            final Integer IdObj = id;
-            dataReader = m_databaseConnection.rawQuery(sqlExpression, new String[]{IdObj.toString()});
+            dataReader = m_databaseConnection.rawQuery(sqlExpression, new String[]{value});
 
             if (dataReader.moveToFirst())
                 resultName = dataReader.getString(0);
         }
-        catch (Exception e)
+        catch (Exception exp)
         {
             resultName = null;
         }

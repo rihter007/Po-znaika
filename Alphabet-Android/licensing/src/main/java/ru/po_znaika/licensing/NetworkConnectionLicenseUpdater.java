@@ -17,7 +17,7 @@ public class NetworkConnectionLicenseUpdater extends BroadcastReceiver
 {
     public NetworkConnectionLicenseUpdater()
     {
-        m_authProvider = new CacheAuthenticationProvider();
+        m_authProvider = null; //new CacheAuthenticationProvider();
     }
 
     public void onReceive(Context context, Intent intent)
