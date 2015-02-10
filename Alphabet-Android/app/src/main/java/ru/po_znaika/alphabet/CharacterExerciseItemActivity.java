@@ -303,12 +303,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
 
                 // Show result fragment
                 {
-                    Fragment finishFragment = new ScoreFragment();
-
-                    Bundle fragmentArguments = new Bundle();
-                    fragmentArguments.putInt(ScoreFragment.ScoreTag, totalScore);
-                    finishFragment.setArguments(fragmentArguments);
-
+                    final Fragment finishFragment = ScoreFragment.createFragment(totalScore);
                     ProcessFragment(finishFragment);
                 }
             }

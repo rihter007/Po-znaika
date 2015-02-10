@@ -40,11 +40,7 @@ public class WordGatherExercise implements IExercise
 
     public void process()
     {
-        Intent intent = new Intent(m_context, WordGatherActivity.class);
-        intent.putExtra(Constant.ExerciseIdTag, m_exerciseId);
-        intent.putExtra(Constant.AlphabetTypeTag, AlphabetDatabase.AlphabetType.Russian.getValue());
-
-        m_context.startActivity(intent);
+        WordGatherActivity.startActivity(m_context, m_exerciseName, AlphabetDatabase.AlphabetType.Russian);
     }
 
     /* Returns a unique id of the exercise */

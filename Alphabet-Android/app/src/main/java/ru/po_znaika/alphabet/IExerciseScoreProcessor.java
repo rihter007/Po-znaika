@@ -10,5 +10,5 @@ import ru.po_znaika.common.CommonException;
  */
 public interface IExerciseScoreProcessor
 {
-    void reportExerciseScore(@NonNull String exerciseId, int score) throws CommonException;
+    void reportExerciseScore(@NonNull String exerciseNameId, int score) throws CommonException;
 }

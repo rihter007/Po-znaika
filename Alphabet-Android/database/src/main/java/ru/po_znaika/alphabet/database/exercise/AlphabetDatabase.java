@@ -174,9 +174,11 @@ public final class AlphabetDatabase
         }
 
         private static final Map<Integer, AlphabetType> ValuesMap = new HashMap<Integer, AlphabetType>()
-        {{
-                put(2092928056, Russian);
-            }};
+        {
+            {
+                put(Russian.getValue(), Russian);
+            }
+        };
 
         public static AlphabetType getTypeByValue(int value)
         {

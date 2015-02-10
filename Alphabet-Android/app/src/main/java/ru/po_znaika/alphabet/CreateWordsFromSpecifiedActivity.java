@@ -116,7 +116,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
 
     private void constructUserInterface(Bundle savedInstanceState)
     {
-        Fragment currentFragment = null;
+        Fragment currentFragment;
 
         if (savedInstanceState == null)
         {
@@ -134,15 +134,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
             }
             else
             {
-                ScoreFragment scoreFragment = new ScoreFragment();
-
-                {
-                    Bundle arguments = new Bundle();
-                    arguments.putInt(ScoreFragment.ScoreTag, m_state.totalScore);
-                    scoreFragment.setArguments(arguments);
-                }
-
-                currentFragment = scoreFragment;
+                currentFragment = ScoreFragment.createFragment(m_state.totalScore);
             }
         }
         else
@@ -175,14 +167,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
         {
             m_state.isExerciseStep = false;
 
-            ScoreFragment scoreFragment = new ScoreFragment();
-
-            {
-                Bundle arguments = new Bundle();
-                arguments.putInt(ScoreFragment.ScoreTag, m_state.totalScore);
-                scoreFragment.setArguments(arguments);
-            }
-
+            final ScoreFragment scoreFragment = ScoreFragment.createFragment(m_state.totalScore);
             ProcessFragment(scoreFragment);
         }
         else

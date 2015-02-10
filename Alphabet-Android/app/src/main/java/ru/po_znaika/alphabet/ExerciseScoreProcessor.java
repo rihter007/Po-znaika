@@ -41,7 +41,7 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
         }
 
         private static final String DatabaseFilename = "exercise_server_cache.db";
-        private static final int DatabaseVersion = 0;
+        private static final int DatabaseVersion = 1;
 
         private static final String TableName = "ExerciseCache";
         private static final String IdColumnName = "id";

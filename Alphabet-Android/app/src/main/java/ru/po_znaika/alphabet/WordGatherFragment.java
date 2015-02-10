@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -25,7 +27,7 @@ import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 /**
  * Fragment for processing word gather exercise
  */
-public class WordGatherFragment extends Fragment
+public final class WordGatherFragment extends Fragment
 {
     private static class WordGatherState implements Parcelable
     {
@@ -80,7 +82,8 @@ public class WordGatherFragment extends Fragment
         };
     }
 
-    private static final String StateTag = "state";
+    private static final String AlphabetTypeTag = "alphabet_type";
+    private static final String InternalStateTag = "internal_state";
 
     private static final int MinWordLength = 6;
     private static final int MaxWordLength = 10;
@@ -89,6 +92,14 @@ public class WordGatherFragment extends Fragment
 
     private static final int InvalidIndexSelectionValue = -1;
 
+    public static WordGatherFragment createFragment(@NonNull AlphabetDatabase.AlphabetType alphabetType)
+    {
+        WordGatherFragment wordGatherFragment = new WordGatherFragment();
+        Bundle arguments = new Bundle();
+        arguments.putInt(AlphabetTypeTag, alphabetType.getValue());
+        wordGatherFragment.setArguments(arguments);
+        return  wordGatherFragment;
+    }
 
     public WordGatherFragment()
     {
@@ -147,7 +158,7 @@ public class WordGatherFragment extends Fragment
     {
         super.onSaveInstanceState(savedInstanceState);
 
-        savedInstanceState.putParcelable(StateTag, m_state);
+        savedInstanceState.putParcelable(InternalStateTag, m_state);
     }
 
     private void restoreInternalState(Bundle savedInstanceState) throws CommonException
@@ -162,7 +173,7 @@ public class WordGatherFragment extends Fragment
             if (wordInfo == null)
                 throw new IllegalArgumentException();
 
-            final int ImageResourceId = getResources().getIdentifier(alphabetDatabase.getImageFileNameById(wordInfo.second), Constant.DrawableResourcesTag, getActivity().getPackageName());
+            final int ImageResourceId = DatabaseHelpers.getDrawableIdByName(getResources(), alphabetDatabase.getImageFileNameById(wordInfo.second));
             if (ImageResourceId == 0)
                 throw new IllegalArgumentException();
 
@@ -178,7 +189,7 @@ public class WordGatherFragment extends Fragment
         }
         else
         {
-            m_state = savedInstanceState.getParcelable(StateTag);
+            m_state = savedInstanceState.getParcelable(InternalStateTag);
         }
 
         m_selectedItemIndex = InvalidIndexSelectionValue;
