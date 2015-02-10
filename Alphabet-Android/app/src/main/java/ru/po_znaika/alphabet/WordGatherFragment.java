@@ -9,6 +9,7 @@ import android.app.Fragment;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 
 import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.CommonException;
+import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
@@ -81,6 +83,8 @@ public final class WordGatherFragment extends Fragment
             }
         };
     }
+
+    private static final String LogTag = WordGatherFragment.class.getName();
 
     private static final String AlphabetTypeTag = "alphabet_type";
     private static final String InternalStateTag = "internal_state";
@@ -171,11 +175,24 @@ public final class WordGatherFragment extends Fragment
             AlphabetDatabase alphabetDatabase = new AlphabetDatabase(getActivity(), false);
             Pair<AlphabetDatabase.WordInfo, Integer> wordInfo = alphabetDatabase.getRandomWordAndImageByAlphabetAndLength(AlphabetId, MinWordLength, MaxWordLength);
             if (wordInfo == null)
-                throw new IllegalArgumentException();
+            {
+                Log.e(LogTag, "Could not extract word from alphabet database");
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
-            final int ImageResourceId = DatabaseHelpers.getDrawableIdByName(getResources(), alphabetDatabase.getImageFileNameById(wordInfo.second));
+            final String imageName = alphabetDatabase.getImageFileNameById(wordInfo.second);
+            if (imageName == null)
+            {
+                Log.e(LogTag, "Could not to extract image by id: " + wordInfo.second.toString());
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
+
+            final int ImageResourceId = DatabaseHelpers.getDrawableIdByName(getResources(), imageName);
             if (ImageResourceId == 0)
-                throw new IllegalArgumentException();
+            {
+                Log.e(LogTag, String.format("Could not extract image for name: \"%s\"", imageName));
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
             m_state = new WordGatherState();
             m_state.imageResourceId = ImageResourceId;

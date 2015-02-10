@@ -6,7 +6,8 @@ package ru.po_znaika.common;
  */
 public enum  CommonResultCode
 {
-    UnknownReason(0);
+    UnknownReason(0),
+    InvalidExternalSource(1);
 
     private CommonResultCode(int value)
     {
