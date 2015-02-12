@@ -466,7 +466,7 @@ public final class AlphabetDatabase
         SQLiteDatabase databaseConnection = null;
         try
         {
-            databaseConnection = SQLiteDatabase.openDatabase(pathToDatabase, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            databaseConnection = SQLiteDatabase.openDatabase(pathToDatabase, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
         }
         catch (SQLiteException exp)
         {
@@ -480,6 +480,7 @@ public final class AlphabetDatabase
      * Gets database from assets folder
      *
      * @return
+     * True if database is successfully created, False otherwise
      */
     private boolean createDatabase(Context context)
     {
@@ -560,7 +561,7 @@ public final class AlphabetDatabase
         try
         {
             dataReader = m_databaseConnection.rawQuery(ExtractAllExercisesShortInfoSqlStatement, null);
-            List<ExerciseShortInfo> resultList = new ArrayList<ExerciseShortInfo>();
+            List<ExerciseShortInfo> resultList = new ArrayList<>();
 
             if (dataReader.moveToFirst())
             {
@@ -602,7 +603,7 @@ public final class AlphabetDatabase
 
             if (dataReader.moveToFirst())
             {
-                List<ExerciseShortInfo> exercises = new ArrayList<ExerciseShortInfo>();
+                List<ExerciseShortInfo> exercises = new ArrayList<>();
 
                 do
                 {
@@ -642,7 +643,7 @@ public final class AlphabetDatabase
 
             if (dataReader.moveToFirst())
             {
-                List<ExerciseShortInfo> exercises = new ArrayList<ExerciseShortInfo>();
+                List<ExerciseShortInfo> exercises = new ArrayList<>();
 
                 do
                 {
@@ -756,7 +757,7 @@ public final class AlphabetDatabase
 
             if (dataReader.moveToFirst())
             {
-                ArrayList<CharacterExerciseItemInfo> resultList = new ArrayList<CharacterExerciseItemInfo>();
+                ArrayList<CharacterExerciseItemInfo> resultList = new ArrayList<>();
 
                 do
                 {
@@ -974,7 +975,7 @@ public final class AlphabetDatabase
                 word.word = dataReader.getString(1);
                 word.complexity = dataReader.getInt(2);
 
-                result = new Pair<WordInfo, Integer>(word, dataReader.getInt(3));
+                result = new Pair<>(word, dataReader.getInt(3));
             }
         }
         catch (Exception exp)
@@ -1004,7 +1005,7 @@ public final class AlphabetDatabase
             {
                 final Map<Character, Integer> MainWordStatistics = calculateStringStatistics(wordInfo.word);
 
-                List<WordInfo> subWords = new ArrayList<WordInfo>();
+                List<WordInfo> subWords = new ArrayList<>();
                 do
                 {
                     final String PossibleSubWord = dataReader.getString(3).toLowerCase();
@@ -1220,7 +1221,7 @@ public final class AlphabetDatabase
 
     private static Map<Character, Integer> calculateStringStatistics(final String str)
     {
-        Map<Character, Integer> result = new HashMap<Character, Integer>();
+        Map<Character, Integer> result = new HashMap<>();
 
         final char[] NormalizedString = str.toCharArray();
         for (char ch : NormalizedString)

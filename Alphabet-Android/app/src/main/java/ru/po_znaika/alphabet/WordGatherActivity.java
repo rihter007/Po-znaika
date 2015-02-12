@@ -106,7 +106,7 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
     private static final String InternalStateTag = "internal_state";
     private static final String FragmentTag = "main_window_fragment";
 
-    public static void startActivity(@NonNull Context context, @NonNull String exerciseName, AlphabetDatabase.AlphabetType alphabetType)
+    public static void startActivity(@NonNull Context context, @NonNull String exerciseName, @NonNull AlphabetDatabase.AlphabetType alphabetType)
     {
         Intent intent = new Intent(context, WordGatherActivity.class);
         intent.putExtra(ExerciseNameTag, exerciseName);

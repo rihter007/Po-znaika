@@ -212,7 +212,7 @@ public final class WordGatherFragment extends Fragment
         m_selectedItemIndex = InvalidIndexSelectionValue;
     }
 
-    private void constructUserInterface(View fragmentView)
+    private void constructUserInterface(@NonNull View fragmentView)
     {
         // process Button onclick listener
         {
