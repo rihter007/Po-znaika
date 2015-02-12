@@ -2,10 +2,14 @@ package ru.po_znaika.alphabet;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridView;
@@ -19,11 +23,20 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import ru.po_znaika.common.CommonException;
+import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 public class CharacterExerciseMenuActivity extends Activity
 {
+    private static String LogTag = CharacterExerciseMenuActivity.class.getName();
+
+    public static void startActivity(@NonNull Context context)
+    {
+        Intent intent = new Intent(context, CharacterExerciseMenuActivity.class);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -56,7 +69,10 @@ public class CharacterExerciseMenuActivity extends Activity
         AlphabetDatabase alphabetDatabase = new AlphabetDatabase(this, false);
         AlphabetDatabase.ExerciseShortInfo[] characterExercisesInfo = alphabetDatabase.getAllExercisesShortInfoByType(AlphabetDatabase.ExerciseType.Character);
         if (characterExercisesInfo == null)
-            throw new IllegalArgumentException();
+        {
+            Log.e(LogTag, "Failed to get any exercises");
+            throw new CommonException(CommonResultCode.InvalidExternalSource);
+        }
 
         final ExerciseFactory exerciseFactory = new ExerciseFactory(this, alphabetDatabase);
 

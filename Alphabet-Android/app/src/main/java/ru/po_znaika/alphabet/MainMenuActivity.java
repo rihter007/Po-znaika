@@ -128,8 +128,7 @@ public class MainMenuActivity extends ActionBarActivity
             if (itemSelectedIndex == 0)
             {
                 // ABC-book is selected
-                Intent intent = new Intent(this, CharacterExerciseMenuActivity.class);
-                startActivity(intent);
+                CharacterExerciseMenuActivity.startActivity(this);
             }
             else
             {
