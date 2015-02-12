@@ -153,7 +153,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         private int m_gridElementSelectionIndex;
     }
 
-    private static final String StateTag = "state";
+    private static final String InternalStateTag = "state";
 
     private static final int MinWordLength = 8;
     private static final int MaxWordLength = 10;
@@ -179,13 +179,67 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         // Required empty public constructor
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        View fragmentView = inflater.inflate(R.layout.fragment_create_words_from_specified, container, false);
+
+        try
+        {
+            restoreInternalState(savedInstanceState);
+            constructUserInterface(fragmentView);
+        }
+        catch (Exception exp)
+        {
+            Resources resources = getResources();
+            AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.failed_exercise_start),
+                    resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            getActivity().finish();
+                        }
+                    });
+            msgBox.show();
+        }
+
+        return fragmentView;
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+
+        m_exerciseCallback = (IExerciseStepCallback) activity;
+        m_scoreNotification = (IScoreNotification) activity;
+    }
+
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+
+        m_exerciseCallback = null;
+        m_scoreNotification = null;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState)
+    {
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.putParcelable(InternalStateTag, m_state);
+    }
+
     private void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         NoSelectionColor = getResources().getColor(android.R.color.holo_blue_light);
         SelectionColor = getResources().getColor(android.R.color.holo_green_light);
 
         if (savedInstanceState != null)
-            m_state = savedInstanceState.getParcelable(StateTag);
+            m_state = savedInstanceState.getParcelable(InternalStateTag);
 
         if (m_state == null)
         {
@@ -354,61 +408,16 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         {
             ListView foundWordsListView = (ListView) fragmentView.findViewById(R.id.wordsListView);
             TextAdapter adapter = new TextAdapter(getActivity(), getResources().getDimension(R.dimen.small_text_size));
+            for (int foundWordIndex : m_state.foundSubWords)
+                adapter.add(m_state.allSubWords.get(foundWordIndex));
             foundWordsListView.setAdapter(adapter);
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        View fragmentView = inflater.inflate(R.layout.fragment_create_words_from_specified, container, false);
-
-        try
-        {
-            restoreInternalState(savedInstanceState);
-            constructUserInterface(fragmentView);
-        }
-        catch (Exception exp)
-        {
-            Resources resources = getResources();
-            AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.failed_exercise_start),
-                    resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i)
-                        {
-                            getActivity().finish();
-                        }
-                    });
-            msgBox.show();
-        }
-
-        return fragmentView;
-    }
-
-    @Override
-    public void onAttach(Activity activity)
-    {
-        super.onAttach(activity);
-
-        m_exerciseCallback = (IExerciseStepCallback) activity;
-        m_scoreNotification = (IScoreNotification) activity;
-    }
-
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-
-        m_exerciseCallback = null;
-        m_scoreNotification = null;
     }
 
     private void printCharactersFound(@NonNull View view, int charactersCount)
     {
         TextView textView = (TextView) view.findViewById(R.id.charactersCountTextView);
         textView.setText(String.format(getResources().getString(R.string.caption_current_character_count), charactersCount));
-
     }
 
     private void onGridItemClicked(int gridId, int elementId)
@@ -569,60 +578,78 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
     private void onFinishButtonClicked()
     {
         final Resources resources = getResources();
-        final AlertDialogHelper.DialogResult dialogResult = AlertDialogHelper.showAlertDialog(getActivity(),
+        AlertDialogHelper.showAlertDialog(getActivity(),
                 resources.getString(R.string.alert_title),
                 resources.getString(R.string.alert_finish_exercise),
                 resources.getString(R.string.yes),
-                resources.getString(R.string.no));
+                resources.getString(R.string.no),
+                new AlertDialogHelper.IDialogResultListener()
+                {
+                    @Override
+                    public void onDialogProcessed(@NonNull AlertDialogHelper.DialogResult dialogResult)
+                    {
+                        if (dialogResult == AlertDialogHelper.DialogResult.PositiveSelected)
+                        {
+                            int totalScore = 0;
+                            for (Integer wordId : m_state.foundSubWords)
+                            {
+                                final String WordLiteral = m_state.allSubWords.get(wordId);
+                                totalScore += WordLiteral.length() * (m_state.usedHints.contains(wordId) ? SingleCharacterHintScore : SingleCharacterScore);
+                            }
 
-        if (dialogResult == AlertDialogHelper.DialogResult.PositiveSelected)
-        {
-            int totalScore = 0;
-            for (Integer wordId : m_state.foundSubWords)
-            {
-                final String WordLiteral = m_state.allSubWords.get(wordId);
-                totalScore += WordLiteral.length() * (m_state.usedHints.contains(wordId) ? SingleCharacterHintScore : SingleCharacterScore);
-            }
-
-            m_scoreNotification.setScore(totalScore);
-            m_exerciseCallback.processNextStep();
-        }
+                            m_scoreNotification.setScore(totalScore);
+                            m_exerciseCallback.processNextStep();
+                        }
+                    }
+                });
     }
 
     private void onBackButtonClicked()
     {
         final Resources resources = getResources();
-        final AlertDialogHelper.DialogResult dialogResult = AlertDialogHelper.showAlertDialog(getActivity(),
+        AlertDialogHelper.showAlertDialog(getActivity(),
                 resources.getString(R.string.alert_title),
                 resources.getString(R.string.alert_exit_exercise),
                 resources.getString(R.string.yes),
-                resources.getString(R.string.no));
-
-        if (dialogResult == AlertDialogHelper.DialogResult.PositiveSelected)
-            getActivity().finish();
+                resources.getString(R.string.no),
+                new AlertDialogHelper.IDialogResultListener()
+                {
+                    @Override
+                    public void onDialogProcessed(@NonNull AlertDialogHelper.DialogResult dialogResult)
+                    {
+                        if (dialogResult == AlertDialogHelper.DialogResult.PositiveSelected)
+                            getActivity().finish();
+                    }
+                });
     }
 
     private void onSkipButtonClicked()
     {
         final Resources resources = getResources();
-        final AlertDialogHelper.DialogResult dialogResult = AlertDialogHelper.showAlertDialog(getActivity(),
+        AlertDialogHelper.showAlertDialog(getActivity(),
                 resources.getString(R.string.alert_title),
                 resources.getString(R.string.alert_sure_word_skip),
                 resources.getString(R.string.yes),
-                resources.getString(R.string.no));
-
-        if (dialogResult == AlertDialogHelper.DialogResult.PositiveSelected)
-        {
-            try
-            {
-                restoreInternalState(null);
-                constructUserInterface(getView());
-            }
-            catch (Exception exp)
-            {
-                getActivity().finish();
-            }
-        }
+                resources.getString(R.string.no),
+                new AlertDialogHelper.IDialogResultListener()
+                {
+                    @Override
+                    public void onDialogProcessed(@NonNull AlertDialogHelper.DialogResult dialogResult)
+                    {
+                        if (dialogResult == AlertDialogHelper.DialogResult.PositiveSelected)
+                        {
+                            try
+                            {
+                                restoreInternalState(null);
+                                constructUserInterface(getView());
+                            }
+                            catch (Exception exp)
+                            {
+                                getActivity().finish();
+                            }
+                        }
+                    }
+                });
     }
 
     private LinearLayout[] getGridElementsArrayById(int id)

@@ -17,32 +17,35 @@ public final class AlertDialogHelper
         NegativeSelected
     }
 
-    public static DialogResult showAlertDialog(@NonNull Context context, String title, String message,
-                                               String positiveButtonCaption, String negativeButtonCaption)
+    public static interface IDialogResultListener
+    {
+        void onDialogProcessed(@NonNull DialogResult dialogResult);
+    }
+
+    public static void showAlertDialog(@NonNull Context context, String title, String message,
+                                               String positiveButtonCaption, String negativeButtonCaption,
+                                               @NonNull IDialogResultListener dialogListener)
     {
         class SimpleClickListener implements DialogInterface.OnClickListener
         {
-            public SimpleClickListener()
+            public SimpleClickListener(@NonNull DialogResult result, @NonNull IDialogResultListener listener)
             {
-                m_isClicked = false;
+                m_result = result;
+                m_listener = listener;
             }
 
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                m_isClicked = true;
+                m_listener.onDialogProcessed(m_result);
             }
 
-            public boolean isClicked()
-            {
-                return m_isClicked;
-            }
-
-            private boolean m_isClicked;
+            private DialogResult m_result;
+            private IDialogResultListener m_listener;
         }
 
-        SimpleClickListener positiveButtonClicker = new SimpleClickListener();
-        SimpleClickListener negativeButtonClicker = new SimpleClickListener();
+        SimpleClickListener positiveButtonClicker = new SimpleClickListener(DialogResult.PositiveSelected, dialogListener);
+        SimpleClickListener negativeButtonClicker = new SimpleClickListener(DialogResult.NegativeSelected, dialogListener);
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
         dialogBuilder.setCancelable(false);
@@ -51,7 +54,5 @@ public final class AlertDialogHelper
         dialogBuilder.setPositiveButton(positiveButtonCaption, positiveButtonClicker);
         dialogBuilder.setNegativeButton(negativeButtonCaption, negativeButtonClicker);
         dialogBuilder.show();
-
-        return positiveButtonClicker.isClicked() ? DialogResult.PositiveSelected : DialogResult.NegativeSelected;
     }
 }

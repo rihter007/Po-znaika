@@ -148,7 +148,13 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState)
     {
+        super.onSaveInstanceState(savedInstanceState);
+
         savedInstanceState.putParcelable(InternalStateTag, m_state);
+
+        final FragmentManager fragmentManager = getFragmentManager();
+        final Fragment currentFragment = fragmentManager.findFragmentByTag(FragmentTag);
+        fragmentManager.putFragment(savedInstanceState, FragmentTag, currentFragment);
     }
 
     private void restoreInternalState(Bundle savedInstanceState)
