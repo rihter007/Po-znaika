@@ -173,7 +173,7 @@ public final class WordGatherFragment extends Fragment
             final AlphabetDatabase.AlphabetType AlphabetId = AlphabetDatabase.AlphabetType.getTypeByValue(arguments.getInt(Constant.AlphabetTypeTag));
 
             AlphabetDatabase alphabetDatabase = new AlphabetDatabase(getActivity(), false);
-            Pair<AlphabetDatabase.WordInfo, Integer> wordInfo = alphabetDatabase.getRandomWordAndImageByAlphabetAndLength(AlphabetId, MinWordLength, MaxWordLength);
+            final Pair<AlphabetDatabase.WordInfo, Integer> wordInfo = alphabetDatabase.getRandomWordAndImageByAlphabetAndLength(AlphabetId, MinWordLength, MaxWordLength);
             if (wordInfo == null)
             {
                 Log.e(LogTag, "Could not extract word from alphabet database");
@@ -187,15 +187,15 @@ public final class WordGatherFragment extends Fragment
                 throw new CommonException(CommonResultCode.InvalidExternalSource);
             }
 
-            final int ImageResourceId = DatabaseHelpers.getDrawableIdByName(getResources(), imageName);
-            if (ImageResourceId == 0)
+            final int imageResourceId = DatabaseHelpers.getDrawableIdByName(getResources(), imageName);
+            if (imageResourceId == 0)
             {
                 Log.e(LogTag, String.format("Could not extract image for name: \"%s\"", imageName));
                 throw new CommonException(CommonResultCode.InvalidExternalSource);
             }
 
             m_state = new WordGatherState();
-            m_state.imageResourceId = ImageResourceId;
+            m_state.imageResourceId = imageResourceId;
             m_state.word = wordInfo.first.word;
             m_state.currentGather = m_state.word.toCharArray();
             m_state.isExerciseChecked = false;
@@ -216,7 +216,7 @@ public final class WordGatherFragment extends Fragment
     {
         // process Button onclick listener
         {
-            Button button = (Button) fragmentView.findViewById(R.id.finishButton);
+            final Button button = (Button) fragmentView.findViewById(R.id.finishButton);
             button.setOnClickListener(new View.OnClickListener()
             {
                 @Override
@@ -229,7 +229,7 @@ public final class WordGatherFragment extends Fragment
 
         // Set image hint
         {
-            ImageView imageHint = (ImageView) fragmentView.findViewById(R.id.imageView);
+            final ImageView imageHint = (ImageView) fragmentView.findViewById(R.id.imageView);
             imageHint.setImageDrawable(getResources().getDrawable(m_state.imageResourceId));
         }
 
@@ -246,13 +246,13 @@ public final class WordGatherFragment extends Fragment
                     TextView textView = (TextView) layout.findViewById(R.id.textView);
                     textView.setText(((Character)m_state.currentGather[chIndex]).toString());
 
-                    final int CharacterIndex = chIndex;
+                    final int characterIndex = chIndex;
                     layout.setOnClickListener(new View.OnClickListener()
                     {
                         @Override
                         public void onClick(View view)
                         {
-                            onGridElementClicked(CharacterIndex);
+                            onGridElementClicked(characterIndex);
                         }
                     });
 

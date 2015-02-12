@@ -186,6 +186,8 @@ INSERT INTO image(_id, file_name) VALUES(76, 'database_hippopotamus');
 INSERT INTO image(_id, file_name) VALUES(77, 'database_gnome');
 INSERT INTO image(_id, file_name) VALUES(78, 'database_iron');
 
+INSERT INTO image(_id, file_name) VALUES(79, 'database_icecream');
+
 /*
 INSERT INTO image(_id, file_name) VALUES(9, 'database_ch1_verse1');
 INSERT INTO image(_id, file_name) VALUES(10, 'database_ch1_verse2');
@@ -327,11 +329,14 @@ INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(24,    -345575051, '
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(25,    -345575051, 'ворона', 3);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(26,    -345575051, 'солнце', 2);
 
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(27,    -345575051, 'мороженое', 5);
+
 /* 
 ***************************
 word_image_description table
 ***************************
 */
+INSERT INTO word_image_description(word_id, image_id) VALUES(27, 79);
 /*
 INSERT INTO word_image_description(word_id, image_id) VALUES(14, 13);
 INSERT INTO word_image_description(word_id, image_id) VALUES(15, 24);
