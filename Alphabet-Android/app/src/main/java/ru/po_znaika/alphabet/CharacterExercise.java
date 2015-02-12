@@ -69,10 +69,7 @@ public class CharacterExercise implements IExercise
         /**
          * Start character exercise menu activity
          */
-        Intent intent = new Intent(m_context, SingleCharacterExerciseMenuActivity.class);
-        intent.putExtra(Constant.CharacterExerciseIdTag, exerciseInfo.id);
-        intent.putExtra(Constant.CharacterTag, exerciseInfo.character);
-        m_context.startActivity(intent);
+        SingleCharacterExerciseMenuActivity.startActivity(m_context, exerciseInfo.id, exerciseInfo.character);
     }
 
     public int getId()

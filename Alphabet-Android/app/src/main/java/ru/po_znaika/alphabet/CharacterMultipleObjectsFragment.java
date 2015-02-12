@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
@@ -83,8 +84,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
                 Resources resources = getResources();
                 final String PackageName = getActivity().getPackageName();
 
-                final int ImageResourceId = resources.getIdentifier(alphabetDatabase.getImageFileNameById(ImageId),
-                        Constant.DrawableResourcesTag, PackageName);
+                final int ImageResourceId = DatabaseHelpers.getDrawableIdByName(resources, alphabetDatabase.getImageFileNameById(ImageId));
                 final int SoundResourceId = resources.getIdentifier(alphabetDatabase.getSoundFileNameById(SoundId),
                         Constant.RawResourcesTag, PackageName);
 

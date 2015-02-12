@@ -5,9 +5,11 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +18,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.CommonException;
+import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -26,16 +30,15 @@ import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
  */
 public class TheoryPageFragment extends Fragment
 {
-    private static final String TheoryTableIndexTag = "theory_table_index";
+    private static final String LogTag = TheoryPageFragment.class.getName();
 
+    private static final String TheoryTableIndexTag = "theory_table_index";
     private static final String TheoryImageIndexTag = "theory_image_index";
     private static final String TheorySoundIndexTag = "theory_sound_index";
     private static final String TheoryMessageTag = "theory_message";
 
-    public static TheoryPageFragment createFragment(CharacterExerciseItemStepState state)
+    public static TheoryPageFragment createFragment(@NonNull CharacterExerciseItemStepState state)
     {
-        assert state != null;
-
         TheoryPageFragment pageFragment = new TheoryPageFragment();
         Bundle fragmentArguments = new Bundle();
         fragmentArguments.putInt(TheoryTableIndexTag, state.value);
@@ -54,7 +57,6 @@ public class TheoryPageFragment extends Fragment
         m_alphabetDatabase = new AlphabetDatabase(getActivity(), false);
 
         Bundle fragmentArguments = getArguments();
-        assert fragmentArguments != null;
         final Integer TheoryTableIndex = fragmentArguments.getInt(TheoryTableIndexTag);
 
         // Restore essential internal members
@@ -76,24 +78,30 @@ public class TheoryPageFragment extends Fragment
     /**
      * Constructs parts of user interface
      */
-    void constructUserInterface(View fragmentView)
+    void constructUserInterface(View fragmentView) throws CommonException
     {
         if ((m_theoryImageId == DatabaseConstant.InvalidDatabaseIndex) && (m_theorySoundId == DatabaseConstant.InvalidDatabaseIndex) &&
                 (TextUtils.isEmpty(m_theoryMessage)))
-            throw new IllegalArgumentException(); // TODO: fatal
+        {
+            Log.e(LogTag, "Invalid data");
+            throw new CommonException(CommonResultCode.InvalidInternalState);
+        }
 
         // process image
         if (m_theoryImageId != DatabaseConstant.InvalidDatabaseIndex)
         {
             Resources resources = getResources();
 
-            final String ResourceFileName = m_alphabetDatabase.getImageFileNameById(m_theoryImageId);
-            final int ImageResourceId = resources.getIdentifier(ResourceFileName, Constant.DrawableResourcesTag, getActivity().getPackageName());
-            if (ImageResourceId == 0)
-                throw new IllegalArgumentException();
+            final String resourceFileName = m_alphabetDatabase.getImageFileNameById(m_theoryImageId);
+            final int imageResourceId = DatabaseHelpers.getDrawableIdByName(resources, resourceFileName);
+            if (imageResourceId == 0)
+            {
+                Log.e(LogTag, String.format("Failed to obtain sound by id:\"%d\"", imageResourceId));
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
             ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.theoryImageView);
-            theoryImageView.setImageDrawable(resources.getDrawable(ImageResourceId));
+            theoryImageView.setImageDrawable(resources.getDrawable(imageResourceId));
         }
         else
         {
@@ -109,11 +117,14 @@ public class TheoryPageFragment extends Fragment
         if (m_theorySoundId != DatabaseConstant.InvalidDatabaseIndex)
         {
             final String ResourceFileName = m_alphabetDatabase.getSoundFileNameById(m_theorySoundId);
-            final int SoundResourceId = getResources().getIdentifier(ResourceFileName, Constant.RawResourcesTag, getActivity().getPackageName());
-            if (SoundResourceId == 0)
-                throw new IllegalArgumentException();
+            final int soundResourceId = getResources().getIdentifier(ResourceFileName, Constant.RawResourcesTag, getActivity().getPackageName());
+            if (soundResourceId == 0)
+            {
+                Log.e(LogTag, String.format("Failed to obtain sound by id:\"%d\"", soundResourceId));
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
-            m_theorySoundPlayer = MediaPlayer.create(getActivity(), SoundResourceId);
+            m_theorySoundPlayer = MediaPlayer.create(getActivity(), soundResourceId);
             m_theorySoundPlayer.start();
             m_isResumed = false;
         }

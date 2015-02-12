@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
-import java.io.IOException;
 import java.util.Random;
 
 import android.app.Activity;
@@ -12,13 +11,17 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.CommonException;
+import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -40,8 +43,17 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
     }
 
     private static final String LogTag = CharacterExerciseItemActivity.class.getName();
-    private static final String StateTag = "State";
-    private static final String FragmentTag = "MainWindowFragment";
+
+    private static final String CharacterExerciseItemIdTag = "character_exercise_id";
+    private static final String InternalStateTag = "internal_state";
+    private static final String FragmentTag = "current_fragment";
+
+    public static void startActivity(@NonNull Context context, int characterExerciseItemId)
+    {
+        Intent intent = new Intent(context, CharacterExerciseItemActivity.class);
+        intent.putExtra(CharacterExerciseItemIdTag, characterExerciseItemId);
+        context.startActivity(intent);
+    }
 
     private class SoundGeneralExerciseFactory implements CharacterExerciseStepManager.ICustomExerciseStepFactory
     {
@@ -64,7 +76,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
 
                     case 1:
 
-                        ArrayList<ImageSelectionSingleExerciseState> imageSelectionExercises = new ArrayList<ImageSelectionSingleExerciseState>();
+                        ArrayList<ImageSelectionSingleExerciseState> imageSelectionExercises = new ArrayList<>();
 
                         final SoundObjectExerciseContainer[] soundObjectExercises = new SoundObjectExerciseContainer[]
                                 {
@@ -114,8 +126,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
                                         soundIdentifier = OtherSoundObjectInfo.soundId;
                                     }
 
-                                    final int ImageResourceId = resources.getIdentifier(m_alphabetDatabase.getImageFileNameById(imageIdentifier),
-                                            Constant.DrawableResourcesTag, getPackageName());
+                                    final int ImageResourceId = DatabaseHelpers.getDrawableIdByName(resources, m_alphabetDatabase.getImageFileNameById(imageIdentifier));
                                     final int SoundResourceId = resources.getIdentifier(m_alphabetDatabase.getSoundFileNameById(soundIdentifier),
                                             Constant.RawResourcesTag, getPackageName());
 
@@ -188,42 +199,65 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         {
             if (savedInstanceState != null)
             {
-                m_state = savedInstanceState.getParcelable(StateTag);
+                m_state = savedInstanceState.getParcelable(InternalStateTag);
+                if (m_state == null)
+                {
+                    Log.e(LogTag, "Failed to restore internal state");
+                    throw new CommonException(CommonResultCode.InvalidInternalState);
+                }
             }
-
-            if (m_state == null)
+            else
             {
                 Bundle intentParams = getIntent().getExtras();
 
                 // get initial parameters from intent
 
-                final int CharacterExerciseId = intentParams.getInt(Constant.CharacterExerciseIdTag);
-                final char ExerciseCharacter = intentParams.getChar(Constant.CharacterTag);
-
-                final int CharacterExerciseItemId = intentParams.getInt(Constant.CharacterExerciseItemIdTag);
-                final AlphabetDatabase.CharacterExerciseItemType CharacterExerciseItemType =
-                        AlphabetDatabase.CharacterExerciseItemType.getTypeByValue(intentParams.getInt(Constant.CharacterExerciseItemTypeTag));
-                final String CharacterExerciseItemTitle = getResources().getString(R.string.title_activity_character_exercise_item) + " \"" +
-                        intentParams.getString(Constant.CharacterExerciseItemTitleTag) + "\"";
-
-                if ((CharacterExerciseId == DatabaseConstant.InvalidDatabaseIndex) || (CharacterExerciseItemId == DatabaseConstant.InvalidDatabaseIndex))
-                    throw new IllegalArgumentException();
+                final int characterExerciseItemId = intentParams.getInt(Constant.CharacterExerciseIdTag);
+                if (characterExerciseItemId == DatabaseConstant.InvalidDatabaseIndex)
+                {
+                    Log.e(LogTag, "Invalid character exercise id");
+                    throw new CommonException(CommonResultCode.InvalidInternalState);
+                }
 
                 // get additional parameters about item steps from database
                 m_alphabetDatabase = new AlphabetDatabase(this, false);
-                AlphabetDatabase.CharacterExerciseItemStepInfo[] exerciseSteps = m_alphabetDatabase.getAllCharacterExerciseStepsByCharacterExerciseItemId(CharacterExerciseItemId);
+
+                final AlphabetDatabase.CharacterExerciseItemInfo characterExerciseItemInfo =
+                        m_alphabetDatabase.getCharacterExerciseItemById(characterExerciseItemId);
+                if (characterExerciseItemInfo == null)
+                {
+                    Log.e(LogTag, String.format("Failed to obtain character item info from database, id: \"%d\"",
+                            characterExerciseItemId));
+                    throw new CommonException(CommonResultCode.InvalidExternalSource);
+                }
+
+                final AlphabetDatabase.CharacterExerciseInfo characterExerciseInfo =
+                        m_alphabetDatabase.getCharacterExerciseById(characterExerciseItemInfo.characterExerciseId);
+                if (characterExerciseInfo == null)
+                {
+                    Log.e(LogTag, String.format("Failed to obtain character exercise info from database, id: \"%d\"",
+                            characterExerciseItemInfo.characterExerciseId));
+                    throw new CommonException(CommonResultCode.InvalidExternalSource);
+                }
 
                 Map<Integer, CharacterExerciseItemStepState> sortedExerciseSteps = new HashMap<>();
-                for (AlphabetDatabase.CharacterExerciseItemStepInfo exerciseStepInfo : exerciseSteps)
                 {
-                    sortedExerciseSteps.put(exerciseStepInfo.stepNumber,
-                            new CharacterExerciseItemStepState(exerciseStepInfo.action, exerciseStepInfo.value));
+                    final AlphabetDatabase.CharacterExerciseItemStepInfo[] exerciseSteps =
+                            m_alphabetDatabase.getAllCharacterExerciseStepsByCharacterExerciseItemId(characterExerciseItemId);
+                    for (AlphabetDatabase.CharacterExerciseItemStepInfo exerciseStepInfo : exerciseSteps)
+                    {
+                        sortedExerciseSteps.put(exerciseStepInfo.stepNumber,
+                                new CharacterExerciseItemStepState(exerciseStepInfo.action, exerciseStepInfo.value));
+                    }
                 }
 
                 m_state = new CharacterExerciseItemState(
                         0,
-                        CharacterExerciseId, ExerciseCharacter,
-                        CharacterExerciseItemId, CharacterExerciseItemType, CharacterExerciseItemTitle,
+                        characterExerciseInfo.id,
+                        characterExerciseInfo.character,
+                        characterExerciseItemId,
+                        characterExerciseItemInfo.type,
+                        getResources().getString(R.string.title_activity_character_exercise_item) + " \"" + characterExerciseItemInfo.displayName + "\"",
                         sortedExerciseSteps.values(), null);
             }
         }
@@ -261,7 +295,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
     {
         super.onSaveInstanceState(savedInstanceState);
 
-        savedInstanceState.putParcelable(StateTag, m_state);
+        savedInstanceState.putParcelable(InternalStateTag, m_state);
     }
 
     public void processPreviousStep()
@@ -325,7 +359,9 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         }
         catch (Exception exp)
         {
-            // todo: wtf!!!
+            Log.e(LogTag, String.format("Fatal error. Failed to process exercise step fragment, exp:\"%s\"", exp.getMessage()));
+            MessageBox.Show(this, "Fatal error", "Fatal error");
+            finish();
         }
     }
 
