@@ -1,21 +1,19 @@
 package ru.po_znaika.alphabet;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
-import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.network.IServerOperations;
@@ -36,9 +34,11 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
         {
             public int id;
             public Date date;
-            public String exerciseLiteralId;
+            public String exerciseNameId;
             public int score;
         }
+
+        private static final String LogTag = ExerciseCacheDatabase.class.getName();
 
         private static final String DatabaseFilename = "exercise_server_cache.db";
         private static final int DatabaseVersion = 1;
@@ -46,15 +46,22 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
         private static final String TableName = "ExerciseCache";
         private static final String IdColumnName = "id";
         private static final String DateColumnName = "date";
-        private static final String ExerciseIdColumnName = "exercise_id";
+        private static final String ExerciseNameColumnName = "exercise_id";
         private static final String ScoreColumnName = "score";
 
         private static final String CreateExerciseCacheTableSqlStatement = "CREATE TABLE " + TableName + "(" +
                 IdColumnName + " INTEGER PRIMARY KEY ASC AUTOINCREMENT, " +
                 DateColumnName + " INTEGER NOT NULL, " +
-                ExerciseIdColumnName + " INTEGER NOT NULL, " +
+                ExerciseNameColumnName + " INTEGER NOT NULL, " +
                 ScoreColumnName + " INTEGER NOT NULL)";
         private static final String DropExerciseCacheTableSqlStatement = "DROP TABLE " + TableName;
+
+        private static final String ExtractAllCacheTableItemsSqlStatement = "SELECT " +
+                IdColumnName + ", " +
+                DateColumnName + ", " +
+                ExerciseNameColumnName + ", " +
+                ScoreColumnName + " " +
+                "FROM " + TableName;
 
         public ExerciseCacheDatabase(@NonNull Context _context)
         {
@@ -76,23 +83,95 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
             onCreate(database);
         }
 
-        public List<CacheItem> getCacheItems()
+        public CacheItem[] getCacheItems()
         {
-            return new ArrayList<>();
+            SQLiteDatabase database = getReadableDatabase();
+            Cursor dataReader = null;
+            try
+            {
+                dataReader = database.rawQuery(ExtractAllCacheTableItemsSqlStatement, null);
+                if (dataReader.moveToFirst())
+                {
+                    List<CacheItem> items = new ArrayList<>();
+
+                    do
+                    {
+                        CacheItem item = new CacheItem();
+                        item.id = dataReader.getInt(0);
+                        item.date = new Date(dataReader.getLong(1));
+                        item.exerciseNameId = dataReader.getString(2);
+                        item.score = dataReader.getInt(3);
+
+                        items.add(item);
+                    } while (dataReader.moveToNext());
+
+                    CacheItem[] result = new CacheItem[items.size()];
+                    items.toArray(result);
+                    return result;
+                }
+            }
+            catch (Exception exp)
+            {
+                Log.e(LogTag, String.format("getCacheItems exception: \"%s\"", exp.getMessage()));
+            }
+            finally
+            {
+                if (dataReader != null)
+                    dataReader.close();
+
+                database.close();
+            }
+
+            return null;
         }
 
         public int addCacheItem(@NonNull Date date, @NonNull String exerciseName, int score)
         {
-            return DatabaseConstant.InvalidDatabaseIndex;
-        }
+            SQLiteDatabase database = getWritableDatabase();
+            try
+            {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(DateColumnName, date.getTime());
+                contentValues.put(ExerciseNameColumnName, exerciseName);
+                contentValues.put(ScoreColumnName, score);
 
-        public boolean removeCacheItem(int itemId)
-        {
-            return false;
+                return (int)database.insert(TableName, null, contentValues);
+            }
+            catch (Exception exp)
+            {
+                Log.e(LogTag, String.format("addCacheItem exception: \"%s\"", exp.getMessage()));
+            }
+            finally
+            {
+                database.close();
+            }
+
+            return DatabaseConstant.InvalidDatabaseIndex;
         }
 
         public boolean removeCacheItem(@NonNull List<Integer> itemIds)
         {
+            if (itemIds.isEmpty())
+                return true;
+
+            SQLiteDatabase database = getWritableDatabase();
+            try
+            {
+                String[] deletionIds = new String[itemIds.size()];
+                for (int i = 0; i < itemIds.size(); ++i)
+                    deletionIds[i] = itemIds.get(i).toString();
+
+                database.delete(TableName, IdColumnName + '=', deletionIds);
+                return true;
+            }
+            catch (Exception exp)
+            {
+                Log.e(LogTag, String.format("removeCacheItem exception: \"%s\"", exp.getMessage()));
+            }
+            finally
+            {
+                database.close();
+            }
             return false;
         }
     }
@@ -121,7 +200,7 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
         try
         {
             m_serverOperations.reportExerciseScore(scoreDate, exerciseName, score);
-            List<ExerciseCacheDatabase.CacheItem> cacheItems = m_exerciseScoreCache.getCacheItems();
+            ExerciseCacheDatabase.CacheItem[] cacheItems = m_exerciseScoreCache.getCacheItems();
             if (cacheItems != null)
             {
                 List<Integer> sendedItems = new ArrayList<>();
@@ -132,9 +211,9 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
                         Log.i(LogTag, String.format("Try to send cache item - id:\"%d\" date:\"%s\" literalId:\"%s\" score:\"%d\"",
                                         cacheItem.id,
                                         cacheItem.date,
-                                        cacheItem.exerciseLiteralId,
+                                        cacheItem.exerciseNameId,
                                         cacheItem.score));
-                        m_serverOperations.reportExerciseScore(cacheItem.date, cacheItem.exerciseLiteralId, score);
+                        m_serverOperations.reportExerciseScore(cacheItem.date, cacheItem.exerciseNameId, score);
                     }
                 }
                 catch (CommonException | NetworkException exp)
