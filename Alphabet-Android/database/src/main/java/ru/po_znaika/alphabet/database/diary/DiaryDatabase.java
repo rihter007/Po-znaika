@@ -101,7 +101,7 @@ public class DiaryDatabase extends SQLiteOpenHelper
             dataReader = database.rawQuery(ExtractAllExercisesScoresOrderedByDateSqlStatement, null);
             if (dataReader.moveToFirst())
             {
-                List<ExerciseDiaryInfo> items = new ArrayList<ExerciseDiaryInfo>();
+                List<ExerciseDiaryInfo> items = new ArrayList<>();
 
                 do
                 {
