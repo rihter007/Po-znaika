@@ -160,7 +160,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     private void restoreInternalState(Bundle savedInstanceState)
     {
         final Bundle arguments = getIntent().getExtras();
-        m_exerciseName = arguments.getString(Constant.ExerciseIdTag);
+        m_exerciseName = arguments.getString(ExerciseNameTag);
         m_alphabetType = AlphabetDatabase.AlphabetType.getTypeByValue(arguments.getInt(Constant.AlphabetTypeTag));
 
         if (savedInstanceState == null)
