@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
 
 /**
  * A fragment for the Game: Create sub words from the given
@@ -567,65 +568,61 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
     private void onFinishButtonClicked()
     {
-        int totalScore = 0;
-        for (Integer wordId : m_state.foundSubWords)
-        {
-            final String WordLiteral = m_state.allSubWords.get(wordId);
-            totalScore +=  WordLiteral.length() * ( m_state.usedHints.contains(wordId) ? SingleCharacterHintScore: SingleCharacterScore);
-        }
+        final Resources resources = getResources();
+        final AlertDialogHelper.DialogResult dialogResult = AlertDialogHelper.showAlertDialog(getActivity(),
+                resources.getString(R.string.alert_title),
+                resources.getString(R.string.alert_finish_exercise),
+                resources.getString(R.string.yes),
+                resources.getString(R.string.no));
 
-        m_scoreNotification.setScore(totalScore);
-        m_exerciseCallback.processNextStep();
+        if (dialogResult == AlertDialogHelper.DialogResult.PositiveSelected)
+        {
+            int totalScore = 0;
+            for (Integer wordId : m_state.foundSubWords)
+            {
+                final String WordLiteral = m_state.allSubWords.get(wordId);
+                totalScore += WordLiteral.length() * (m_state.usedHints.contains(wordId) ? SingleCharacterHintScore : SingleCharacterScore);
+            }
+
+            m_scoreNotification.setScore(totalScore);
+            m_exerciseCallback.processNextStep();
+        }
     }
 
     private void onBackButtonClicked()
     {
-        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(getActivity());
+        final Resources resources = getResources();
+        final AlertDialogHelper.DialogResult dialogResult = AlertDialogHelper.showAlertDialog(getActivity(),
+                resources.getString(R.string.alert_title),
+                resources.getString(R.string.alert_exit_exercise),
+                resources.getString(R.string.yes),
+                resources.getString(R.string.no));
 
-        Resources resources = getResources();
-        dlgAlert.setMessage(resources.getString(R.string.alert_finish_exercise));
-        dlgAlert.setTitle(resources.getString(R.string.alert_title));
-        dlgAlert.setPositiveButton(resources.getString(R.string.yes), new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i)
-            {
-                getActivity().finish();
-            }
-        });
-        dlgAlert.setNegativeButton(resources.getString(R.string.no), null);
-
-        dlgAlert.create().show();
+        if (dialogResult == AlertDialogHelper.DialogResult.PositiveSelected)
+            getActivity().finish();
     }
 
     private void onSkipButtonClicked()
     {
-        Resources resources = getResources();
-        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(getActivity());
+        final Resources resources = getResources();
+        final AlertDialogHelper.DialogResult dialogResult = AlertDialogHelper.showAlertDialog(getActivity(),
+                resources.getString(R.string.alert_title),
+                resources.getString(R.string.alert_sure_word_skip),
+                resources.getString(R.string.yes),
+                resources.getString(R.string.no));
 
-        dlgAlert.setMessage(resources.getString(R.string.alert_sure_word_skip));
-        dlgAlert.setTitle(resources.getString(R.string.alert_title));
-        dlgAlert.setPositiveButton(resources.getString(R.string.yes), new DialogInterface.OnClickListener()
+        if (dialogResult == AlertDialogHelper.DialogResult.PositiveSelected)
         {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i)
+            try
             {
-                m_scoreNotification.setScore(0);
-
-                try
-                {
-                    restoreInternalState(null);
-                    constructUserInterface(getView());
-                }
-                catch (Exception exp)
-                {
-                    getActivity().finish();
-                }
+                restoreInternalState(null);
+                constructUserInterface(getView());
             }
-        });
-        dlgAlert.setNegativeButton(resources.getString(R.string.no), null);
-
-        dlgAlert.create().show();
+            catch (Exception exp)
+            {
+                getActivity().finish();
+            }
+        }
     }
 
     private LinearLayout[] getGridElementsArrayById(int id)
