@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,14 +17,16 @@ import ru.po_znaika.alphabet.database.DatabaseConstant;
 /**
  * Handles requests on diary
  */
-public class DiaryDatabase extends SQLiteOpenHelper
+public final class DiaryDatabase extends SQLiteOpenHelper
 {
-    public class ExerciseDiaryInfo
+    public static class ExerciseDiaryInfo
     {
         public Date date;
         public String exerciseName;
         public int score;
     }
+
+    private static final String LogTag = DiaryDatabase.class.getName();
 
     private static final String DATABASE_NAME = "diary.db";
     private static final int DATABASE_VERSION = 1;
@@ -42,7 +45,12 @@ public class DiaryDatabase extends SQLiteOpenHelper
     private static final String DropExerciseDiaryTableSqlStatement = "DROP TABLE exercise_diary";
 
     private static final String ExtractAllExercisesScoresOrderedByDateSqlStatement =
-            "SELECT date, exercise_id, score FROM exercise_diary ORDER BY date";
+            "SELECT " +
+            DateColumnName + ", " +
+            ExerciseNameColumnName + ", " +
+            ScoreColumnName + " " +
+            "FROM " + TableName + " " +
+            "ORDER BY " + DateColumnName;
 
     public DiaryDatabase(Context context)
     {
@@ -72,9 +80,9 @@ public class DiaryDatabase extends SQLiteOpenHelper
         try
         {
             ContentValues contentValues = new ContentValues();
-            contentValues.put("date", dateTime.getTime());
-            contentValues.put("exercise_name", exerciseId);
-            contentValues.put("score", score);
+            contentValues.put(DateColumnName, dateTime.getTime());
+            contentValues.put(ExerciseNameColumnName, exerciseId);
+            contentValues.put(ScoreColumnName, score);
 
             resultId = (int)database.insert(TableName, null, contentValues);
         }
@@ -92,8 +100,6 @@ public class DiaryDatabase extends SQLiteOpenHelper
 
     public ExerciseDiaryInfo[] getAllDiaryRecordsOrderedByDate()
     {
-        ExerciseDiaryInfo[] diaryRecords = null;
-
         SQLiteDatabase database = getReadableDatabase();
         Cursor dataReader = null;
         try
@@ -113,13 +119,14 @@ public class DiaryDatabase extends SQLiteOpenHelper
                     items.add(item);
                 } while (dataReader.moveToNext());
 
-                diaryRecords = new ExerciseDiaryInfo[items.size()];
+                ExerciseDiaryInfo[] diaryRecords = new ExerciseDiaryInfo[items.size()];
                 items.toArray(diaryRecords);
+                return diaryRecords;
             }
         }
-        catch (Exception e)
+        catch (Exception exp)
         {
-            diaryRecords = null;
+            Log.e(LogTag, String.format("getAllDiaryRecordsOrderedByDate exception:\"%s\"", exp.getMessage()));
         }
         finally
         {
@@ -129,6 +136,6 @@ public class DiaryDatabase extends SQLiteOpenHelper
             database.close();
         }
 
-        return diaryRecords;
+        return null;
     }
 }
