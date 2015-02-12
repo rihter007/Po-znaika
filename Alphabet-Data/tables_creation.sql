@@ -330,13 +330,15 @@ INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(25,    -345575051, '
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(26,    -345575051, 'солнце', 2);
 
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(27,    -345575051, 'мороженое', 5);
-
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(28,    -345575051, 'лошадь', 2);
 /* 
 ***************************
 word_image_description table
 ***************************
 */
 INSERT INTO word_image_description(word_id, image_id) VALUES(27, 79);
+INSERT INTO word_image_description(word_id, image_id) VALUES(28, 68);
+
 /*
 INSERT INTO word_image_description(word_id, image_id) VALUES(14, 13);
 INSERT INTO word_image_description(word_id, image_id) VALUES(15, 24);

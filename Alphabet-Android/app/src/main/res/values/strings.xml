@@ -38,7 +38,8 @@
     <string name="caption_back">Назад</string>
     <string name="caption_skip">Пропустить</string>
     <string name="caption_abc_book">Букварь</string>
-    <string name="caption_current_character_count">Найдено %d букв</string>
+    <string name="caption_current_character_count">Найдено букв: %d</string>
+    <string name="alert_finish_exercise">Завершить упражнение?</string>
     <string name="alert_incorrect_word_creation">Некорректное слово</string>
     <string name="alert_word_already_exists">Данное слово уже существует</string>
     <string name="alert_sure_word_skip">Пропустить данное слово?</string>

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,9 +40,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         public AlphabetDatabase.WordInfo mainWord;
 
         public ArrayList<String> allSubWords;
-
         public ArrayList<Integer> foundSubWords;
-
         public ArrayList<Integer> usedHints;
 
         public CreateWordsFromSpecifiedState() {}
@@ -164,6 +163,16 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
     private int SelectionColor;
     private int NoSelectionColor;
 
+    public static CreateWordsFromSpecifiedFragment createFragment(@NonNull AlphabetDatabase.AlphabetType alphabetType)
+    {
+        CreateWordsFromSpecifiedFragment fragment = new CreateWordsFromSpecifiedFragment();
+
+        Bundle arguments = new Bundle();
+        arguments.putInt(Constant.AlphabetTypeTag, alphabetType.getValue());
+        fragment.setArguments(arguments);
+        return fragment;
+    }
+
     public CreateWordsFromSpecifiedFragment()
     {
         // Required empty public constructor
@@ -190,25 +199,25 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
             if (m_state.mainWord == null)
                 throw new IllegalArgumentException();
 
-            final AlphabetDatabase.WordInfo[] AllSubWords = alphabetDatabase.getSubWords(m_state.mainWord);
-            if (AllSubWords == null)
+            final AlphabetDatabase.WordInfo[] allSubWords = alphabetDatabase.getSubWords(m_state.mainWord);
+            if (allSubWords == null)
                 throw new IllegalArgumentException();
 
-            m_state.allSubWords = new ArrayList<String>();
-            for (AlphabetDatabase.WordInfo wordInfo : AllSubWords)
+            m_state.allSubWords = new ArrayList<>();
+            for (AlphabetDatabase.WordInfo wordInfo : allSubWords)
             {
                 m_state.allSubWords.add(wordInfo.word);
             }
 
-            m_state.foundSubWords = new ArrayList<Integer>();
-            m_state.usedHints = new ArrayList<Integer>();
+            m_state.foundSubWords = new ArrayList<>();
+            m_state.usedHints = new ArrayList<>();
         }
 
         // calculate current used characters number
         {
-            m_currentCharactersCount = 0;
+            m_currentCharactersFound = 0;
             for (Integer wordIndex : m_state.foundSubWords)
-                m_currentCharactersCount += m_state.allSubWords.get(wordIndex).length();
+                m_currentCharactersFound += m_state.allSubWords.get(wordIndex).length();
         }
 
         m_selection = new GridSelection();
@@ -286,10 +295,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         }
 
         // process characters text view
-        {
-            TextView textView = (TextView) fragmentView.findViewById(R.id.charactersCountTextView);
-            textView.setText(String.format(getResources().getString(R.string.caption_current_character_count), m_currentCharactersCount));
-        }
+        printCharactersFound(fragmentView, m_currentCharactersFound);
 
         // process create word button
         {
@@ -346,7 +352,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         // process found sub words list
         {
             ListView foundWordsListView = (ListView) fragmentView.findViewById(R.id.wordsListView);
-            TextAdapter adapter = new TextAdapter(getActivity());
+            TextAdapter adapter = new TextAdapter(getActivity(), getResources().getDimension(R.dimen.small_text_size));
             foundWordsListView.setAdapter(adapter);
         }
     }
@@ -395,6 +401,13 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
         m_exerciseCallback = null;
         m_scoreNotification = null;
+    }
+
+    private void printCharactersFound(@NonNull View view, int charactersCount)
+    {
+        TextView textView = (TextView) view.findViewById(R.id.charactersCountTextView);
+        textView.setText(String.format(getResources().getString(R.string.caption_current_character_count), charactersCount));
+
     }
 
     private void onGridItemClicked(int gridId, int elementId)
@@ -489,8 +502,8 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
             }
         }
 
-        final int SubWordIndex = m_state.allSubWords.indexOf(word);
-        if (SubWordIndex == -1)
+        final int subWordIndex = m_state.allSubWords.indexOf(word);
+        if (subWordIndex == -1)
         {
             Resources resources = getResources();
             MessageBox.Show(getActivity(), resources.getString(R.string.alert_incorrect_word_creation),
@@ -498,7 +511,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
             return;
         }
 
-        if (m_state.foundSubWords.contains(SubWordIndex))
+        if (m_state.foundSubWords.contains(subWordIndex))
         {
             Resources resources = getResources();
             MessageBox.Show(getActivity(), resources.getString(R.string.alert_word_already_exists),
@@ -510,7 +523,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         // word is ok
         //
 
-        m_state.foundSubWords.add(SubWordIndex);
+        m_state.foundSubWords.add(subWordIndex);
 
         // return grids to initial state
         {
@@ -537,12 +550,18 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
         // renew list of created words
         {
-            TextAdapter textAdapter = new TextAdapter(getActivity());
+            TextAdapter textAdapter = new TextAdapter(getActivity(), getResources().getDimension(R.dimen.small_text_size));
             for (Integer foundWordIndex : m_state.foundSubWords)
                 textAdapter.add(m_state.allSubWords.get(foundWordIndex));
 
             ListView wordsListView = (ListView) getView().findViewById(R.id.wordsListView);
             wordsListView.setAdapter(textAdapter);
+        }
+
+        // renew found characters text
+        {
+            m_currentCharactersFound += m_state.allSubWords.get(subWordIndex).length();
+            printCharactersFound(getView(), m_currentCharactersFound);
         }
     }
 
@@ -561,7 +580,22 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
     private void onBackButtonClicked()
     {
-        m_exerciseCallback.processNextStep();
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(getActivity());
+
+        Resources resources = getResources();
+        dlgAlert.setMessage(resources.getString(R.string.alert_finish_exercise));
+        dlgAlert.setTitle(resources.getString(R.string.alert_title));
+        dlgAlert.setPositiveButton(resources.getString(R.string.yes), new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                getActivity().finish();
+            }
+        });
+        dlgAlert.setNegativeButton(resources.getString(R.string.no), null);
+
+        dlgAlert.create().show();
     }
 
     private void onSkipButtonClicked()
@@ -603,7 +637,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
     private IScoreNotification m_scoreNotification;
 
     private CreateWordsFromSpecifiedState m_state;
-    private int m_currentCharactersCount;
+    private int m_currentCharactersFound;
 
     private LinearLayout[] m_sourceGridElements;
     private LinearLayout[] m_destinationGridElements;

@@ -58,11 +58,7 @@ public class CreateWordsFromSpecifiedExercise implements IExercise
     */
     public void process()
     {
-        Intent intent = new Intent(m_context, CreateWordsFromSpecifiedActivity.class);
-        intent.putExtra(Constant.ExerciseIdTag, m_exerciseId);
-        intent.putExtra(Constant.AlphabetTypeTag, AlphabetDatabase.AlphabetType.Russian.getValue());
-
-        m_context.startActivity(intent);
+        CreateWordsFromSpecifiedActivity.startActivity(m_context, m_exerciseName, AlphabetDatabase.AlphabetType.Russian);
     }
 
     /* Returns a unique id of the exercise */

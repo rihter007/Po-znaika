@@ -15,10 +15,11 @@ import java.util.List;
  */
 public class TextAdapter extends BaseAdapter
 {
-    public TextAdapter(Context _context)
+    public TextAdapter(Context _context, float _textSize)
     {
         m_context = _context;
-        m_textElements = new ArrayList<String>();
+        m_textSize = _textSize;
+        m_textElements = new ArrayList<>();
     }
 
     public void add(String itemText)
@@ -67,11 +68,13 @@ public class TextAdapter extends BaseAdapter
         }
 
         TextView textView = (TextView) elementView.findViewById(R.id.textView);
+        textView.setTextSize(m_textSize);
         textView.setText(m_textElements.get(position));
 
         return elementView;
     }
 
     private Context m_context;
+    private float m_textSize;
     private List<String> m_textElements;
 }

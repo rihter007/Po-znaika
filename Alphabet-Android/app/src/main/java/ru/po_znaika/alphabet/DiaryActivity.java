@@ -45,12 +45,13 @@ public final class DiaryActivity extends ActionBarActivity
 
     private void constructUserInterface() throws CommonException
     {
-        TextAdapter textAdapter = new TextAdapter(this);
+        TextAdapter textAdapter;
 
         // fill grid caption
         {
-            Resources resources = getResources();
+            final Resources resources = getResources();
 
+            textAdapter = new TextAdapter(this, resources.getDimension(R.dimen.small_text_size));
             textAdapter.add(resources.getString(R.string.caption_date));
             textAdapter.add(resources.getString(R.string.caption_exercise_name));
             textAdapter.add(resources.getString(R.string.caption_exercise_score));
