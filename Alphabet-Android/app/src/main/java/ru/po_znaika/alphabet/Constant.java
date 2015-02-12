@@ -15,8 +15,5 @@ public class Constant
     public final static String AlphabetTypeTag = "alphabet_type";
 
     public final static String CharacterExerciseIdTag = "character_exercise_id";
-    public final static String CharacterExerciseItemIdTag = "character_exercise_item_id";
-    public final static String CharacterExerciseItemTypeTag = "character_exercise_item_type";
-    public final static String CharacterExerciseItemTitleTag = "character_exercise_item_title";
     public final static String CharacterTag = "character";
 }
