@@ -10,9 +10,9 @@ import ru.po_znaika.common.CommonException;
  */
 public interface IAuthenticationProvider
 {
-    AuthenticationToken getAuthenticationToken() throws CommonException;
-    public void setAuthenticationToken() throws CommonException;
+    String getAccountName();
+    AuthenticationToken getAuthenticationToken();
 
-    LoginPasswordCredentials getLoginPasswordCredentials() throws CommonException;
+    LoginPasswordCredentials getLoginPasswordCredentials();
     void setLoginPasswordCredentials(@NonNull String login, @NonNull String password) throws CommonException;
 }

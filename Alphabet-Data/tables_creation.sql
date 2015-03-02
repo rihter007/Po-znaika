@@ -83,6 +83,14 @@ CREATE TABLE word_sound_description (
     UNIQUE (sound_id, word_id) ON CONFLICT FAIL
 );
 
+/*CREATE TABLE word_sound_position (
+	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
+	word_id INTEGER NOT NULL,
+	
+	FOREIGN KEY(word_id) REFERENCES word(_id)
+
+);*/
+
 CREATE TABLE character_exercise (
     _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
     exercise_id INTEGER NOT NULL,
@@ -299,6 +307,7 @@ action is a column which specifies what to do
 291784361 - a crc32 of 'CustomAction'. Depends on character_exercise_item_id: 
 	0 - fragment with multiple words/sound/images for that SOUND (just for information: user clicks on image, hears the sound, views the object)
 	1 - fragment with selection of words for that SOUND
+	2 - fragment with selection of words for that CHARACTER
 ***************************
 */
 
@@ -311,6 +320,24 @@ INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_n
     VALUES(3, 1195583655, 2, 1986991965, 3);
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
     VALUES(4, 1195583655, 3, 1986991965, 4);
+INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+    VALUES(5, 1195583655, 3, 291784361, 0);
+/*INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+    VALUES(6, 1195583655, 3, 291784361, 1);*/
+	
+/* Letter ch1 */
+INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+    VALUES(11, 1196999958, 0, 1986991965, 5);
+INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+    VALUES(12, 1196999958, 1, 1986991965, 6);
+INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+    VALUES(13, 1196999958, 2, 1986991965, 7);
+INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+    VALUES(14, 1196999958, 3, 1986991965, 8);
+INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+    VALUES(15, 1196999958, 4, 1986991965, 9);
+
+
 /*
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
     VALUES(2, 1195583655, 1, 291784361, 0);
@@ -326,8 +353,12 @@ INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(1, 200, 0, 'Ф�
 INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(2, 201, 0, 'Произношение звука ''а''');
 INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(3, 203, 0, 'Ударение падает на букву ''а'': А`ист');
 INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(4, 202, 0, 'Ударение не падает на букву ''а'': Бе`лка');
-/*INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(1, 4, 1, '(Пример текста:) Аист в небе пролетает, на юга опять летит!');*/
 
+INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(5, 1, 0, 'Печатный вариант буквы А');
+INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(6, 5, 0, 'Прописной вариант буквы А');
+INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(7, 400, 0, 'Аист');
+INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(8, 401, 0, 'лошАдь');
+INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(9, 402, 0, 'совА');
 
 /* 
 ***************************

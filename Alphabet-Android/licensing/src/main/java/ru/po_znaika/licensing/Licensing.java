@@ -4,10 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.JsonReader;
 import android.util.Log;
 
-import org.apache.http.util.EncodingUtils;
-
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.util.Date;
 
 import java.io.ByteArrayOutputStream;
@@ -17,11 +18,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.HttpURLConnection;
-
 import ru.po_znaika.common.CommonException;
+import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.network.IAuthenticationProvider;
 import ru.po_znaika.network.LoginPasswordCredentials;
 import ru.po_znaika.network.NetworkConstant;
+import ru.po_znaika.network.NetworkException;
+import ru.po_znaika.network.NetworkResultCode;
 
 /**
  * Created by Rihter on 19.01.2015.
@@ -30,6 +33,7 @@ import ru.po_znaika.network.NetworkConstant;
 class LicensingCache
 {
     private static final String CacheFileName = "LicensingCache";
+    private static final String AccountName = "account_name";
     private static final String LicenseKey = "license";
     private static final String CheckDateKey = "check_date";
 
@@ -38,6 +42,11 @@ class LicensingCache
     public LicensingCache(@NonNull Context context)
     {
         m_cacheFile = context.getSharedPreferences(CacheFileName, Context.MODE_PRIVATE);
+    }
+
+    public String getAccountName()
+    {
+        return m_cacheFile.getString(AccountName, "");
     }
 
     public LicenseType getLicense()
@@ -58,13 +67,23 @@ class LicensingCache
         return new Date(checkDateUTC);
     }
 
-    public void updateLicense(@NonNull LicenseType licenseType)
+    public void clear()
+    {
+        SharedPreferences.Editor editor = m_cacheFile.edit();
+        editor.remove(AccountName);
+        editor.remove(LicenseKey);
+        editor.remove(CheckDateKey);
+        editor.commit();
+    }
+
+    public void updateLicense(@NonNull String accountName, @NonNull LicenseType licenseType)
     {
         final Date currentDate = new Date();
         SharedPreferences.Editor editor = m_cacheFile.edit();
+        editor.putString(AccountName, accountName);
         editor.putInt(LicenseKey, licenseType.getValue());
         editor.putLong(CheckDateKey, currentDate.getTime());
-        editor.apply();
+        editor.commit();
     }
 
     private SharedPreferences m_cacheFile;
@@ -93,75 +112,52 @@ public class Licensing implements ILicensing
         m_authProvider = _authProvider;
     }
 
-    public LicenseType getCurrentLicenseInfo() throws CommonException
+    @Override
+    public LicenseType getCurrentLicenseInfo(@NonNull LoginPasswordCredentials credentials)
+            throws CommonException, NetworkException
     {
-        //
-        // Try to refresh license info by internet
-        //
+        return getLicenseByCredentials(credentials);
+    }
 
+    @Override
+    public LicenseType getCurrentLicenseInfo() throws CommonException, NetworkException
+    {
         LoginPasswordCredentials credentials = m_authProvider.getLoginPasswordCredentials();
-        if ((credentials != null) && (credentials.isValid()))
+        if (credentials == null)
+            throw new CommonException(CommonResultCode.InvalidArgument);
+
+        return getLicenseByCredentials(credentials);
+    }
+
+    private LicenseType getLicenseByCredentials(@NonNull LoginPasswordCredentials credentials) throws CommonException, NetworkException
+    {
+        if (!credentials.isValid())
+            throw new CommonException(CommonResultCode.InvalidArgument);
+
+        LicenseType licenseType = LicenseType.NoLicense;
+        try
         {
-            Log.i(LogTag, "Login/Password credentials are provided. Try to renew license");
-            try
-            {
-                HttpURLConnection request = (HttpURLConnection) m_url.openConnection();
-                request.setRequestMethod("GET");
-                request.setRequestProperty(NetworkConstant.LoginHeader, credentials.login);
-                if (!TextUtils.isEmpty(credentials.password))
-                    request.setRequestProperty(NetworkConstant.PasswordHeader, credentials.password);
-
-                InputStream requestBody = request.getInputStream();
-
-                String responseEncoding = request.getContentEncoding();
-                responseEncoding = TextUtils.isEmpty(responseEncoding) ? "UTF-8" : responseEncoding;
-
-                if (requestBody.available() > 0)
-                {
-                    String normalizedResponse;
-                    ByteArrayOutputStream totalStream = new ByteArrayOutputStream();
-                    try
-                    {
-                        byte[] chunk = new byte[512];
-
-                        for (; ; )
-                        {
-                            final int bytesRead = requestBody.read(chunk);
-                            if (bytesRead == 0)
-                                break;
-
-                            totalStream.write(chunk, 0, bytesRead);
-                        }
-
-                        normalizedResponse = EncodingUtils.getString(totalStream.toByteArray(), responseEncoding);
-                    }
-                    finally
-                    {
-                        totalStream.close();
-                    }
-
-                    // TODO: parse as json
-                    if (normalizedResponse != null)
-                    {
-                        final LicenseType currentLicense = ParseLicenseType(normalizedResponse);
-                        m_licensingCache.updateLicense(currentLicense);
-                        return currentLicense;
-                    }
-                }
-                else
-                {
-                    Log.e(LogTag, "Server returned empty response body");
-                }
-            }
-            catch (IOException exp)
-            {
-                Log.i(LogTag, String.format("Failed to open connection, exception message: \"%s\"", exp.getMessage()));
-            }
+            licenseType = getLicenseFromServer(credentials);
+            m_licensingCache.updateLicense(credentials.login, licenseType);
+            return licenseType;
+        }
+        catch (NetworkException exp)
+        {
+            Log.i(LogTag, "Exception when verifying license occurred: " + exp.getMessage());
+            if (exp.getResultCode() == NetworkResultCode.AuthenticationError)
+                throw exp;
         }
 
         //
         // Take information from cache
         //
+        final String accountName = m_licensingCache.getAccountName();
+        if (!accountName.equalsIgnoreCase(credentials.login))
+        {
+            m_licensingCache.clear();
+            return licenseType;
+        }
+
         final LicenseType cachedLicense = m_licensingCache.getLicense();
         if (!LicenseType.isActive(cachedLicense))
             return cachedLicense;
@@ -184,6 +180,108 @@ public class Licensing implements ILicensing
 
         final long TimeDiffDays = (currentDate.getTime() - cachedDate.getTime()) / MilliSecondsInDay;
         return MaxLicenseTimeDeltaDays >= TimeDiffDays ? cachedLicense : LicenseType.Expired;
+    }
+
+    private LicenseType getLicenseFromServer(@NonNull LoginPasswordCredentials credentials) throws NetworkException
+    {
+        Log.i(LogTag, "Login/Password credentials are provided. Try to renew license");
+        Log.i(LogTag, "Login: " + credentials.login);
+        Log.i(LogTag, "password: " + credentials.password);
+
+        try
+        {
+            HttpURLConnection request = (HttpURLConnection) m_url.openConnection();
+            request.setRequestMethod("GET");
+            request.setRequestProperty(NetworkConstant.LoginHeader, credentials.login);
+            if (!TextUtils.isEmpty(credentials.password))
+                request.setRequestProperty(NetworkConstant.PasswordHeader, credentials.password);
+
+            int responseCode = 0;
+            try
+            {
+                responseCode = request.getResponseCode();
+            }
+            catch (IOException exp)
+            {
+            }
+
+            if (responseCode != 200)
+            {
+                Log.e(LogTag, "Response error code= " + responseCode);
+                switch (responseCode)
+                {
+                    case 401:
+                    case 404:
+                        throw new NetworkException(NetworkResultCode.AuthenticationError);
+                    default:
+                        throw new NetworkException(NetworkResultCode.Unknown);
+                }
+            }
+
+            InputStream requestBody = request.getInputStream();
+
+            String responseEncoding = request.getContentEncoding();
+            responseEncoding = TextUtils.isEmpty(responseEncoding) ? "UTF-8" : responseEncoding;
+
+            ByteArrayOutputStream responseBodyStream = new ByteArrayOutputStream();
+            try
+            {
+                byte[] chunk = new byte[512];
+
+                for (; ; )
+                {
+                    final int bytesRead = requestBody.read(chunk);
+                    if (bytesRead <= 0)
+                        break;
+
+                    responseBodyStream.write(chunk, 0, bytesRead);
+                }
+            }
+            finally
+            {
+                Log.e(LogTag, "Failed to read out response body");
+                responseBodyStream.close();
+            }
+
+            if (responseBodyStream.size() > 0)
+            {
+                // http://developer.android.com/reference/android/util/JsonReader.html
+                JsonReader jsonReader = new JsonReader(new InputStreamReader(
+                        new ByteArrayInputStream(responseBodyStream.toByteArray()), responseEncoding));
+                try
+                {
+                    jsonReader.beginObject();
+
+                    while (jsonReader.hasNext())
+                    {
+                        final String nodeName = jsonReader.nextName();
+                        if (nodeName.equalsIgnoreCase("Type"))
+                        {
+                            return ParseLicenseType(jsonReader.nextString());
+                        }
+                    }
+                    Log.e(LogTag, "No type node is found");
+
+                    jsonReader.endObject();
+                }
+                finally
+                {
+                    Log.e(LogTag, "Failed to parse response json");
+                    jsonReader.close();
+                }
+            }
+            else
+            {
+                Log.e(LogTag, "Server has returned empty body");
+            }
+        }
+        catch (IOException exp)
+        {
+            Log.e(LogTag, exp.getMessage());
+            throw new NetworkException(NetworkResultCode.Unknown);
+        }
+
+        return LicenseType.NoLicense;
     }
 
     private static LicenseType ParseLicenseType(@NonNull String license)

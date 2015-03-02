@@ -48,7 +48,7 @@ public class Authenticator implements IAuthentication
             final String tokenField = urlConnection.getHeaderField("token");
             final String expirationField = urlConnection.getHeaderField("expiration");
             if ((TextUtils.isEmpty(tokenField)) || (TextUtils.isEmpty(expirationField)))
-                throw new NetworkException(NetworkResultCode.BrokenProtocol);
+                throw new NetworkException(NetworkResultCode.Unknown);
             long utcExpirationDate = 0;
 
             try
@@ -57,7 +57,7 @@ public class Authenticator implements IAuthentication
             }
             catch (NumberFormatException exp)
             {
-                throw new NetworkException(NetworkResultCode.BrokenProtocol);
+                throw new NetworkException(NetworkResultCode.Unknown);
             }
 
             AuthenticationToken token = new AuthenticationToken();
@@ -71,7 +71,7 @@ public class Authenticator implements IAuthentication
         }
         catch (SocketException exp)
         {
-            throw new NetworkException(NetworkResultCode.ConnectionTimeout);
+            throw new NetworkException(NetworkResultCode.Unknown);
         }
         catch (Exception exp)
         {

@@ -211,7 +211,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
 
             try
             {
-                m_serviceLocator.getexerciseScoreProcessor().reportExerciseScore(m_exerciseName, m_state.totalScore);
+                m_serviceLocator.getExerciseScoreProcessor().reportExerciseScore(m_exerciseName, m_state.totalScore);
             }
             catch (CommonException exp)
             {

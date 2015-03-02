@@ -70,7 +70,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
             AlphabetDatabase.SoundObjectInfo[] rawSoundObjects =
                     alphabetDatabase.getCharacterSoundObjectsByCharacterExerciseIdAndMatchFlag(m_state.characterExerciseId, AlphabetDatabase.SoundObjectInfo.Contain, DisplayedObjectsCount);
 
-            List<SoundObject> resultDisplayObjects = new ArrayList<SoundObject>();
+            List<SoundObject> resultDisplayObjects = new ArrayList<>();
             for (int soundObjectIndex = 0; soundObjectIndex < rawSoundObjects.length; ++soundObjectIndex)
             {
                 final AlphabetDatabase.SoundObjectInfo RawSoundObject = rawSoundObjects[soundObjectIndex];
@@ -114,6 +114,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
             captionTextView.setText(StandardCaption + '\'' + m_state.exerciseCharacter + '\'');
         }
 
+        // http://stackoverflow.com/questions/6094315/single-textview-with-two-different-colored-text
         // show object elements in list
         {
             ListView objectsMenuList = (ListView)fragmentView.findViewById(R.id.objectsListView);
@@ -182,7 +183,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
         catch (Exception exp)
         {
             Resources resources = getResources();
-            AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.failed_exercise_step),
+            AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.failed_action),
                     resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
                     {
                         @Override

@@ -25,7 +25,14 @@ public final class CacheAuthenticationProvider implements IAuthenticationProvide
         m_cacheFile = _context.getSharedPreferences(CacheFileName, Context.MODE_PRIVATE);
     }
 
-    public AuthenticationToken getAuthenticationToken() throws CommonException
+    @Override
+    public String getAccountName()
+    {
+        return m_cacheFile.getString(LoginKey, null);
+    }
+
+    @Override
+    public AuthenticationToken getAuthenticationToken()
     {
         throw new UnsupportedOperationException();
     }
@@ -35,7 +42,7 @@ public final class CacheAuthenticationProvider implements IAuthenticationProvide
         throw new UnsupportedOperationException();
     }
 
-    public LoginPasswordCredentials getLoginPasswordCredentials() throws CommonException
+    public LoginPasswordCredentials getLoginPasswordCredentials()
     {
         final String login = m_cacheFile.getString(LoginKey, null);
         if (login == null)

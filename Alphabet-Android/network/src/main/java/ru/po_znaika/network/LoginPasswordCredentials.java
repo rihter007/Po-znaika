@@ -20,6 +20,6 @@ public class LoginPasswordCredentials
 
     public boolean isValid()
     {
-        return !TextUtils.isEmpty(login) && TextUtils.isEmpty(password);
+        return !TextUtils.isEmpty(login) && !TextUtils.isEmpty(password);
     }
 }

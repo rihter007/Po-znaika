@@ -274,7 +274,7 @@ public class ImageSelectionFragment extends Fragment
         catch (Exception exp)
         {
             Resources resources = getResources();
-            AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.failed_exercise_step),
+            AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.failed_action),
                     resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
                     {
                         @Override

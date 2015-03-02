@@ -6,9 +6,9 @@ package ru.po_znaika.network;
  */
 public enum NetworkResultCode
 {
-    ConnectionTimeout(0),
-    BrokenProtocol(0),
-    NotAuthenticated(1);
+    Unknown(0),
+    NoConnection(1),
+    AuthenticationError(1);
 
     private NetworkResultCode(int value)
     {

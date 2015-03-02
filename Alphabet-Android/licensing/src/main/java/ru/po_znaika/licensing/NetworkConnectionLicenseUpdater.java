@@ -22,7 +22,7 @@ public class NetworkConnectionLicenseUpdater extends BroadcastReceiver
 
     public void onReceive(Context context, Intent intent)
     {
-        ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+       /* ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo network = connectivityManager.getActiveNetworkInfo();
         if ((network == null) || (network.getState() != NetworkInfo.State.CONNECTED))
             return;
@@ -37,6 +37,7 @@ public class NetworkConnectionLicenseUpdater extends BroadcastReceiver
         {
             // just ignore
         }
+        */
     }
 
     private IAuthenticationProvider m_authProvider;

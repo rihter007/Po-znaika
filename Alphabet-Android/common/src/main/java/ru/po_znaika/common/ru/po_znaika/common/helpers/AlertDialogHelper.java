@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
+import android.view.View;
 
 /**
  * Created by Rihter on 12.02.2015.
@@ -22,28 +23,43 @@ public final class AlertDialogHelper
         void onDialogProcessed(@NonNull DialogResult dialogResult);
     }
 
+    private static class SimpleClickListener implements DialogInterface.OnClickListener
+    {
+        public SimpleClickListener(@NonNull DialogResult result, @NonNull IDialogResultListener listener)
+        {
+            m_result = result;
+            m_listener = listener;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which)
+        {
+            m_listener.onDialogProcessed(m_result);
+        }
+
+        private DialogResult m_result;
+        private IDialogResultListener m_listener;
+    }
+
+    public static void showAlertDialog(@NonNull Context context, View dialogView,
+                                       String positiveButtonCaption, String negativeButtonCaption,
+                                       @NonNull IDialogResultListener dialogListener)
+    {
+        SimpleClickListener positiveButtonClicker = new SimpleClickListener(DialogResult.PositiveSelected, dialogListener);
+        SimpleClickListener negativeButtonClicker = new SimpleClickListener(DialogResult.NegativeSelected, dialogListener);
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setCancelable(false);
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.setPositiveButton(positiveButtonCaption, positiveButtonClicker);
+        dialogBuilder.setNegativeButton(negativeButtonCaption, negativeButtonClicker);
+        dialogBuilder.show();
+    }
+
     public static void showAlertDialog(@NonNull Context context, String title, String message,
                                                String positiveButtonCaption, String negativeButtonCaption,
                                                @NonNull IDialogResultListener dialogListener)
     {
-        class SimpleClickListener implements DialogInterface.OnClickListener
-        {
-            public SimpleClickListener(@NonNull DialogResult result, @NonNull IDialogResultListener listener)
-            {
-                m_result = result;
-                m_listener = listener;
-            }
-
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                m_listener.onDialogProcessed(m_result);
-            }
-
-            private DialogResult m_result;
-            private IDialogResultListener m_listener;
-        }
-
         SimpleClickListener positiveButtonClicker = new SimpleClickListener(DialogResult.PositiveSelected, dialogListener);
         SimpleClickListener negativeButtonClicker = new SimpleClickListener(DialogResult.NegativeSelected, dialogListener);
 

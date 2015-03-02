@@ -1,6 +1,9 @@
 package ru.po_znaika.licensing;
 
+import android.support.annotation.NonNull;
+
 import ru.po_znaika.common.CommonException;
+import ru.po_znaika.network.LoginPasswordCredentials;
 import ru.po_znaika.network.NetworkException;
 
 /**
@@ -9,10 +12,17 @@ import ru.po_znaika.network.NetworkException;
  */
 public interface ILicensing
 {
+    /** Gets license for account by specified credentials
+     * @param credentials Credentials used to get license
+     * @return License obtained for account by specified credentials
+     * @throws CommonException
+     */
+    LicenseType getCurrentLicenseInfo(@NonNull LoginPasswordCredentials credentials) throws CommonException, NetworkException;
+
     /**
      *
      * @return
      * @throws CommonException
      */
-    LicenseType getCurrentLicenseInfo() throws CommonException;
+    LicenseType getCurrentLicenseInfo() throws CommonException, NetworkException;
 }

@@ -7,21 +7,102 @@ import java.util.TreeMap;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.util.Log;
 
 import ru.po_znaika.common.CommonException;
+import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
+import ru.po_znaika.licensing.LicenseType;
+import ru.po_znaika.network.LoginPasswordCredentials;
+import ru.po_znaika.network.NetworkException;
+import ru.po_znaika.network.NetworkResultCode;
 
 public class MainMenuActivity extends ActionBarActivity
 {
+    private static final String LogTag = "MainMenuActivity";
+
+    private class LicenseProcessingTask extends AsyncTask<String, Integer, LicenseType>
+    {
+        @Override
+        protected LicenseType doInBackground(String... credentialParts)
+        {
+            LoginPasswordCredentials credentials = new LoginPasswordCredentials();
+            credentials.login = credentialParts[0];
+            credentials.password = credentialParts[1];
+
+            try
+            {
+                final LicenseType accountLicense = m_serviceLocator.getLicensing().getCurrentLicenseInfo(credentials);
+                m_serviceLocator.getAuthenticationProvider().
+                        setLoginPasswordCredentials(credentials.login, credentials.password);
+
+                m_serviceLocator.getAuthenticationProvider().setLoginPasswordCredentials(credentials.login, credentials.password);
+                return accountLicense;
+            }
+            catch (NetworkException exp)
+            {
+                Log.e(LogTag, "License processing network exception: " + exp.getMessage());
+                m_networkErrorCode = exp.getResultCode();
+            }
+            catch (CommonException exp)
+            {
+                Log.e(LogTag, "License processing common exception: " + exp.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(LicenseType accountLicense)
+        {
+            Resources resources = getResources();
+            if (accountLicense != null)
+            {
+                if (!LicenseType.isActive(accountLicense))
+                {
+                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_no_active_license),
+                            resources.getString(R.string.alert_title));
+                    return;
+                }
+
+                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_application_activated),
+                        resources.getString(R.string.alert_title));
+                return;
+            }
+
+            if (m_networkErrorCode == NetworkResultCode.AuthenticationError)
+            {
+                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_login_password_incorrect),
+                        resources.getString(R.string.alert_title));
+                return;
+            }
+            if (m_commonErrorCode == CommonResultCode.InvalidArgument)
+            {
+                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_bad_credentials),
+                        resources.getString(R.string.alert_title));
+                return;
+            }
+
+            MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.failed_action),
+                    resources.getString(R.string.alert_title));
+        }
+
+        private CommonResultCode m_commonErrorCode;
+        private NetworkResultCode m_networkErrorCode;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -47,6 +128,15 @@ public class MainMenuActivity extends ActionBarActivity
 
     void restoreInternalState() throws CommonException
     {
+        // Print account name
+        {
+            final String accountName = m_serviceLocator.getAuthenticationProvider().getAccountName();
+            if (!TextUtils.isEmpty(accountName))
+            {
+                // TODO:
+            }
+        }
+
         ExerciseFactory exerciseFactory = new ExerciseFactory(this, m_serviceLocator.getAlphabetDatabase());
 
         // contains processed exercises in sorted order
@@ -125,6 +215,13 @@ public class MainMenuActivity extends ActionBarActivity
     {
         try
         {
+            if (!LicenseType.isActive(m_serviceLocator.getLicensing().getCurrentLicenseInfo()))
+            {
+                Resources resources = getResources();
+                MessageBox.Show(this, resources.getString(R.string.alert_no_active_license), resources.getString(R.string.alert_title));
+                return;
+            }
+
             if (itemSelectedIndex == 0)
             {
                 // ABC-book is selected
@@ -157,9 +254,45 @@ public class MainMenuActivity extends ActionBarActivity
         switch (SelectedItemId)
         {
             case R.id.action_diary:
+            {
                 Intent intent = new Intent(this, DiaryActivity.class);
                 startActivity(intent);
-                break;
+            }
+            break;
+
+            case R.id.action_authorization:
+            {
+                final Resources resources = getResources();
+                final View signInDialog = getLayoutInflater().inflate(R.layout.dialog_signin, null);
+                AlertDialogHelper.showAlertDialog(this
+                        , signInDialog
+                        , resources.getString(R.string.caption_authorize)
+                        , resources.getString(R.string.caption_cancel)
+                        , new AlertDialogHelper.IDialogResultListener()
+                        {
+                            @Override
+                            public void onDialogProcessed(@NonNull AlertDialogHelper.DialogResult dialogResult)
+                            {
+                                if (dialogResult != AlertDialogHelper.DialogResult.PositiveSelected)
+                                    return;
+
+                                EditText loginText = (EditText) signInDialog.findViewById(R.id.loginEditText);
+                                EditText passwordText = (EditText) signInDialog.findViewById(R.id.passwordEditText);
+
+                                if ((loginText.length() == 0) || (passwordText.length() == 0))
+                                {
+                                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_login_password_not_empty),
+                                            resources.getString(R.string.alert_title));
+                                    return;
+                                }
+
+                                new LicenseProcessingTask().execute(loginText.getText().toString(),
+                                        passwordText.getText().toString());
+                            }
+                        }
+                );
+            }
+            break;
 
             case R.id.action_about:
                 break;
