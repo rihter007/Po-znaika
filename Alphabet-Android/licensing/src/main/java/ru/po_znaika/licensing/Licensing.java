@@ -60,7 +60,7 @@ class LicensingCache
 
     public Date getCheckDate()
     {
-        final long checkDateUTC = m_cacheFile.getInt(CheckDateKey, UndefinedValue);
+        final long checkDateUTC = m_cacheFile.getLong(CheckDateKey, UndefinedValue);
         if (checkDateUTC == UndefinedValue)
             return null;
 
