@@ -46,9 +46,6 @@ public class MainMenuActivity extends ActionBarActivity
             try
             {
                 final LicenseType accountLicense = m_serviceLocator.getLicensing().getCurrentLicenseInfo(credentials);
-                m_serviceLocator.getAuthenticationProvider().
-                        setLoginPasswordCredentials(credentials.login, credentials.password);
-
                 m_serviceLocator.getAuthenticationProvider().setLoginPasswordCredentials(credentials.login, credentials.password);
                 return accountLicense;
             }
@@ -101,6 +98,52 @@ public class MainMenuActivity extends ActionBarActivity
 
         private CommonResultCode m_commonErrorCode;
         private NetworkResultCode m_networkErrorCode;
+    }
+
+    private class ExerciseStartTask extends AsyncTask<Void, Integer, LicenseType>
+    {
+        public ExerciseStartTask(int selectedMenuPosition)
+        {
+            m_selectedMenuPosition = selectedMenuPosition;
+        }
+
+        @Override
+        protected LicenseType doInBackground(Void... params)
+        {
+            try
+            {
+                return m_serviceLocator.getLicensing().getCurrentLicenseInfo();
+            }
+            catch (CommonException | NetworkException exp)
+            {
+                Log.i(LogTag, "Licensing get exception message: " + exp.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(LicenseType licenseType)
+        {
+            if (!LicenseType.isActive(licenseType))
+            {
+                Resources resources = getResources();
+                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_no_license),
+                        resources.getString(R.string.alert_title));
+                return;
+            }
+
+            if (m_selectedMenuPosition == 0)
+            {
+                // ABC-book is selected
+                CharacterExerciseMenuActivity.startActivity(MainMenuActivity.this);
+            }
+            else
+            {
+                m_menuExercises.get(m_selectedMenuPosition - 1).process();
+            }
+        }
+
+        private int m_selectedMenuPosition;
     }
 
     @Override
@@ -215,22 +258,7 @@ public class MainMenuActivity extends ActionBarActivity
     {
         try
         {
-            if (!LicenseType.isActive(m_serviceLocator.getLicensing().getCurrentLicenseInfo()))
-            {
-                Resources resources = getResources();
-                MessageBox.Show(this, resources.getString(R.string.alert_no_active_license), resources.getString(R.string.alert_title));
-                return;
-            }
-
-            if (itemSelectedIndex == 0)
-            {
-                // ABC-book is selected
-                CharacterExerciseMenuActivity.startActivity(this);
-            }
-            else
-            {
-                m_menuExercises.get(itemSelectedIndex - 1).process();
-            }
+            new ExerciseStartTask(itemSelectedIndex).execute();
         }
         catch (Exception exp)
         {
