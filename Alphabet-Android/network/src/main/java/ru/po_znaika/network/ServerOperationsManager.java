@@ -69,7 +69,7 @@ public class ServerOperationsManager implements IServerOperations
             request.setRequestProperty(NetworkConstant.LoginHeader, credentials.login);
             if (!TextUtils.isEmpty(credentials.password))
                 request.setRequestProperty(NetworkConstant.PasswordHeader, credentials.password);
-            //request.setRequestProperty();
+            request.setRequestProperty(DateHeader, NetworkHelpers.getHttpDateRepresentation(date));
             request.setRequestProperty(ExerciseNameHeader, exerciseName);
             request.setRequestProperty(ScoreHeader, ((Integer)score).toString());
 
@@ -80,21 +80,26 @@ public class ServerOperationsManager implements IServerOperations
             }
             catch (IOException exp)
             {
-                Log.i(LogTag, "report exercise score exception: " + exp.getMessage());
+                if (exp instanceof java.net.UnknownHostException)
+                    throw new NetworkException(NetworkResultCode.NoConnection);
             }
 
             if (statusCode != 200)
             {
+                switch (statusCode)
+                {
+                    case 401:
+                    case 404:
+                        throw new NetworkException(NetworkResultCode.AuthenticationError);
+                }
 
+                throw new NetworkException(NetworkResultCode.Unknown);
             }
-
-
         }
         catch (IOException exp)
         {
             Log.e(LogTag, "reportExerciseScore exception: " + exp.getMessage());
         }
-        //throw new UnsupportedOperationException();
     }
 
     @Override
@@ -114,7 +119,7 @@ public class ServerOperationsManager implements IServerOperations
      * @throws NetworkException
      */
     @Override
-    public List<ExerciseScore> getExercisesScores(int exerciseGroupId, Date startDate, Date endDate)
+    public ExerciseScore[] getExercisesScores(int exerciseGroupId, Date startDate, Date endDate)
             throws CommonException, NetworkException
     {
         return null;

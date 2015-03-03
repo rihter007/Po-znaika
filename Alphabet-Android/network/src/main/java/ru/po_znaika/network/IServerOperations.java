@@ -38,6 +38,6 @@ public interface IServerOperations
      * @throws CommonException
      * @throws NetworkException
      */
-    List<ExerciseScore> getExercisesScores(int exerciseGroupId, Date startDate, Date endDate)
+    ExerciseScore[] getExercisesScores(int exerciseGroupId, Date startDate, Date endDate)
             throws CommonException, NetworkException;
 }

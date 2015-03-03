@@ -14,7 +14,9 @@ public interface IExerciseScoreProcessor
     /**
      * Sends cached exercise marks to server
      */
-    boolean syncCacheData();
+    void syncCache() throws CommonException, NetworkException;
+
+    void clearCache();
 
     /**
      * Saves exercise score and tries to sync it with server in background

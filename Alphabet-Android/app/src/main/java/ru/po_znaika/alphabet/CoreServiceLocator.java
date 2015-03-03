@@ -3,6 +3,8 @@ package ru.po_znaika.alphabet;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import java.io.Closeable;
+
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
 
@@ -20,7 +22,7 @@ import ru.po_znaika.network.ServerOperationsManager;
  * Created by Rihter on 08.02.2015.
  * A simple way to initialize and access common services and helpers
  */
-public class CoreServiceLocator
+public class CoreServiceLocator implements Closeable
 {
     public CoreServiceLocator(@NonNull Context _context) throws CommonException
     {
@@ -61,6 +63,16 @@ public class CoreServiceLocator
     public ILicensing getLicensing()
     {
         return m_licensing;
+    }
+
+    @Override
+    public void close()
+    {
+        try
+        {
+            ((Closeable)m_exerciseScoreProcessor).close();
+        }
+        catch (Exception exp) { }
     }
 
     private AlphabetDatabase m_alphabetDatabase;

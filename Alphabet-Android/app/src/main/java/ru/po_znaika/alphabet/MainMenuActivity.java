@@ -1,5 +1,6 @@
 package ru.po_znaika.alphabet;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
 import ru.po_znaika.licensing.LicenseType;
 import ru.po_znaika.network.LoginPasswordCredentials;
 import ru.po_znaika.network.NetworkException;
+import ru.po_znaika.network.NetworkHelpers;
 import ru.po_znaika.network.NetworkResultCode;
 
 public class MainMenuActivity extends ActionBarActivity
@@ -39,10 +41,22 @@ public class MainMenuActivity extends ActionBarActivity
         @Override
         protected LicenseType doInBackground(String... credentialParts)
         {
-            if (!m_serviceLocator.getExerciseScoreProcessor().syncCacheData())
+            try
             {
-                m_networkErrorCode = NetworkResultCode.NoConnection;
-                return null;
+                m_serviceLocator.getExerciseScoreProcessor().syncCache();
+            }
+            catch (CommonException | NetworkException exp)
+            {
+                if ((exp instanceof  NetworkException) &&
+                        (((NetworkException)exp).getResultCode() == NetworkResultCode.AuthenticationError))
+                {
+                    m_serviceLocator.getExerciseScoreProcessor().clearCache();
+                }
+                else
+                {
+                    m_networkErrorCode = NetworkResultCode.NoConnection;
+                    return null;
+                }
             }
 
             LoginPasswordCredentials credentials = new LoginPasswordCredentials();
@@ -142,13 +156,9 @@ public class MainMenuActivity extends ActionBarActivity
         protected void onPostExecute(LicenseType licenseType)
         {
             // TODO: remove in future!!! hack for testing
-            {
-                final LoginPasswordCredentials credentials = m_serviceLocator.getAuthenticationProvider().getLoginPasswordCredentials();
-                if ((credentials != null) && (credentials.login.equalsIgnoreCase("test")))
-                {
-                    licenseType = LicenseType.Commercial;
-                }
-            }
+            if (isTestUser())
+                licenseType = LicenseType.Commercial;
+
             if (!LicenseType.isActive(licenseType))
             {
                 Resources resources = getResources();
@@ -169,6 +179,14 @@ public class MainMenuActivity extends ActionBarActivity
         }
 
         private int m_selectedMenuPosition;
+    }
+
+    private boolean isTestUser()
+    {
+        final LoginPasswordCredentials credentials = m_serviceLocator.getAuthenticationProvider().getLoginPasswordCredentials();
+        if ((credentials != null) && (credentials.login.equalsIgnoreCase("test")))
+            return true;
+        return false;
     }
 
     @Override
@@ -192,6 +210,13 @@ public class MainMenuActivity extends ActionBarActivity
             Log.e(MainMenuActivity.class.getName(), "onCreate: Unknown exception occurred");
             MessageBox.Show(this, exp.getMessage(), getResources().getString(R.string.assert_error));
         }
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        m_serviceLocator.close();
     }
 
     void restoreInternalState() throws CommonException

@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -23,12 +24,13 @@ import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.ExerciseScore;
 import ru.po_znaika.network.IServerOperations;
 import ru.po_znaika.network.NetworkException;
+import ru.po_znaika.network.NetworkResultCode;
 
 /**
  * Created by Rihter on 10.02.2015.
  * Fully manages the scores of the exercises
  */
-public class ExerciseScoreProcessor implements IExerciseScoreProcessor
+public class ExerciseScoreProcessor implements IExerciseScoreProcessor, Closeable
 {
     /**
      * Caches operations that were not processed by server side
@@ -62,6 +64,8 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
         private static final String DropExerciseCacheTableSqlStatement = "DROP TABLE " + TableName;
 
         private static final String SelectCacheTableEmptySqlStatement = "SELECT 1 FROM " + TableName ;
+
+        private static final String ClearCacheTableSqlStatement = "DELETE FROM " + TableName;
 
         private static final String ExtractAllCacheTableItemsSqlStatement = "SELECT " +
                 IdColumnName + ", " +
@@ -207,12 +211,35 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
             }
             return false;
         }
+
+        public boolean removeCacheItems()
+        {
+            SQLiteDatabase database = getWritableDatabase();
+
+            try
+            {
+                database.execSQL(ClearCacheTableSqlStatement);
+            }
+            catch (SQLiteException exp)
+            {
+                Log.e(LogTag, "Assert: removeCacheItems, message: " + exp.getMessage());
+                return false;
+            }
+            finally
+            {
+                database.close();
+            }
+            return true;
+        }
     }
 
     private class ServerScoreReporter implements Runnable
     {
         public ServerScoreReporter(@NonNull Map<Integer, ExerciseScore> reportedScores)
         {
+            m_commonErrorCode = null;
+            m_networkErrorCode = null;
+
             m_reportedScores = reportedScores;
         }
 
@@ -223,22 +250,39 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
             List<Integer> sendedItemsIds = new ArrayList<>();
 
             final Collection<Map.Entry<Integer, ExerciseScore> > allExerciseItems = m_reportedScores.entrySet();
-            for (Map.Entry<Integer, ExerciseScore> item : allExerciseItems)
+            try
             {
-                try
+                for (Map.Entry<Integer, ExerciseScore> item : allExerciseItems)
                 {
                     final ExerciseScore exerciseScore = item.getValue();
                     m_serverOperations.reportExerciseScore(exerciseScore.date, exerciseScore.exerciseName, exerciseScore.score);
                     sendedItemsIds.add(item.getKey());
                 }
-                catch (CommonException | NetworkException exp)
-                {
-                    Log.w(LogTag, String.format("Failed to send cache item, exp:\"%s\"", exp.getMessage()));
-                }
+            }
+            catch (CommonException | NetworkException exp)
+            {
+                Log.w(LogTag, String.format("Failed to send cache item, exp:\"%s\"", exp.getMessage()));
+                if (exp instanceof CommonException)
+                    m_commonErrorCode = ((CommonException)exp).getResultCode();
+                else
+                    m_networkErrorCode = ((NetworkException) exp).getResultCode();
             }
 
             m_exerciseScoreCache.removeCacheItems(sendedItemsIds);
         }
+
+        public CommonResultCode getCommonErrorCode()
+        {
+            return m_commonErrorCode;
+        }
+
+        public NetworkResultCode getNetworkResultCode()
+        {
+            return m_networkErrorCode;
+        }
+
+        private CommonResultCode m_commonErrorCode;
+        private NetworkResultCode m_networkErrorCode;
 
         private Map<Integer, ExerciseScore> m_reportedScores;
     }
@@ -279,14 +323,25 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
     }
 
     @Override
-    public boolean syncCacheData()
+    public void syncCache() throws CommonException, NetworkException
     {
         {
             ServerScoreReporter scoreReporter = new ServerScoreReporter(getCacheItems());
             scoreReporter.run();
+            if (scoreReporter.getCommonErrorCode() != null)
+                throw new CommonException(scoreReporter.getCommonErrorCode());
+            if (scoreReporter.getNetworkResultCode() != null)
+                throw new NetworkException(scoreReporter.getNetworkResultCode());
         }
 
-        return m_exerciseScoreCache.isCacheEmpty();
+        if (m_exerciseScoreCache.isCacheEmpty())
+            throw new CommonException(CommonResultCode.InvalidInternalState);
+    }
+
+    @Override
+    public void clearCache()
+    {
+        m_exerciseScoreCache.removeCacheItems();
     }
 
     @Override
@@ -307,6 +362,19 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
         m_exerciseScoreCache.addCacheItem(scoreDate, exerciseName, score);
 
         m_backGroundThread.reportExercisesScores(getCacheItems());
+    }
+
+    @Override
+    public void close()
+    {
+        try
+        {
+            m_backGroundThread.join();
+        }
+        catch (InterruptedException exp)
+        {
+            Log.e(LogTag, "Assert: backGround thread has been aborted");
+        }
     }
 
     private Map<Integer, ExerciseScore> getCacheItems()
