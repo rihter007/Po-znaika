@@ -2,6 +2,7 @@ package ru.po_znaika.network;
 
 import android.support.annotation.NonNull;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import ru.po_znaika.common.CommonException;
 public interface IServerOperations
 {
     /**
-     * Sends student score on server
+     * Sends student score to server
      * @param date date of the operation in GMT
      * @param exerciseName unique exercise id
      * @param score exercise score
@@ -24,6 +25,9 @@ public interface IServerOperations
      */
     void reportExerciseScore(@NonNull Date date, @NonNull String exerciseName, int score)
             throws CommonException, NetworkException;
+
+
+    void reportExerciseScore(@NonNull Collection<ExerciseScore> marks) throws CommonException, NetworkException;
 
     /**
      * Returns obtained scores for specified time period

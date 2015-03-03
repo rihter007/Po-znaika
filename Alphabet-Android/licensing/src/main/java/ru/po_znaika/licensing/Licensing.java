@@ -116,7 +116,12 @@ public class Licensing implements ILicensing
     public LicenseType getCurrentLicenseInfo(@NonNull LoginPasswordCredentials credentials)
             throws CommonException, NetworkException
     {
-        return getLicenseByCredentials(credentials);
+        if (!credentials.isValid())
+            throw new CommonException(CommonResultCode.InvalidArgument);
+
+        LicenseType licenseType = getLicenseFromServer(credentials);
+        m_licensingCache.updateLicense(credentials.login, licenseType);
+        return licenseType;
     }
 
     @Override
@@ -155,7 +160,7 @@ public class Licensing implements ILicensing
         if (!accountName.equalsIgnoreCase(credentials.login))
         {
             m_licensingCache.clear();
-            return licenseType;
+            return null;
         }
 
         final LicenseType cachedLicense = m_licensingCache.getLicense();
@@ -203,6 +208,8 @@ public class Licensing implements ILicensing
             }
             catch (IOException exp)
             {
+                if (exp instanceof java.net.UnknownHostException)
+                    throw new NetworkException(NetworkResultCode.NoConnection);
             }
 
             if (responseCode != 200)

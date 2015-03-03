@@ -39,14 +39,20 @@ public class MainMenuActivity extends ActionBarActivity
         @Override
         protected LicenseType doInBackground(String... credentialParts)
         {
+            if (!m_serviceLocator.getExerciseScoreProcessor().syncCacheData())
+            {
+                m_networkErrorCode = NetworkResultCode.NoConnection;
+                return null;
+            }
+
             LoginPasswordCredentials credentials = new LoginPasswordCredentials();
             credentials.login = credentialParts[0];
             credentials.password = credentialParts[1];
 
             try
             {
-                final LicenseType accountLicense = m_serviceLocator.getLicensing().getCurrentLicenseInfo(credentials);
                 m_serviceLocator.getAuthenticationProvider().setLoginPasswordCredentials(credentials.login, credentials.password);
+                final LicenseType accountLicense = m_serviceLocator.getLicensing().getCurrentLicenseInfo(credentials);
                 return accountLicense;
             }
             catch (NetworkException exp)
@@ -79,11 +85,22 @@ public class MainMenuActivity extends ActionBarActivity
                 return;
             }
 
-            if (m_networkErrorCode == NetworkResultCode.AuthenticationError)
+            switch (m_networkErrorCode)
             {
-                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_login_password_incorrect),
-                        resources.getString(R.string.alert_title));
-                return;
+                case AuthenticationError:
+                {
+                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_login_password_incorrect),
+                            resources.getString(R.string.alert_title));
+                    return;
+                }
+
+                case Unknown:
+                case NoConnection:
+                {
+                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_no_connection),
+                            resources.getString(R.string.alert_title));
+                    return;
+                }
             }
             if (m_commonErrorCode == CommonResultCode.InvalidArgument)
             {
@@ -124,6 +141,14 @@ public class MainMenuActivity extends ActionBarActivity
         @Override
         protected void onPostExecute(LicenseType licenseType)
         {
+            // TODO: remove in future!!! hack for testing
+            {
+                final LoginPasswordCredentials credentials = m_serviceLocator.getAuthenticationProvider().getLoginPasswordCredentials();
+                if ((credentials != null) && (credentials.login.equalsIgnoreCase("test")))
+                {
+                    licenseType = LicenseType.Commercial;
+                }
+            }
             if (!LicenseType.isActive(licenseType))
             {
                 Resources resources = getResources();

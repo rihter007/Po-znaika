@@ -16,6 +16,7 @@ import java.util.Map;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
 import ru.po_znaika.common.CommonException;
+import ru.po_znaika.common.ExerciseScore;
 
 public final class DiaryActivity extends ActionBarActivity
 {
@@ -60,12 +61,12 @@ public final class DiaryActivity extends ActionBarActivity
         AlphabetDatabase alphabetDatabase = new AlphabetDatabase(this, false);
 
         DiaryDatabase diaryDatabase = new DiaryDatabase(this);
-        DiaryDatabase.ExerciseDiaryInfo diaryNotes[] = diaryDatabase.getAllDiaryRecordsOrderedByDate();
+        ExerciseScore diaryNotes[] = diaryDatabase.getAllDiaryRecordsOrderedByDate();
 
         if ((diaryNotes != null) && (diaryNotes.length > 0))
         {
             Map<String, String> exerciseNamesMap = new HashMap<>();
-            for (DiaryDatabase.ExerciseDiaryInfo diaryNote : diaryNotes)
+            for (ExerciseScore diaryNote : diaryNotes)
             {
                 Calendar noteTime = new GregorianCalendar();
                 noteTime.setTime(diaryNote.date);

@@ -8,7 +8,7 @@ import java.util.Date;
  */
 public class ExerciseScore
 {
-    public int exerciseId;
-    public Date completionDate;
+    public String exerciseName;
+    public Date date;
     public int score;
 }

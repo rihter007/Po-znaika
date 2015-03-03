@@ -4,18 +4,23 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.CommonResultCode;
+import ru.po_znaika.common.ExerciseScore;
 import ru.po_znaika.network.IServerOperations;
 import ru.po_znaika.network.NetworkException;
 
@@ -55,6 +60,8 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
                 ExerciseNameColumnName + " INTEGER NOT NULL, " +
                 ScoreColumnName + " INTEGER NOT NULL)";
         private static final String DropExerciseCacheTableSqlStatement = "DROP TABLE " + TableName;
+
+        private static final String SelectCacheTableEmptySqlStatement = "SELECT 1 FROM " + TableName ;
 
         private static final String ExtractAllCacheTableItemsSqlStatement = "SELECT " +
                 IdColumnName + ", " +
@@ -113,6 +120,7 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
             catch (Exception exp)
             {
                 Log.e(LogTag, String.format("getCacheItems exception: \"%s\"", exp.getMessage()));
+                return null;
             }
             finally
             {
@@ -122,7 +130,31 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
                 database.close();
             }
 
-            return null;
+            return new CacheItem[0];
+        }
+
+        public boolean isCacheEmpty()
+        {
+            SQLiteDatabase database = getReadableDatabase();
+            Cursor dataReader = null;
+
+            try
+            {
+                dataReader = database.rawQuery(SelectCacheTableEmptySqlStatement, null);
+                return !dataReader.moveToFirst();
+            }
+            catch (SQLiteException exp)
+            {
+                Log.e(LogTag, "isCacheEmpty: " + exp.getMessage());
+            }
+            finally
+            {
+                if (dataReader != null)
+                    dataReader.close();
+
+                database.close();
+            }
+            return false;
         }
 
         public int addCacheItem(@NonNull Date date, @NonNull String exerciseName, int score)
@@ -149,7 +181,7 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
             return DatabaseConstant.InvalidDatabaseIndex;
         }
 
-        public boolean removeCacheItem(@NonNull List<Integer> itemIds)
+        public boolean removeCacheItems(@NonNull Collection<Integer> itemIds)
         {
             if (itemIds.isEmpty())
                 return true;
@@ -157,9 +189,10 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
             SQLiteDatabase database = getWritableDatabase();
             try
             {
+                int index = 0;
                 String[] deletionIds = new String[itemIds.size()];
-                for (int i = 0; i < itemIds.size(); ++i)
-                    deletionIds[i] = itemIds.get(i).toString();
+                for (Integer itemIndex : itemIds)
+                    deletionIds[index++] = itemIds.toString();
 
                 database.delete(TableName, IdColumnName + '=', deletionIds);
                 return true;
@@ -176,15 +209,87 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
         }
     }
 
+    private class ServerScoreReporter implements Runnable
+    {
+        public ServerScoreReporter(@NonNull Map<Integer, ExerciseScore> reportedScores)
+        {
+            m_reportedScores = reportedScores;
+        }
+
+        @Override
+        public void run()
+        {
+            // TODO: temporary realization due to inconsistent protocol
+            List<Integer> sendedItemsIds = new ArrayList<>();
+
+            final Collection<Map.Entry<Integer, ExerciseScore> > allExerciseItems = m_reportedScores.entrySet();
+            for (Map.Entry<Integer, ExerciseScore> item : allExerciseItems)
+            {
+                try
+                {
+                    final ExerciseScore exerciseScore = item.getValue();
+                    m_serverOperations.reportExerciseScore(exerciseScore.date, exerciseScore.exerciseName, exerciseScore.score);
+                    sendedItemsIds.add(item.getKey());
+                }
+                catch (CommonException | NetworkException exp)
+                {
+                    Log.w(LogTag, String.format("Failed to send cache item, exp:\"%s\"", exp.getMessage()));
+                }
+            }
+
+            m_exerciseScoreCache.removeCacheItems(sendedItemsIds);
+        }
+
+        private Map<Integer, ExerciseScore> m_reportedScores;
+    }
+
+    private class ServerScoreReporterThread extends Thread
+    {
+        public ServerScoreReporterThread()
+        {
+            super("ServerScoreReporter");
+        }
+
+        public void reportExercisesScores(@NonNull Map<Integer, ExerciseScore> scores)
+        {
+            if (isAlive())
+                return;
+            m_scoreReporter = new ServerScoreReporter(scores);
+            start();
+        }
+
+        @Override
+        public void run()
+        {
+            m_scoreReporter.run();
+        }
+
+        private ServerScoreReporter m_scoreReporter;
+    }
+
     private final String LogTag = ExerciseScoreProcessor.class.getName();
 
     public ExerciseScoreProcessor(@NonNull Context _context, @NonNull IServerOperations _serverOperations) throws CommonException
     {
+        m_backGroundThread = new ServerScoreReporterThread();
+
         m_diaryDatabase = new DiaryDatabase(_context);
         m_exerciseScoreCache = new ExerciseCacheDatabase(_context);
         m_serverOperations = _serverOperations;
     }
 
+    @Override
+    public boolean syncCacheData()
+    {
+        {
+            ServerScoreReporter scoreReporter = new ServerScoreReporter(getCacheItems());
+            scoreReporter.run();
+        }
+
+        return m_exerciseScoreCache.isCacheEmpty();
+    }
+
+    @Override
     public void reportExerciseScore(@NonNull String exerciseName, int score) throws CommonException
     {
         Log.i(LogTag, String.format("Report exercise score: exerciseId:\"%s\", score:\"%d\"", exerciseName, score));
@@ -194,47 +299,38 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor
         {
             final int rowId = m_diaryDatabase.insertExerciseScore(scoreDate, exerciseName, score);
             if (rowId == DatabaseConstant.InvalidDatabaseIndex)
-                throw new CommonException(CommonResultCode.UnknownReason);
-        }
-
-        try
-        {
-            m_serverOperations.reportExerciseScore(scoreDate, exerciseName, score);
-            ExerciseCacheDatabase.CacheItem[] cacheItems = m_exerciseScoreCache.getCacheItems();
-            if (cacheItems != null)
             {
-                List<Integer> sendedItems = new ArrayList<>();
-                try
-                {
-                    for (ExerciseCacheDatabase.CacheItem cacheItem : cacheItems)
-                    {
-                        Log.i(LogTag, String.format("Try to send cache item - id:\"%d\" date:\"%s\" literalId:\"%s\" score:\"%d\"",
-                                        cacheItem.id,
-                                        cacheItem.date,
-                                        cacheItem.exerciseNameId,
-                                        cacheItem.score));
-                        m_serverOperations.reportExerciseScore(cacheItem.date, cacheItem.exerciseNameId, score);
-                    }
-                }
-                catch (CommonException | NetworkException exp)
-                {
-                    Log.w(LogTag, "Failed to send cache item");
-                }
-
-                if (!sendedItems.isEmpty())
-                    m_exerciseScoreCache.removeCacheItem(sendedItems);
-            }
-        }
-        catch (CommonException | NetworkException exp)
-        {
-            Log.w(LogTag, String.format("Failed to send cache item, exp:\"%s\"", exp.getMessage()));
-            if (m_exerciseScoreCache.addCacheItem(scoreDate, exerciseName, score) == DatabaseConstant.InvalidDatabaseIndex)
-            {
-                Log.e(LogTag, "Failed to save items both on server and cache");
+                Log.e(LogTag, "Failed to insert database score");
                 throw new CommonException(CommonResultCode.UnknownReason);
             }
         }
+        m_exerciseScoreCache.addCacheItem(scoreDate, exerciseName, score);
+
+        m_backGroundThread.reportExercisesScores(getCacheItems());
     }
+
+    private Map<Integer, ExerciseScore> getCacheItems()
+    {
+        ExerciseCacheDatabase.CacheItem[] cacheItems = m_exerciseScoreCache.getCacheItems();
+        Map<Integer, ExerciseScore> exerciseScores = new HashMap<>();
+
+        if (cacheItems != null)
+        {
+            for (ExerciseCacheDatabase.CacheItem cachedItem : cacheItems)
+            {
+                ExerciseScore exerciseScore = new ExerciseScore();
+                exerciseScore.date = cachedItem.date;
+                exerciseScore.exerciseName = cachedItem.exerciseNameId;
+                exerciseScore.score = cachedItem.score;
+
+                exerciseScores.put(cachedItem.id, exerciseScore);
+            }
+        }
+
+        return exerciseScores;
+    }
+
+    private ServerScoreReporterThread m_backGroundThread;
 
     private DiaryDatabase m_diaryDatabase;
     private ExerciseCacheDatabase m_exerciseScoreCache;

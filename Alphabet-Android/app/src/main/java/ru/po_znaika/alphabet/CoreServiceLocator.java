@@ -26,10 +26,10 @@ public class CoreServiceLocator
     {
         m_alphabetDatabase = new AlphabetDatabase(_context, false);
         m_diaryDatabase = new DiaryDatabase(_context);
-        m_serverOperations = new ServerOperationsManager();
+        m_authenticationProvider = new CacheAuthenticationProvider(_context);
+        m_serverOperations = new ServerOperationsManager(m_authenticationProvider);
         m_exerciseScoreProcessor = new ExerciseScoreProcessor(_context, m_serverOperations);
 
-        m_authenticationProvider = new CacheAuthenticationProvider(_context);
         m_licensing = new Licensing(_context,m_authenticationProvider);
     }
 

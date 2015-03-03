@@ -13,19 +13,13 @@ import java.util.Date;
 import java.util.List;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.common.ExerciseScore;
 
 /**
  * Handles requests on diary
  */
 public final class DiaryDatabase extends SQLiteOpenHelper
 {
-    public static class ExerciseDiaryInfo
-    {
-        public Date date;
-        public String exerciseName;
-        public int score;
-    }
-
     private static final String LogTag = DiaryDatabase.class.getName();
 
     private static final String DATABASE_NAME = "diary.db";
@@ -98,7 +92,7 @@ public final class DiaryDatabase extends SQLiteOpenHelper
         return resultId;
     }
 
-    public ExerciseDiaryInfo[] getAllDiaryRecordsOrderedByDate()
+    public ExerciseScore[] getAllDiaryRecordsOrderedByDate()
     {
         SQLiteDatabase database = getReadableDatabase();
         Cursor dataReader = null;
@@ -107,11 +101,11 @@ public final class DiaryDatabase extends SQLiteOpenHelper
             dataReader = database.rawQuery(ExtractAllExercisesScoresOrderedByDateSqlStatement, null);
             if (dataReader.moveToFirst())
             {
-                List<ExerciseDiaryInfo> items = new ArrayList<>();
+                List<ExerciseScore> items = new ArrayList<>();
 
                 do
                 {
-                    ExerciseDiaryInfo item = new ExerciseDiaryInfo();
+                    ExerciseScore item = new ExerciseScore();
                     item.date = new Date(dataReader.getLong(0));
                     item.exerciseName = dataReader.getString(1);
                     item.score = dataReader.getInt(2);
@@ -119,7 +113,7 @@ public final class DiaryDatabase extends SQLiteOpenHelper
                     items.add(item);
                 } while (dataReader.moveToNext());
 
-                ExerciseDiaryInfo[] diaryRecords = new ExerciseDiaryInfo[items.size()];
+                ExerciseScore[] diaryRecords = new ExerciseScore[items.size()];
                 items.toArray(diaryRecords);
                 return diaryRecords;
             }

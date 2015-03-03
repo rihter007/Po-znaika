@@ -52,7 +52,7 @@
     <string name="alert_login_password_not_empty">Поля логин и пароль не должны быть пустыми</string>
     <string name="alert_no_active_license">Отсутствует текущая активная лицензия</string>
     <string name="alert_login_password_incorrect">Введены неверные логин/пароль</string>
-    <string name="alert_no_connection">Отсутствует соединение с Интернетом</string>
+    <string name="alert_no_connection">Ошибка доступа сети. Проверьте подключение к Интернету.</string>
     <string name="alert_application_activated">Приложение успешно активировано</string>
     <string name="alert_no_license">Отсутствует текущая активная лицензия\n
         Посетите http://po-znaika.ru для получения дополнительной информации</string>
