@@ -246,16 +246,16 @@ type column represents hardcoded identifiers of exercise type:
 -858355490 - crc32 of 'CreateWordsFromSpecified' 
 ***************************
 */
-INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(-1022889626,   294335127, 'Russian.Alphabet.Character1', 'Буква А', 1);
-INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(1510908124, 294335127, 'Russian.Alphabet.Character2', 'Буква Б', 2);
+INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(-1022889626,   294335127, 'Alphabet.Russian.Character1', 'Буква А', 1);
+INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(1510908124, 294335127, 'Alphabet.Russian.Character2', 'Буква Б', 2);
 /*
 INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(-943947333,  294335127, 'Russian.Alphabet.Character3', 'Буква В', 3);
 INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(1507333144,  294335127, 'Russian.Alphabet.Character4', 'Буква Г', 4);
 */
 
 -- Games
-INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(916623525,   402850721, 'Russian.Alphabet.WordGather', 'Слово рассыпалось', 5);
-INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(1264890976,   -858355490, 'Russian.Alphabet.CreateWordsFromSpecified', 'Составь слова', 6);
+INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(916623525,   402850721, 'Alphabet.Russian.WordGather', 'Слово рассыпалось', 5);
+INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(1264890976,   -858355490, 'Alphabet.Russian.CreateWordsFromSpecified', 'Составь слова', 6);
 
 /* 
 ***************************
