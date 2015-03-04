@@ -7,11 +7,9 @@ import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
@@ -225,61 +223,33 @@ public class Licensing implements ILicensing
                 }
             }
 
-            InputStream requestBody = request.getInputStream();
+            InputStream responseBodyStream = request.getInputStream();
 
             String responseEncoding = request.getContentEncoding();
             responseEncoding = TextUtils.isEmpty(responseEncoding) ? "UTF-8" : responseEncoding;
 
-            ByteArrayOutputStream responseBodyStream = new ByteArrayOutputStream();
+            // http://developer.android.com/reference/android/util/JsonReader.html
+            JsonReader jsonReader = new JsonReader(new InputStreamReader(responseBodyStream, responseEncoding));
             try
             {
-                byte[] chunk = new byte[512];
+                jsonReader.beginObject();
 
-                for (; ; )
+                while (jsonReader.hasNext())
                 {
-                    final int bytesRead = requestBody.read(chunk);
-                    if (bytesRead <= 0)
-                        break;
-
-                    responseBodyStream.write(chunk, 0, bytesRead);
+                    final String nodeName = jsonReader.nextName();
+                    if (nodeName.equalsIgnoreCase("Type"))
+                    {
+                        return ParseLicenseType(jsonReader.nextString());
+                    }
                 }
+                Log.e(LogTag, "No type node is found");
+
+                jsonReader.endObject();
             }
             finally
             {
-                Log.e(LogTag, "Failed to read out response body");
-                responseBodyStream.close();
-            }
-
-            if (responseBodyStream.size() > 0)
-            {
-                // http://developer.android.com/reference/android/util/JsonReader.html
-                JsonReader jsonReader = new JsonReader(new InputStreamReader(
-                        new ByteArrayInputStream(responseBodyStream.toByteArray()), responseEncoding));
-                try
-                {
-                    jsonReader.beginObject();
-
-                    while (jsonReader.hasNext())
-                    {
-                        final String nodeName = jsonReader.nextName();
-                        if (nodeName.equalsIgnoreCase("Type"))
-                        {
-                            return ParseLicenseType(jsonReader.nextString());
-                        }
-                    }
-                    Log.e(LogTag, "No type node is found");
-
-                    jsonReader.endObject();
-                }
-                finally
-                {
-                    Log.e(LogTag, "Failed to parse response json");
-                    jsonReader.close();
-                }
-            }
-            else
-            {
-                Log.e(LogTag, "Server has returned empty body");
+                Log.e(LogTag, "Failed to parse response json");
+                jsonReader.close();
             }
         }
         catch (IOException exp)
