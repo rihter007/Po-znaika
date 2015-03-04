@@ -2,6 +2,7 @@
 <resources>
 
     <string name="assert_error">Ошибка времени исполнения</string>
+    <string name="ok">Ok</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="main_menu_caption">Выбери упражнение:</string>
@@ -12,6 +13,8 @@
     <string name="action_about">О приложении</string>
     <string name="action_synchronize">Синхронизировать</string>
     <string name="action_clear">Очистить</string>
+    <string name="failed_sync_diary">Не удалось обновить дневник.
+        Проверьте подключение к Интернету или повторите попытку позже</string>
     <string name="failed_play_sound">Не удалось запустить звук</string>
     <string name="failed_exercise_start">Не удалось запустить упражнение :(</string>
     <string name="failed_action">Ошибка при работе приложения :(</string>
@@ -42,6 +45,8 @@
     <string name="caption_password">Пароль</string>
     <string name="caption_authorize">Войти</string>
     <string name="caption_cancel">Отмена</string>
+    <string name="caption_license_scroll_title">Выберите период дневника</string>
+    <string name="caption_days_selected">Выбрано %d дней</string>
     <string name="alert_title">Внимание</string>
     <string name="alert_bad_credentials">Некорректный логин и/или пароль</string>
     <string name="alert_finish_exercise">Завершить упражнение?</string>

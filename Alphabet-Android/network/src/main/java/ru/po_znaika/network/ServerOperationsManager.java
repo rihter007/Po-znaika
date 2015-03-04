@@ -2,17 +2,22 @@ package ru.po_znaika.network;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.JsonReader;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import ru.po_znaika.common.CommonException;
+import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.ExerciseScore;
 
 /**
@@ -29,6 +34,8 @@ public class ServerOperationsManager implements IServerOperations
     private static final String DateHeader = "Date";
     private static final String ExerciseNameHeader = "Exercise";
     private static final String ScoreHeader = "Score";
+    private static final String StartDateHeader = "StartDate";
+    private static final String EndDateHeader = "EndDate";
 
     public ServerOperationsManager(@NonNull IAuthenticationProvider _authenticationProvider)
     {
@@ -119,11 +126,112 @@ public class ServerOperationsManager implements IServerOperations
      * @throws NetworkException
      */
     @Override
-    public ExerciseScore[] getExercisesScores(int exerciseGroupId, Date startDate, Date endDate)
+    public ExerciseScore[] getExercisesScores(@NonNull String exerciseGroupId, Date startDate, Date endDate)
             throws CommonException, NetworkException
     {
+        final LoginPasswordCredentials credentials = m_authenticationProvider.getLoginPasswordCredentials();
+        if ((credentials == null) || (!credentials.isValid()))
+            throw new NetworkException(NetworkResultCode.AuthenticationError);
+
+        try
+        {
+            HttpURLConnection request = (HttpURLConnection) m_exerciseScoreUrl.openConnection();
+            request.setRequestMethod("GET");
+            request.setRequestProperty(NetworkConstant.LoginHeader, credentials.login);
+            if (!TextUtils.isEmpty(credentials.password))
+                request.setRequestProperty(NetworkConstant.PasswordHeader, credentials.password);
+            request.setRequestProperty(ExerciseNameHeader, exerciseGroupId);
+
+            if (startDate != null)
+                request.setRequestProperty(StartDateHeader, NetworkHelpers.getHttpDateRepresentation(startDate));
+            if (endDate != null)
+                request.setRequestProperty(EndDateHeader, NetworkHelpers.getHttpDateRepresentation(endDate));
+
+            int statusCode = 0;
+            try
+            {
+                statusCode = request.getResponseCode();
+            }
+            catch (IOException exp)
+            {
+                if (exp instanceof java.net.UnknownHostException)
+                    throw new NetworkException(NetworkResultCode.NoConnection);
+            }
+
+            if (statusCode != 200)
+            {
+                switch (statusCode)
+                {
+                    case 401:
+                    case 404:
+                        throw new NetworkException(NetworkResultCode.AuthenticationError);
+                }
+
+                throw new NetworkException(NetworkResultCode.Unknown);
+            }
+
+            InputStream responseBodyStream = request.getInputStream();
+
+            String responseEncoding = request.getContentEncoding();
+            responseEncoding = TextUtils.isEmpty(responseEncoding) ? "UTF-8" : responseEncoding;
+
+            List<ExerciseScore> returnedExercises = new ArrayList<>();
+
+            JsonReader jsonReader = new JsonReader(new InputStreamReader(responseBodyStream, responseEncoding));
+            try
+            {
+                jsonReader.beginArray();
+                while (jsonReader.hasNext())
+                {
+                    ExerciseScore exerciseScore = new ExerciseScore();
+                    boolean nameIsSet = false;
+                    boolean dateIsSet = false;
+                    boolean scoreIsSet = false;
+
+                    jsonReader.beginObject();
+                    while (jsonReader.hasNext())
+                    {
+                        final String propertyName = jsonReader.nextName();
+                        if (propertyName.equalsIgnoreCase("Exercise"))
+                        {
+                            exerciseScore.exerciseName = jsonReader.nextString();
+                            nameIsSet = true;
+                        }
+                        else if (propertyName.equalsIgnoreCase("Date"))
+                        {
+                            exerciseScore.date = new Date(jsonReader.nextLong());
+                            dateIsSet = true;
+                        }
+                        else if (propertyName.equalsIgnoreCase("Score"))
+                        {
+                            exerciseScore.score = jsonReader.nextInt();
+                            scoreIsSet = true;
+                        }
+                    }
+                    jsonReader.endObject();
+
+                    if (!(nameIsSet & dateIsSet & scoreIsSet) || (TextUtils.isEmpty(exerciseScore.exerciseName)))
+                        throw new CommonException(CommonResultCode.UnknownReason);
+
+                    returnedExercises.add(exerciseScore);
+                }
+                jsonReader.endArray();
+            }
+            finally
+            {
+                jsonReader.close();
+            }
+
+            ExerciseScore[] result = new ExerciseScore[returnedExercises.size()];
+            returnedExercises.toArray(result);
+            return result;
+        }
+        catch (IOException exp)
+        {
+            Log.e(LogTag, "reportExerciseScore exception: " + exp.getMessage());
+        }
+
         return null;
-        //throw new UnsupportedOperationException();
     }
 
     private IAuthenticationProvider m_authenticationProvider;

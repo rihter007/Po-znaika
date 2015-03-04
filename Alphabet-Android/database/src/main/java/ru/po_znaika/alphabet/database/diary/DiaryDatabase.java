@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -131,5 +132,22 @@ public final class DiaryDatabase extends SQLiteOpenHelper
         }
 
         return null;
+    }
+
+    public void deleteRecordsOlderThan(@NonNull Date minRecordDate)
+    {
+        SQLiteDatabase database = getWritableDatabase();
+        try
+        {
+            database.delete(TableName, DateColumnName + " < ?", new String[]{((Long) minRecordDate.getTime()).toString()});
+        }
+        catch (SQLiteException exp)
+        {
+            Log.e(LogTag, String.format("Failed to delete records exception message: \"%s\"", exp.getMessage()));
+        }
+        finally
+        {
+            database.close();
+        }
     }
 }

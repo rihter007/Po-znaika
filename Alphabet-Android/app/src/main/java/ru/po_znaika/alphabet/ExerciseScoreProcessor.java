@@ -22,6 +22,7 @@ import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.ExerciseScore;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.CommonHelpers;
 import ru.po_znaika.network.IServerOperations;
 import ru.po_znaika.network.NetworkException;
 import ru.po_znaika.network.NetworkResultCode;
@@ -349,7 +350,7 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor, Closeabl
     {
         Log.i(LogTag, String.format("Report exercise score: exerciseId:\"%s\", score:\"%d\"", exerciseName, score));
 
-        final Date scoreDate = new Date();
+        final Date scoreDate = CommonHelpers.beginOfTheDay(new Date());
 
         {
             final int rowId = m_diaryDatabase.insertExerciseScore(scoreDate, exerciseName, score);
