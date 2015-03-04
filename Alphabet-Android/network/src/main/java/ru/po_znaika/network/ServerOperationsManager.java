@@ -19,6 +19,7 @@ import java.util.List;
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.ExerciseScore;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.CommonHelpers;
 
 /**
  * Created by Rihter on 10.02.2015.
@@ -199,7 +200,7 @@ public class ServerOperationsManager implements IServerOperations
                         }
                         else if (propertyName.equalsIgnoreCase("Date"))
                         {
-                            exerciseScore.date = new Date(jsonReader.nextLong());
+                            exerciseScore.date = CommonHelpers.gmtToLocal(new Date(jsonReader.nextLong()));
                             dateIsSet = true;
                         }
                         else if (propertyName.equalsIgnoreCase("Score"))

@@ -2,7 +2,6 @@ package ru.po_znaika.common.ru.po_znaika.common.helpers;
 
 import android.support.annotation.NonNull;
 
-import java.io.ByteArrayInputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -13,13 +12,13 @@ import java.util.TimeZone;
  */
 public class CommonHelpers
 {
-    public static Date localToGmt(@NonNull Date date)
+    public static Date localToGmt(@NonNull Date localTime)
     {
         final TimeZone localTimeZone = TimeZone.getDefault();
-        Date gmtTime = new Date(date.getTime() - localTimeZone.getRawOffset());
+        Date gmtTime = new Date(localTime.getTime() - localTimeZone.getRawOffset());
 
-        // if we are now in DST, back off by the delta.  Note that we are checking the GMT date, this is the KEY.
-        if (localTimeZone.inDaylightTime(date))
+        // if we are now in DST, back off by the delta.  Note that we are checking the GMT localTime, this is the KEY.
+        if (localTimeZone.inDaylightTime(localTime))
         {
             Date dstDate = new Date(gmtTime.getTime() - localTimeZone.getDSTSavings() );
 
@@ -31,6 +30,25 @@ public class CommonHelpers
             }
         }
         return gmtTime;
+    }
+
+    public static Date gmtToLocal(@NonNull Date gmtTime)
+    {
+        final TimeZone localTimeZone = TimeZone.getDefault();
+        Date localTime = new Date(gmtTime.getTime() + localTimeZone.getRawOffset());
+
+        if (localTimeZone.inDaylightTime(localTime))
+        {
+            Date dstDate = new Date(localTime.getTime() + localTimeZone.getDSTSavings() );
+
+            // check to make sure we have not crossed back into standard time
+            // this happens when we are on the cusp of DST (7pm the day before the change for PDT)
+            if (localTimeZone.inDaylightTime(dstDate))
+            {
+                localTime = dstDate;
+            }
+        }
+        return localTime;
     }
 
     public static Date beginOfTheDay(@NonNull Date date)
