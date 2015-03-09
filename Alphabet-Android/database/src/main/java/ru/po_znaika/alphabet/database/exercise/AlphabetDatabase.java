@@ -282,6 +282,12 @@ public final class AlphabetDatabase
     private final String DatabaseName = "alphabet.db";
 
     /**
+     * SQL-expressions from verse table
+     */
+    private static final String ExtractVerseTextByAlphabetIdSqlStatement =
+            "SELECT verse_text FROM verse WHERE alphabet_id = ?";
+
+    /**
      * SQL-expressions from exercise table
      */
     private static final String ExtractAllExercisesShortInfoSqlStatement =
@@ -525,6 +531,26 @@ public final class AlphabetDatabase
         return m_pathToDatabase;
     }
 
+    public String getVerseTextByAlphabet(@NonNull AlphabetType alphabetType, char character)
+    {
+        Cursor dataReader = null;
+
+        try
+        {
+            dataReader = m_databaseConnection.rawQuery(ExtractAllExercisesShortInfoByTypeSqlStatement,
+                    new String[]{((Integer) alphabetType.getValue()).toString()});
+            if (dataReader.moveToFirst())
+                return dataReader.getString(0);
+        }
+        catch (SQLiteException exp) { }
+        finally
+        {
+            if (dataReader != null)
+                dataReader.close();
+        }
+        return null;
+    }
+
     public ExerciseShortInfo[] getAllExercisesShortInfo()
     {
         ExerciseShortInfo[] result = null;
@@ -563,7 +589,7 @@ public final class AlphabetDatabase
         return result;
     }
 
-    public ExerciseShortInfo[] getAllExercisesShortInfoByType(ExerciseType exerciseType)
+    public ExerciseShortInfo[] getAllExercisesShortInfoByType(@NonNull ExerciseType exerciseType)
     {
         ExerciseShortInfo[] result = null;
         Cursor dataReader = null;
@@ -603,7 +629,7 @@ public final class AlphabetDatabase
         return result;
     }
 
-    public ExerciseShortInfo[] getAllExercisesShortInfoExceptType(ExerciseType exerciseType)
+    public ExerciseShortInfo[] getAllExercisesShortInfoExceptType(@NonNull ExerciseType exerciseType)
     {
         ExerciseShortInfo[] result = null;
         Cursor dataReader = null;

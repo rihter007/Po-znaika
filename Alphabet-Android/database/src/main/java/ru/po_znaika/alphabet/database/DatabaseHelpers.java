@@ -22,7 +22,6 @@ public final class DatabaseHelpers
 
     public static int getSoundIdByName(@NonNull Resources resources, @NonNull String soundName)
     {
-        throw new UnsupportedOperationException();
-        //return resources.get
+        return resources.getIdentifier(soundName, "raw", ResourcesPackageName);
     }
 }

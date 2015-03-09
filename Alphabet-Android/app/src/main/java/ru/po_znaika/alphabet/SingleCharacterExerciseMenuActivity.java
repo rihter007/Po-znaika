@@ -66,7 +66,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
     }
 
     /**
-     * Restores all internal objects
+     * Restores all internal selectionVariants
      * @throws ru.po_znaika.common.CommonException
      */
     void restoreInternalState() throws CommonException

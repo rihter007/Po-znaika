@@ -30,6 +30,14 @@ CREATE TABLE special_sound (
 	UNIQUE (sound_id) ON CONFLICT FAIL
 );
 
+CREATE TABLE verse (
+	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
+	alphabet_id INTEGER NOT NULL,
+	verse_text TEXT NOT NULL,
+	
+	UNIQUE(alphabet_id, verse_text) ON CONFLICT FAIL
+);	
+
 CREATE TABLE exercise (
     _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
     type INTEGER,

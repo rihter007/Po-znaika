@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Represents state of exercise step with multiple objects with specified sound
+ * Represents state of exercise step with multiple selectionVariants with specified sound
  */
 public class CharacterMultipleObjectsState implements Parcelable
 {
@@ -20,7 +20,7 @@ public class CharacterMultipleObjectsState implements Parcelable
         this.characterExerciseId = _in.readInt();
         this.exerciseCharacter = _in.readString().charAt(0);
 
-        // get array of sound objects
+        // get array of sound selectionVariants
         {
             final int SoundObjectsNumber = _in.readInt();
             if (SoundObjectsNumber > 0)

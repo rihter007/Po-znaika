@@ -27,7 +27,7 @@ import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
- * Represents fragment with multiple objects represented by name, sound and image
+ * Represents fragment with multiple selectionVariants represented by name, sound and image
  */
 public class CharacterMultipleObjectsFragment extends Fragment
 {
@@ -51,7 +51,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
     }
 
     /**
-     * Restores all internal objects
+     * Restores all internal selectionVariants
      * @param savedInstanceState activity saved state
      */
     private void restoreInternalState(Bundle savedInstanceState) throws CommonException

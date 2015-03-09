@@ -1,6 +1,7 @@
 package ru.po_znaika.alphabet;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 
@@ -23,13 +24,13 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
     private static enum CustomAction
     {
         ObjectsContainingSound(0),
-        SelectPictureWithCharacter(1),
+        SelectPictureWithSound(1),
         FindCharacter(2);
 
         private static Map<Integer, CustomAction> ValuesMap = new HashMap<Integer, CustomAction>()
         {
             { put(ObjectsContainingSound.getValue(), ObjectsContainingSound); }
-            { put(SelectPictureWithCharacter.getValue(), SelectPictureWithCharacter); }
+            { put(SelectPictureWithSound.getValue(), SelectPictureWithSound); }
             { put(FindCharacter.getValue(), FindCharacter); }
         };
 
@@ -69,10 +70,12 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
     private static final int BeginsSoundImageExercisesCount = 1;
     private static final int EndsSoundImageExercisesCount = 1;
 
-    public CharacterExerciseActionsFactory(int characterExerciseId, @NonNull AlphabetDatabase alphabetDatabase)
+    public CharacterExerciseActionsFactory(int _characterExerciseId, @NonNull Context _context,
+                                           @NonNull AlphabetDatabase _alphabetDatabase)
     {
-        m_characterExerciseId = characterExerciseId;
-        m_alphabetDatabase = alphabetDatabase;
+        m_characterExerciseId = _characterExerciseId;
+        m_context = _context;
+        m_alphabetDatabase = _alphabetDatabase;
     }
 
     public Fragment createExerciseStep(@NonNull AlphabetDatabase.CharacterExerciseActionType actionType,
@@ -111,9 +114,13 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                 }
                 break;
 
-                case SelectPictureWithCharacter:
+                case SelectPictureWithSound:
                 {
-                    /*ArrayList<ImageSelectionSingleExerciseState> imageSelectionExercises = new ArrayList<>();
+                    final AlphabetDatabase.CharacterExerciseInfo characterExerciseInfo = m_alphabetDatabase.getCharacterExerciseById(m_characterExerciseId);
+                    if (characterExerciseInfo == null)
+                        throw new CommonException(CommonResultCode.InvalidExternalSource);
+
+                    ArrayList<ImageSelectionSingleExerciseState> imageSelectionExercises = new ArrayList<>();
 
                     final SoundObjectExerciseContainer[] soundObjectExercises = new SoundObjectExerciseContainer[]
                             {
@@ -123,28 +130,29 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                             };
 
                     Random rand = new Random(System.currentTimeMillis());
-                    Resources resources = getResources();
+                    Resources resources = m_context.getResources();
                     for (SoundObjectExerciseContainer soundObjectExercise : soundObjectExercises)
                     {
-                        final int ThisSoundObjectsCount = soundObjectExercise.exercisesCount;
-                        final int OtherSoundObjectsCount = ThisSoundObjectsCount * (ImageSelectionFragment.ImagesCount - ThisSoundObjectsCount);
+                        final int thisSoundObjectsCount = soundObjectExercise.exercisesCount;
+                        final int otherSoundObjectsCount = thisSoundObjectsCount * (ImageSelectionFragment.ImagesCount - thisSoundObjectsCount);
 
                         AlphabetDatabase.SoundObjectInfo thisSoundObjects[] = m_alphabetDatabase.getCharacterSoundObjectsByCharacterExerciseIdAndMatchFlag(
-                                m_characterExerciseId, soundObjectExercise.soundFlag, ThisSoundObjectsCount);
-                        if ((thisSoundObjects == null) || (thisSoundObjects.length != ThisSoundObjectsCount))
-                            throw new IllegalStateException();
+                                m_characterExerciseId, soundObjectExercise.soundFlag, thisSoundObjectsCount);
+                        if ((thisSoundObjects == null) || (thisSoundObjects.length != thisSoundObjectsCount))
+                            throw new CommonException(CommonResultCode.InvalidExternalSource);
 
                         AlphabetDatabase.SoundObjectInfo otherSoundObjects[] = m_alphabetDatabase.getCharacterSoundObjectsByCharacterExerciseIdAndNotMatchFlag(
-                                m_characterExerciseId, soundObjectExercise.soundFlag, OtherSoundObjectsCount);
-                        if ((otherSoundObjects == null) || (otherSoundObjects.length != OtherSoundObjectsCount))
+                                m_characterExerciseId, soundObjectExercise.soundFlag, otherSoundObjectsCount);
+                        if ((otherSoundObjects == null) || (otherSoundObjects.length != otherSoundObjectsCount))
                             throw new IllegalStateException();
 
-                        for (int subExerciseIndex = 0; subExerciseIndex < ThisSoundObjectsCount; ++subExerciseIndex)
+                        for (int subExerciseIndex = 0; subExerciseIndex < thisSoundObjectsCount; ++subExerciseIndex)
                         {
                             ImageSelectionSingleExerciseState singleExerciseState = new ImageSelectionSingleExerciseState();
 
-                            singleExerciseState.exerciseTitle = String.format(resources.getString(soundObjectExercise.exerciseTitleResourceId), m_state.exerciseCharacter);
-                            singleExerciseState.objects = new ObjectDescription[ImageSelectionFragment.ImagesCount];
+                            singleExerciseState.exerciseTitle = String.format(resources.getString(soundObjectExercise.exerciseTitleResourceId),
+                                    characterExerciseInfo.character);
+                            singleExerciseState.selectionVariants = new ObjectDescription[ImageSelectionFragment.ImagesCount];
                             singleExerciseState.answer = rand.nextInt(ImageSelectionFragment.ImagesCount);
 
                             int otherObjectsIndex = 0;
@@ -158,31 +166,30 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                                 }
                                 else
                                 {
-                                    final AlphabetDatabase.SoundObjectInfo OtherSoundObjectInfo = otherSoundObjects[(ImageSelectionFragment.ImagesCount - 1) * subExerciseIndex + otherObjectsIndex++];
-                                    imageIdentifier = OtherSoundObjectInfo.imageId;
-                                    soundIdentifier = OtherSoundObjectInfo.soundId;
+                                    final AlphabetDatabase.SoundObjectInfo otherSoundObjectInfo = otherSoundObjects[(ImageSelectionFragment.ImagesCount - 1) * subExerciseIndex + otherObjectsIndex++];
+                                    imageIdentifier = otherSoundObjectInfo.imageId;
+                                    soundIdentifier = otherSoundObjectInfo.soundId;
                                 }
 
-                                final int ImageResourceId = DatabaseHelpers.getDrawableIdByName(resources, m_alphabetDatabase.getImageFileNameById(imageIdentifier));
-                                final int SoundResourceId = resources.getIdentifier(m_alphabetDatabase.getSoundFileNameById(soundIdentifier),
-                                        Constant.RawResourcesTag, getPackageName());
+                                final int imageResourceId = DatabaseHelpers.getDrawableIdByName(resources, m_alphabetDatabase.getImageFileNameById(imageIdentifier));
+                                final int soundResourceId = DatabaseHelpers.getSoundIdByName(resources,m_alphabetDatabase.getSoundFileNameById(soundIdentifier));
 
-                                if ((ImageResourceId == 0) || (SoundResourceId == 0))
+                                if ((imageResourceId == 0) || (soundResourceId == 0))
                                     throw new IllegalStateException();
 
-                                singleExerciseState.objects[imageIndex] = new ObjectDescription(ImageResourceId, SoundResourceId, null);
+                                singleExerciseState.selectionVariants[imageIndex] = new ObjectDescription(imageResourceId, soundResourceId, null);
                             }
 
                             imageSelectionExercises.add(singleExerciseState);
                         }
                     }
-                    resultFragment = ImageSelectionFragment.CreateFragment(imageSelectionExercises);*/
+                    resultFragment = ImageSelectionFragment.createFragment(imageSelectionExercises);
                 }
                 break;
 
                 case FindCharacter:
                 {
-
+                    //m_alphabetDatabase.getVerseTextByAlphabet()
                 }
                 break;
             }
@@ -196,5 +203,6 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
     }
 
     private int m_characterExerciseId;
+    private Context m_context;
     private AlphabetDatabase m_alphabetDatabase;
 }

@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Represents single object description in different aspects
  */
-public class ObjectDescription implements Parcelable
+class ObjectDescription implements Parcelable
 {
     public int imageResourceIndex;
     public int soundResourceIndex;

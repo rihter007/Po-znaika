@@ -193,7 +193,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
     }
 
     /**
-     * Restores all internal objects
+     * Restores all internal selectionVariants
      * @param savedInstanceState activity saved state
      * @throws ru.po_znaika.common.CommonException
      */

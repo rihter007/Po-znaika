@@ -1,13 +1,10 @@
 package ru.po_znaika.alphabet;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +17,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
@@ -41,31 +37,13 @@ public final class DiaryActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary);
 
-        try
-        {
-            m_serviceLocator = new CoreServiceLocator(this);
-        }
-        catch (CommonException exp)
-        {
-            Log.e(LogTag, "Failed creating core service locator: " + exp.getMessage());
-            Resources resources = getResources();
-            AlertDialog msgBox = MessageBox.CreateDialog(this, resources.getString(R.string.failed_exercise_start),
-                    resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i)
-                        {
-                            finish();
-                        }
-                    });
-            msgBox.show();
-        }
+        m_serviceLocator = new CoreServiceLocator(this);
     }
 
     @Override
     protected void onDestroy()
     {
-        m_serviceLocator.close();
+        new CloseAsyncTask(m_serviceLocator).execute();
     }
 
     @Override
