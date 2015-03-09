@@ -6,20 +6,27 @@ import android.os.Parcelable;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
- * Created by Rihter on 14.08.2014.
+ * Created by Rihter on 06.03.2015.
+ * Represents database description of exercise step
  */
-public class CharacterExerciseItemStepState implements Parcelable
+final class CharacterExerciseItemStep implements Parcelable
 {
+    /**
+     * Kind of action to perform
+     */
     public AlphabetDatabase.CharacterExerciseActionType actionType;
+    /**
+     * Special parameter wich depends on action type
+     */
     public int value;
 
-    public CharacterExerciseItemStepState(AlphabetDatabase.CharacterExerciseActionType _actionType, int _value)
+    public CharacterExerciseItemStep(AlphabetDatabase.CharacterExerciseActionType _actionType, int _value)
     {
         actionType = _actionType;
         value = _value;
     }
 
-    public CharacterExerciseItemStepState(Parcel _in)
+    public CharacterExerciseItemStep(Parcel _in)
     {
         actionType = AlphabetDatabase.CharacterExerciseActionType.getTypeByValue(_in.readInt());
         value = _in.readInt();
@@ -40,14 +47,14 @@ public class CharacterExerciseItemStepState implements Parcelable
 
     public static final Creator CREATOR = new Creator()
     {
-        public CharacterExerciseItemStepState createFromParcel(Parcel in)
+        public CharacterExerciseItemStep createFromParcel(Parcel in)
         {
-            return new CharacterExerciseItemStepState(in);
+            return new CharacterExerciseItemStep(in);
         }
 
-        public CharacterExerciseItemStepState[] newArray(int size)
+        public CharacterExerciseItemStep[] newArray(int size)
         {
-            return new CharacterExerciseItemStepState[size];
+            return new CharacterExerciseItemStep[size];
         }
     };
 }

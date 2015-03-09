@@ -97,39 +97,6 @@ public final class AlphabetDatabase
         }
     }
 
-    public static enum CharacterExerciseItemType
-    {
-        General(26480598),      // a crc32 of 'General'
-        Sound(961539200),       // a crc32 of 'SoundPronunciation'
-        Letter(-1985025220);    // a ccr32 of 'Letter'
-
-        private int m_value;
-
-        private CharacterExerciseItemType(int _value)
-        {
-            this.m_value = _value;
-        }
-
-        public int getValue()
-        {
-            return m_value;
-        }
-
-        private static final Map<Integer, CharacterExerciseItemType> ValuesMap = new HashMap<Integer, CharacterExerciseItemType>()
-        {
-            {
-                put(General.getValue(), General);
-                put(Sound.getValue(), Sound);
-                put(Letter.getValue(), Letter);
-            }
-        };
-
-        public static CharacterExerciseItemType getTypeByValue(int value)
-        {
-            return ValuesMap.get(value);
-        }
-    }
-
     public static enum CharacterExerciseActionType
     {
         TheoryPage(1986991965),             // a crc32 of 'TheoryPage'
@@ -227,7 +194,6 @@ public final class AlphabetDatabase
     {
         public int id;
         public int characterExerciseId;
-        public CharacterExerciseItemType type;
         public int menuPosition;
         public String name;
         public String displayName;
@@ -339,9 +305,9 @@ public final class AlphabetDatabase
     private static final String ExtractCharacterExerciseByExerciseIdSqlStatement =
             "SELECT _id, character, alphabet_id FROM character_exercise WHERE exercise_id = ?";
     private static final String ExtractCharacterItemByIdSqlStatement =
-            "SELECT character_exercise_id, type, menu_position, name, display_name FROM character_exercise_item WHERE _id = ?";
+            "SELECT character_exercise_id, menu_position, name, display_name FROM character_exercise_item WHERE _id = ?";
     private static final String ExtractAllCharacterExerciseItemsByCharacterExerciseIdSqlStatement =
-            "SELECT _id, type, menu_position, name, display_name FROM character_exercise_item WHERE character_exercise_id = ?";
+            "SELECT _id, menu_position, name, display_name FROM character_exercise_item WHERE character_exercise_id = ?";
     private static final String ExtractAllCharacterExerciseStepsByCharacterExerciseItemIdSqlStatement =
             "SELECT _id, step_number, action, value FROM character_exercise_item_step WHERE character_exercise_item_id = ?";
     private static final String ExtractCharacterItemDisplayNameByIdSqlStatement =
@@ -800,10 +766,9 @@ public final class AlphabetDatabase
                 result = new CharacterExerciseItemInfo();
                 result.id = characterExerciseItemId;
                 result.characterExerciseId = dataReader.getInt(0);
-                result.type = CharacterExerciseItemType.getTypeByValue(dataReader.getInt(1));
-                result.menuPosition = dataReader.getInt(2);
-                result.name = dataReader.getString(3);
-                result.displayName = dataReader.getString(4);
+                result.menuPosition = dataReader.getInt(1);
+                result.name = dataReader.getString(2);
+                result.displayName = dataReader.getString(3);
             }
         }
         catch (Exception exp)
@@ -837,10 +802,9 @@ public final class AlphabetDatabase
                     CharacterExerciseItemInfo item = new CharacterExerciseItemInfo();
                     item.id = dataReader.getInt(0);
                     item.characterExerciseId = characterExerciseId;
-                    item.type = CharacterExerciseItemType.getTypeByValue(dataReader.getInt(1));
-                    item.menuPosition = dataReader.getInt(2);
-                    item.name = dataReader.getString(3);
-                    item.displayName = dataReader.getString(4);
+                    item.menuPosition = dataReader.getInt(1);
+                    item.name = dataReader.getString(2);
+                    item.displayName = dataReader.getString(3);
 
                     resultList.add(item);
                 }

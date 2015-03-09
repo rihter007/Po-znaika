@@ -326,6 +326,9 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor, Closeabl
     @Override
     public void syncCache() throws CommonException, NetworkException
     {
+        if (m_exerciseScoreCache.isCacheEmpty())
+            return;
+
         {
             ServerScoreReporter scoreReporter = new ServerScoreReporter(getCacheItems());
             scoreReporter.run();
@@ -334,9 +337,6 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor, Closeabl
             if (scoreReporter.getNetworkResultCode() != null)
                 throw new NetworkException(scoreReporter.getNetworkResultCode());
         }
-
-        if (m_exerciseScoreCache.isCacheEmpty())
-            throw new CommonException(CommonResultCode.InvalidInternalState);
     }
 
     @Override

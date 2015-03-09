@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -37,11 +36,11 @@ public class TheoryPageFragment extends Fragment
     private static final String TheorySoundIndexTag = "theory_sound_index";
     private static final String TheoryMessageTag = "theory_message";
 
-    public static TheoryPageFragment createFragment(@NonNull CharacterExerciseItemStepState state)
+    public static TheoryPageFragment createFragment(int theoryPageDatabaseId)
     {
         TheoryPageFragment pageFragment = new TheoryPageFragment();
         Bundle fragmentArguments = new Bundle();
-        fragmentArguments.putInt(TheoryTableIndexTag, state.value);
+        fragmentArguments.putInt(TheoryTableIndexTag, theoryPageDatabaseId);
         pageFragment.setArguments(fragmentArguments);
 
         return pageFragment;

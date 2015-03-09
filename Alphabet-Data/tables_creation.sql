@@ -83,14 +83,6 @@ CREATE TABLE word_sound_description (
     UNIQUE (sound_id, word_id) ON CONFLICT FAIL
 );
 
-/*CREATE TABLE word_sound_position (
-	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
-	word_id INTEGER NOT NULL,
-	
-	FOREIGN KEY(word_id) REFERENCES word(_id)
-
-);*/
-
 CREATE TABLE character_exercise (
     _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
     exercise_id INTEGER NOT NULL,
@@ -103,7 +95,6 @@ CREATE TABLE character_exercise (
 CREATE TABLE character_exercise_item (
 	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
 	character_exercise_id INTEGER NOT NULL,
-	type INTEGER NOT NULL,
 	menu_position INTEGER NOT NULL,
 	name TEXT NOT NULL,
 	display_name TEXT NOT NULL,
@@ -275,28 +266,23 @@ INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(
 /* 
 ***************************
 character_exercise_item table
-Here:
-type column is hardcoded character_exercise_item type
-26480598 a crc32 of 'General'
-961539200 a crc32 of 'Sound'
--1985025220 a ccr32 of 'Letter'
 ***************************
 */
 /* Character 1 */
-INSERT INTO character_exercise_item(_id, character_exercise_id, type, menu_position, name, display_name)
-    VALUES(1195583655, 1, 961539200, 0, 'Alphabet.Russian.Character1.Sound', 'Звук буквы А');
-INSERT INTO character_exercise_item(_id, character_exercise_id, type, menu_position, name, display_name)
-    VALUES(1196999958, 1, 26480598, 1, 'Alphabet.Russian.Character1.General', 'Буква А');
-INSERT INTO character_exercise_item(_id, character_exercise_id, type, menu_position, name, display_name)
-    VALUES(752505491, 1, -1985025220, 2, 'Alphabet.Russian.Character1.Letter', 'Написание буквы А');
+INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
+    VALUES(1195583655, 1, 0, 'Alphabet.Russian.Character1.Sound', 'Звук буквы А');
+INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
+    VALUES(1196999958, 1, 1, 'Alphabet.Russian.Character1.General', 'Буква А');
+INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
+    VALUES(752505491, 1, 2, 'Alphabet.Russian.Character1.Letter', 'Написание буквы А');
 
 /*Character 2 */
-INSERT INTO character_exercise_item(_id, character_exercise_id, type, menu_position, name, display_name)
-    VALUES(1990931002, 2, 961539200, 0, 'Alphabet.Russian.Character2.Sound', 'Звук буквы Б');
-INSERT INTO character_exercise_item(_id, character_exercise_id, type, menu_position, name, display_name)
-    VALUES(2127952339, 2, 26480598, 1, 'Alphabet.Russian.Character2.General', 'Буква Б');
-INSERT INTO character_exercise_item(_id, character_exercise_id, type, menu_position, name, display_name)
-    VALUES(-1571465872, 2, -1985025220, 2, 'Alphabet.Russian.Character2.Letter', 'Написание буквы Б');
+INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
+    VALUES(1990931002, 2, 0, 'Alphabet.Russian.Character2.Sound', 'Звук буквы Б');
+INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
+    VALUES(2127952339, 2, 1, 'Alphabet.Russian.Character2.General', 'Буква Б');
+INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
+    VALUES(-1571465872, 2, 2, 'Alphabet.Russian.Character2.Letter', 'Написание буквы Б');
 	
 /* 
 ***************************
@@ -306,8 +292,7 @@ action is a column which specifies what to do
 1986991965 - a crc32 of 'TheoryPage'. Shows a single page of theory. value column specifies an identifier in theory_page table
 291784361 - a crc32 of 'CustomAction'. Depends on character_exercise_item_id: 
 	0 - fragment with multiple words/sound/images for that SOUND (just for information: user clicks on image, hears the sound, views the object)
-	1 - fragment with selection of words for that SOUND
-	2 - fragment with selection of words for that CHARACTER
+	1 - fragment with selection of words for that CHARACTER
 ***************************
 */
 
@@ -320,8 +305,8 @@ INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_n
     VALUES(3, 1195583655, 2, 1986991965, 3);
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
     VALUES(4, 1195583655, 3, 1986991965, 4);
-INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(5, 1195583655, 3, 291784361, 0);
+/*INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+    VALUES(5, 1195583655, 4, 291784361, 0);*/
 /*INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
     VALUES(6, 1195583655, 3, 291784361, 1);*/
 	

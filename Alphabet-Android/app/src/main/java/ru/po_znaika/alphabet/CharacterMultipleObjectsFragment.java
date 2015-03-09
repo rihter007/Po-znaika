@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.CommonException;
+import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -30,18 +31,19 @@ import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
  */
 public class CharacterMultipleObjectsFragment extends Fragment
 {
-    private static final String StateTag = "State";
     private static final int DisplayedObjectsCount = 8;
 
-    public static CharacterMultipleObjectsFragment CreateFragment(int characterExerciseId, char exerciseCharacter)
+    private static final String InternalStateTag = "internal_state";
+    private static final String CharacterExerciseIdTag = "character_exercise_id";
+
+    public static CharacterMultipleObjectsFragment CreateFragment(int characterExerciseId)
     {
         CharacterMultipleObjectsFragment multipleObjectsFragment = new CharacterMultipleObjectsFragment();
 
         // Put character exercise id as state
         {
             Bundle fragmentState = new Bundle();
-            fragmentState.putInt(Constant.CharacterExerciseIdTag, characterExerciseId);
-            fragmentState.putChar(Constant.CharacterTag, exerciseCharacter);
+            fragmentState.putInt(CharacterExerciseIdTag, characterExerciseId);
             multipleObjectsFragment.setArguments(fragmentState);
         }
 
@@ -65,7 +67,10 @@ public class CharacterMultipleObjectsFragment extends Fragment
 
             Bundle fragmentArguments = getArguments();
             m_state.characterExerciseId = fragmentArguments.getInt(Constant.CharacterExerciseIdTag);
-            m_state.exerciseCharacter = fragmentArguments.getChar(Constant.CharacterTag);
+            final AlphabetDatabase.CharacterExerciseInfo exerciseInfo = alphabetDatabase.getCharacterExerciseById(m_state.characterExerciseId);
+            if (exerciseInfo == null)
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            m_state.exerciseCharacter = exerciseInfo.character;
 
             AlphabetDatabase.SoundObjectInfo[] rawSoundObjects =
                     alphabetDatabase.getCharacterSoundObjectsByCharacterExerciseIdAndMatchFlag(m_state.characterExerciseId, AlphabetDatabase.SoundObjectInfo.Contain, DisplayedObjectsCount);
@@ -73,9 +78,9 @@ public class CharacterMultipleObjectsFragment extends Fragment
             List<SoundObject> resultDisplayObjects = new ArrayList<>();
             for (int soundObjectIndex = 0; soundObjectIndex < rawSoundObjects.length; ++soundObjectIndex)
             {
-                final AlphabetDatabase.SoundObjectInfo RawSoundObject = rawSoundObjects[soundObjectIndex];
-                final int ImageId = RawSoundObject.imageId; // alphabetDatabase.getRandomImageIdByWordId(RawSoundObject.word.id);
-                final int SoundId = RawSoundObject.soundId; // alphabetDatabase.getRandomSoundIdByWordId(RawSoundObject.word.id);
+                final AlphabetDatabase.SoundObjectInfo rawSoundObject = rawSoundObjects[soundObjectIndex];
+                final int ImageId = rawSoundObject.imageId; // alphabetDatabase.getRandomImageIdByWordId(RawSoundObject.word.id);
+                final int SoundId = rawSoundObject.soundId; // alphabetDatabase.getRandomSoundIdByWordId(RawSoundObject.word.id);
 
                 // Object must contain both image and sound
                 if ((ImageId == DatabaseConstant.InvalidDatabaseIndex) || (SoundId == DatabaseConstant.InvalidDatabaseIndex))
@@ -89,7 +94,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
                         Constant.RawResourcesTag, PackageName);
 
                 if ((ImageResourceId != 0) && (SoundResourceId != 0))
-                    resultDisplayObjects.add(new SoundObject(RawSoundObject.word.word, ImageResourceId,SoundResourceId));
+                    resultDisplayObjects.add(new SoundObject(rawSoundObject.word.word, ImageResourceId,SoundResourceId));
             }
 
             m_state.soundObjects = new SoundObject[resultDisplayObjects.size()];
@@ -97,7 +102,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
         }
         else
         {
-            m_state = savedInstanceState.getParcelable(StateTag);
+            m_state = savedInstanceState.getParcelable(InternalStateTag);
         }
     }
 
@@ -203,7 +208,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
     {
         super.onSaveInstanceState(savedInstanceState);
 
-        savedInstanceState.putParcelable(StateTag, m_state);
+        savedInstanceState.putParcelable(InternalStateTag, m_state);
     }
 
     @Override

@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:orientation="vertical"
+             tools:context="ru.po_znaika.alphabet.ExerciseFinishedFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ImageView
+        android:layout_width="@dimen/large_image_size"
+        android:layout_height="@dimen/large_image_size"
+        android:id="@+id/imageView"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/caption_exercise_finished"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/titleTextView"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text=""
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/scoreTextView"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/caption_finish"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/finishButton"/>
+</LinearLayout>
