@@ -1,5 +1,6 @@
 package ru.po_znaika.alphabet;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Parcel;
@@ -92,8 +93,6 @@ public class ExerciseFinishedFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        m_callback = (IExerciseStepCallback)getActivity();
-
         if (savedInstanceState != null)
         {
             m_internalState = savedInstanceState.getParcelable(InternalStateTag);
@@ -143,7 +142,24 @@ public class ExerciseFinishedFragment extends Fragment
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState)
     {
+        super.onSaveInstanceState(savedInstanceState);
+
         savedInstanceState.putParcelable(InternalStateTag, m_internalState);
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+
+        m_callback = (IExerciseStepCallback) activity;
+    }
+
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+        m_callback = null;
     }
 
     private IExerciseStepCallback m_callback;
