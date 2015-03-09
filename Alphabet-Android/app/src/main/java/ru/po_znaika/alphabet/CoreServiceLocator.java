@@ -2,6 +2,7 @@ package ru.po_znaika.alphabet;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.Closeable;
 
@@ -24,61 +25,114 @@ import ru.po_znaika.network.ServerOperationsManager;
  */
 public class CoreServiceLocator implements Closeable
 {
-    public CoreServiceLocator(@NonNull Context _context) throws CommonException
-    {
-        m_alphabetDatabase = new AlphabetDatabase(_context, false);
-        m_diaryDatabase = new DiaryDatabase(_context);
-        m_authenticationProvider = new CacheAuthenticationProvider(_context);
-        m_serverOperations = new ServerOperationsManager(m_authenticationProvider);
-        m_exerciseScoreProcessor = new ExerciseScoreProcessor(_context, m_serverOperations);
+    private static final String LogTag = CoreServiceLocator.class.getName();
 
-        m_licensing = new Licensing(_context,m_authenticationProvider);
+    public CoreServiceLocator(@NonNull Context _context)
+    {
+        m_context = _context;
     }
 
-    public AlphabetDatabase getAlphabetDatabase()
+    public synchronized AlphabetDatabase getAlphabetDatabase()
     {
+        if (m_alphabetDatabase == null)
+        {
+            try
+            {
+                m_alphabetDatabase = new AlphabetDatabase(m_context, false);
+            }
+            catch (CommonException exp)
+            {
+                Log.e(LogTag, "Failed to create alphabet database: " + exp.getMessage());
+            }
+        }
+
         return m_alphabetDatabase;
     }
 
-    public DiaryDatabase getDiaryDatabase()
+    public synchronized DiaryDatabase getDiaryDatabase()
     {
+        if (m_diaryDatabase == null)
+            m_diaryDatabase = new DiaryDatabase(m_context);
+
         return m_diaryDatabase;
     }
 
-    public IAuthenticationProvider getAuthenticationProvider()
+    public synchronized IAuthenticationProvider getAuthenticationProvider()
     {
+        if (m_authenticationProvider == null)
+            m_authenticationProvider = new CacheAuthenticationProvider(m_context);
+
         return m_authenticationProvider;
     }
 
-    public IExerciseScoreProcessor getExerciseScoreProcessor()
+    public synchronized IExerciseScoreProcessor getExerciseScoreProcessor()
     {
+        if (m_exerciseScoreProcessor == null)
+        {
+            try
+            {
+                m_exerciseScoreProcessor = new ExerciseScoreProcessor(m_context, getServerOperations());
+            }
+            catch (CommonException exp)
+            {
+                Log.e(LogTag, "Failed to create exercise score processor: " + exp.getMessage());
+            }
+        }
         return m_exerciseScoreProcessor;
     }
 
-    public IServerOperations getServerOperations()
+    public synchronized IServerOperations getServerOperations()
     {
+        if (m_serverOperations == null)
+            m_serverOperations = new ServerOperationsManager(getAuthenticationProvider());
+
         return m_serverOperations;
     }
 
-    public ILicensing getLicensing()
+    public synchronized ILicensing getLicensing()
     {
+        if (m_licensing == null)
+            m_licensing = new Licensing(m_context, getAuthenticationProvider());
+
         return m_licensing;
     }
 
-    @Override
-    public void close()
+    public synchronized IMediaPlayerManager getMediaPlayerManager()
     {
-        try
-        {
-            ((Closeable)m_exerciseScoreProcessor).close();
-        }
-        catch (Exception exp) { }
+        if (m_mediaPlayerManager == null)
+            m_mediaPlayerManager = new MediaPlayerManager(m_context, getAlphabetDatabase());
+
+        return m_mediaPlayerManager;
     }
 
+    @Override
+    public synchronized void close()
+    {
+        if (m_authenticationProvider != null)
+        {
+            try
+            {
+                ((Closeable) m_exerciseScoreProcessor).close();
+            }
+            catch (Exception exp) { }
+        }
+
+        m_context = null;
+        m_alphabetDatabase = null;
+        m_diaryDatabase = null;
+        m_authenticationProvider = null;
+        m_serverOperations = null;
+        m_exerciseScoreProcessor = null;
+        m_licensing = null;
+        m_mediaPlayerManager = null;
+    }
+
+    private Context m_context;
     private AlphabetDatabase m_alphabetDatabase;
     private DiaryDatabase m_diaryDatabase;
     private IAuthenticationProvider m_authenticationProvider;
     private IServerOperations m_serverOperations;
     private IExerciseScoreProcessor m_exerciseScoreProcessor;
     private ILicensing m_licensing;
+    private IMediaPlayerManager m_mediaPlayerManager;
 }
