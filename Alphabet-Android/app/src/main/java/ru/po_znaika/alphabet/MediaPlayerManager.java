@@ -16,7 +16,7 @@ import ru.po_znaika.common.CommonResultCode;
  */
 interface IMediaPlayerManager
 {
-    void play(int soundId);
+    void play(int soundId) throws CommonException;
     void play(@NonNull AlphabetDatabase.SoundType soundType) throws CommonException;
     void pause();
     void resume();
@@ -32,7 +32,7 @@ class MediaPlayerManager implements IMediaPlayerManager
     }
 
     @Override
-    public void play(int soundResourceId)
+    public void play(int soundResourceId) throws CommonException
     {
         if (m_mediaPlayer != null)
         {
@@ -41,6 +41,9 @@ class MediaPlayerManager implements IMediaPlayerManager
         }
 
         m_mediaPlayer = MediaPlayer.create(m_context, soundResourceId);
+        if (m_mediaPlayer == null)
+            throw new CommonException(CommonResultCode.InvalidArgument);
+
         m_mediaPlayer.start();
     }
 
