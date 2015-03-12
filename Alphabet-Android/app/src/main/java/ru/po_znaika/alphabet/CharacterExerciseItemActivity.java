@@ -266,7 +266,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         }
 
         final CharacterExerciseActionsFactory actionsFactory = new CharacterExerciseActionsFactory(m_state.characterExerciseId,
-                m_serviceLocator.getAlphabetDatabase());
+                this, m_serviceLocator.getAlphabetDatabase());
         m_exerciseStepManager = new CharacterExerciseStepManager(m_state.currentStep, m_state.exerciseSteps, actionsFactory);
     }
 

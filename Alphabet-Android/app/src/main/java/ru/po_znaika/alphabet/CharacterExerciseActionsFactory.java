@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,6 +70,9 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
     private static final int ContainsSoundImageExercisesCount = 1;
     private static final int BeginsSoundImageExercisesCount = 1;
     private static final int EndsSoundImageExercisesCount = 1;
+
+    private static final int VerseMinSearchCharactersCount = 3;
+    private static final int VerseMaxCharactersCount = 100;
 
     public CharacterExerciseActionsFactory(int _characterExerciseId, @NonNull Context _context,
                                            @NonNull AlphabetDatabase _alphabetDatabase)
@@ -189,7 +193,17 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
 
                 case FindCharacter:
                 {
-                    //m_alphabetDatabase.getVerseTextByAlphabet()
+                    final AlphabetDatabase.CharacterExerciseInfo exerciseInfo =
+                            m_alphabetDatabase.getCharacterExerciseById(m_characterExerciseId);
+                    if (exerciseInfo == null)
+                        throw new CommonException(CommonResultCode.InvalidExternalSource);
+
+                    final String verseText = m_alphabetDatabase.getVerseTextByAlphabet(exerciseInfo.alphabetId,
+                            exerciseInfo.character, VerseMinSearchCharactersCount, VerseMaxCharactersCount);
+                    if (TextUtils.isEmpty(verseText))
+                        throw new CommonException(CommonResultCode.InvalidExternalSource);
+
+                    resultFragment = FindCharacterFragment.createFragment(verseText, exerciseInfo.character);
                 }
                 break;
             }

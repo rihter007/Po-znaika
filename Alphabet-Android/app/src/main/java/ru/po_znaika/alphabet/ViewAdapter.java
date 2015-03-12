@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * Created by Rihter on 29.08.2014.
+ * Sets predefined views
  */
 public class ViewAdapter extends BaseAdapter
 {
@@ -17,6 +18,11 @@ public class ViewAdapter extends BaseAdapter
         m_elementViews = new ArrayList<View>();
     }
 
+    public void add(View[] views)
+    {
+        for (View v : views)
+            m_elementViews.add(v);
+    }
     public void add(View v)
     {
         m_elementViews.add(v);

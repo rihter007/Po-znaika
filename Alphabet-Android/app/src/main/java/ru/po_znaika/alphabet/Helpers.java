@@ -1,5 +1,7 @@
 package ru.po_znaika.alphabet;
 
+import android.support.annotation.NonNull;
+
 import java.util.Random;
 
 /**
@@ -7,6 +9,17 @@ import java.util.Random;
  */
 public class Helpers
 {
+    public static int getMaxRowLength(@NonNull String[] rows)
+    {
+        int maxRowLength = 0;
+        for (String str : rows)
+        {
+            if (maxRowLength > str.length())
+                maxRowLength = str.length();
+        }
+        return maxRowLength;
+    }
+
     public static <T> void randomSnuffle(T[] arr)
     {
         Random rand = new Random();

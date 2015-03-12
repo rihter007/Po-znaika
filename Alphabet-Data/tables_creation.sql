@@ -233,7 +233,7 @@ INSERT INTO image(_id, file_name) VALUES(25, 'database_wolf');
 Sound table
 ***************************
 */
-/*INSERT INTO sound(_id, file_name) VALUES(1, 'database_sound_test');*/
+INSERT INTO sound(_id, file_name) VALUES(1, 'database_sound_test');
 
 /* 
 ***************************
@@ -301,18 +301,23 @@ action is a column which specifies what to do
 291784361 - a crc32 of 'CustomAction'. Depends on character_exercise_item_id: 
 	0 - fragment with multiple words/sound/images for that SOUND (just for information: user clicks on image, hears the sound, views the object)
 	1 - fragment with selection of words for that CHARACTER
+	2 - fragment with selection of specified CHARACTER in verse
 ***************************
 */
 
 /* Sound ch1 */
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(1, 1195583655, 0, 1986991965, 1);
+    VALUES(1, 1195583655, 0, 291784361, 0);
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(2, 1195583655, 1, 1986991965, 2);
+    VALUES(2, 1195583655, 1, 291784361, 2);
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(3, 1195583655, 2, 1986991965, 3);
+    VALUES(3, 1195583655, 2, 1986991965, 1);
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(4, 1195583655, 3, 1986991965, 4);
+    VALUES(4, 1195583655, 3, 1986991965, 2);
+INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+    VALUES(5, 1195583655, 4, 1986991965, 3);
+INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+    VALUES(6, 1195583655, 5, 1986991965, 4);
 /*INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
     VALUES(5, 1195583655, 4, 291784361, 0);*/
 /*INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
@@ -355,6 +360,14 @@ INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(9, 402, 0, 'с�
 
 /* 
 ***************************
+verse table
+***************************
+*/
+INSERT INTO verse(_id, alphabet_id, verse_text) VALUES(1, -345575051, 'Аист нам доставил груз:\nАппетитнейший арбуз,\nАнанасы, мандарины,\nАбрикосы, апельсины!');
+
+
+/* 
+***************************
 word table
 ***************************
 */
@@ -373,11 +386,10 @@ INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(11,   -345575051, '�
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(12,   -345575051, 'сон', 1);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(13,   -345575051, 'рык', 1);
 
--- Different objects
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(14,    -345575051, 'антилопа', 4);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(15,    -345575051, 'арбуз', 2);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(16,    -345575051, 'астры', 2);
-INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(17,    -345575051, 'бабочка', 3);
+--INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(17,    -345575051, 'бабочка', 3);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(18,    -345575051, 'блин', 1);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(19,    -345575051, 'бусы', 1);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(20,    -345575051, 'облако', 3);
@@ -390,6 +402,12 @@ INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(26,    -345575051, '
 
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(27,    -345575051, 'мороженое', 5);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(28,    -345575051, 'лошадь', 2);
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(29,    -345575051, 'аист', 2);
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(30,    -345575051, 'сова', 2);
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(31,    -345575051, 'белка', 2);
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(32,    -345575051, 'бабочка', 3);
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES(33,    -345575051, 'корова', 3);
+
 /* 
 ***************************
 word_image_description table
@@ -397,6 +415,11 @@ word_image_description table
 */
 INSERT INTO word_image_description(word_id, image_id) VALUES(27, 412);
 INSERT INTO word_image_description(word_id, image_id) VALUES(28, 401);
+INSERT INTO word_image_description(word_id, image_id) VALUES(29, 400);
+INSERT INTO word_image_description(word_id, image_id) VALUES(30, 402);
+INSERT INTO word_image_description(word_id, image_id) VALUES(31, 404);
+INSERT INTO word_image_description(word_id, image_id) VALUES(32, 405);
+INSERT INTO word_image_description(word_id, image_id) VALUES(33, 407);
 
 /*
 INSERT INTO word_image_description(word_id, image_id) VALUES(14, 13);
@@ -418,20 +441,12 @@ INSERT INTO word_image_description(word_id, image_id) VALUES(26, 23);
 word_sound_description table
 ***************************
 */
-/*
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(14, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(15, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(16, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(17, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(18, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(19, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(20, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(21, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(23, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(24, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(25, 1);
-INSERT INTO word_sound_description(word_id, sound_id) VALUES(26, 1);
-*/
+INSERT INTO word_sound_description(word_id, sound_id) VALUES(28, 1);
+INSERT INTO word_sound_description(word_id, sound_id) VALUES(29, 1);
+INSERT INTO word_sound_description(word_id, sound_id) VALUES(30, 1);
+INSERT INTO word_sound_description(word_id, sound_id) VALUES(31, 1);
+INSERT INTO word_sound_description(word_id, sound_id) VALUES(32, 1);
+INSERT INTO word_sound_description(word_id, sound_id) VALUES(33, 1);
 
 /* 
 ***************************
@@ -445,18 +460,12 @@ INSERT INTO word_literal_description(word_id, description) VALUES(14, 'Анти�
 sound_words table
 ***************************
 */
-/*
-INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 14, 7);
-INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 15, 3);
-INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 16, 3);
-INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 17, 1);
-INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 22, 5);
-
-INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(2, 17, 3);
-INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(2, 18, 3);
-INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(2, 19, 3);
-INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(2, 22, 3);
-INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(2, 24, 5);*/
+INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 28, 1);
+INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 29, 3);
+INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 30, 5);
+INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 31, 5);
+INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 32, 5);
+INSERT INTO sound_words(character_exercise_id, word_id, sound_flag) VALUES(1, 33, 5);
 
 /* 
 ***************************

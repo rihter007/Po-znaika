@@ -15,14 +15,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:text="@string/button_previous"
+            android:text="@string/caption_previous"
             android:id="@+id/backButton"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:text="@string/button_next"
+            android:text="@string/caption_next"
             android:id="@+id/forwardButton"/>
     </RelativeLayout>
 

@@ -285,7 +285,10 @@ public final class AlphabetDatabase
      * SQL-expressions from verse table
      */
     private static final String ExtractVerseTextByAlphabetIdSqlStatement =
-            "SELECT verse_text FROM verse WHERE alphabet_id = ?";
+            "SELECT verse_text " +
+            "FROM verse " +
+            "WHERE (alphabet_id = ?) AND (verse_text LIKE ?) AND (length(verse_text) < ?) " +
+            "ORDER BY RANDOM() LIMIT 1";
 
     /**
      * SQL-expressions from exercise table
@@ -531,18 +534,32 @@ public final class AlphabetDatabase
         return m_pathToDatabase;
     }
 
-    public String getVerseTextByAlphabet(@NonNull AlphabetType alphabetType, char character)
+    public String getVerseTextByAlphabet(@NonNull AlphabetType alphabetType, char character
+            , int minSearchCharCount, int maxCharactersCount)
     {
         Cursor dataReader = null;
 
         try
         {
-            dataReader = m_databaseConnection.rawQuery(ExtractAllExercisesShortInfoByTypeSqlStatement,
-                    new String[]{((Integer) alphabetType.getValue()).toString()});
+            final Character characterObject = character;
+
+            String characterCountCondition = "*";
+            for (int i = 0; i < minSearchCharCount; ++i)
+                characterCountCondition = characterCountCondition + characterObject + "*";
+
+            dataReader = m_databaseConnection.rawQuery(ExtractVerseTextByAlphabetIdSqlStatement, new String[]
+                    {
+                            ((Integer) alphabetType.getValue()).toString(),
+                            ((Integer) maxCharactersCount).toString(),
+                            characterCountCondition
+                    });
             if (dataReader.moveToFirst())
                 return dataReader.getString(0);
         }
-        catch (SQLiteException exp) { }
+        catch (SQLiteException exp)
+        {
+            return null;
+        }
         finally
         {
             if (dataReader != null)

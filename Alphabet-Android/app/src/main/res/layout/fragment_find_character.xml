@@ -14,27 +14,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
+            android:text=""
             android:id="@+id/exerciseCaptionTextView"
             android:layout_gravity="center_horizontal|top"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Button"
+            android:text="@string/caption_back"
             android:id="@+id/backButton"
             android:layout_gravity="left|top"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Button"
-            android:id="@+id/finishButton"
+            android:text="@string/caption_finish"
+            android:id="@+id/forwardButton"
             android:layout_gravity="right|top"/>
     </FrameLayout>
 
     <GridView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:numColumns="15"
         android:id="@+id/charactersGridView"/>
 </LinearLayout>

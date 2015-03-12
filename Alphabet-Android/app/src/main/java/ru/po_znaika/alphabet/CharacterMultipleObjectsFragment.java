@@ -6,11 +6,14 @@ import java.util.List;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +34,60 @@ import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
  */
 public class CharacterMultipleObjectsFragment extends Fragment
 {
+    private static class CharacterMultipleObjectsState implements Parcelable
+    {
+        public char exerciseCharacter;
+        public SoundObject[] soundObjects;
+
+        public CharacterMultipleObjectsState() {}
+
+        public CharacterMultipleObjectsState(@NonNull Parcel _in)
+        {
+            this.exerciseCharacter = _in.readString().charAt(0);
+
+            // get array of sound selectionVariants
+            {
+                final int SoundObjectsNumber = _in.readInt();
+                if (SoundObjectsNumber > 0)
+                {
+                    this.soundObjects = new SoundObject[SoundObjectsNumber];
+                    for (int soundObjectIndex = 0; soundObjectIndex < SoundObjectsNumber; ++soundObjectIndex)
+                        this.soundObjects[soundObjectIndex] = _in.readParcelable(SoundObject.class.getClassLoader());
+                }
+            }
+        }
+
+        @Override
+        public int describeContents()
+        {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(@NonNull Parcel container, int flags)
+        {
+            container.writeString(((Character)this.exerciseCharacter).toString());
+
+            container.writeInt(soundObjects.length);
+            for (int soundObjectIndex = 0; soundObjectIndex < soundObjects.length; ++soundObjectIndex)
+                container.writeParcelable(soundObjects[soundObjectIndex], 0);
+        }
+
+        public static final Creator CREATOR = new Creator()
+        {
+            public CharacterMultipleObjectsState createFromParcel(Parcel in)
+            {
+                return new CharacterMultipleObjectsState(in);
+            }
+
+            public CharacterMultipleObjectsState[] newArray(int size)
+            {
+                return new CharacterMultipleObjectsState[size];
+            }
+        };
+    }
+
+    private static final String LogTag = CharacterMultipleObjectsFragment.class.getName();
     private static final int DisplayedObjectsCount = 8;
 
     private static final String InternalStateTag = "internal_state";
@@ -56,45 +113,46 @@ public class CharacterMultipleObjectsFragment extends Fragment
      */
     private void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
-        AlphabetDatabase alphabetDatabase = new AlphabetDatabase(getActivity(), false);
+        m_serviceLocator = new CoreServiceLocator(getActivity());
 
-        m_mediaPlayer = null;
-        m_isResumed = false;
+        AlphabetDatabase alphabetDatabase = m_serviceLocator.getAlphabetDatabase();
+        m_mediaPlayerManager = m_serviceLocator.getMediaPlayerManager();
 
         if (savedInstanceState == null)
         {
             m_state = new CharacterMultipleObjectsState();
 
             Bundle fragmentArguments = getArguments();
-            m_state.characterExerciseId = fragmentArguments.getInt(Constant.CharacterExerciseIdTag);
-            final AlphabetDatabase.CharacterExerciseInfo exerciseInfo = alphabetDatabase.getCharacterExerciseById(m_state.characterExerciseId);
+            final int characterExerciseId = fragmentArguments.getInt(Constant.CharacterExerciseIdTag);
+            final AlphabetDatabase.CharacterExerciseInfo exerciseInfo = alphabetDatabase.getCharacterExerciseById(characterExerciseId);
             if (exerciseInfo == null)
                 throw new CommonException(CommonResultCode.InvalidExternalSource);
             m_state.exerciseCharacter = exerciseInfo.character;
 
             AlphabetDatabase.SoundObjectInfo[] rawSoundObjects =
-                    alphabetDatabase.getCharacterSoundObjectsByCharacterExerciseIdAndMatchFlag(m_state.characterExerciseId, AlphabetDatabase.SoundObjectInfo.Contain, DisplayedObjectsCount);
+                    alphabetDatabase.getCharacterSoundObjectsByCharacterExerciseIdAndMatchFlag(characterExerciseId,
+                            AlphabetDatabase.SoundObjectInfo.Contain,
+                            DisplayedObjectsCount);
+            if (rawSoundObjects == null)
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
 
             List<SoundObject> resultDisplayObjects = new ArrayList<>();
             for (int soundObjectIndex = 0; soundObjectIndex < rawSoundObjects.length; ++soundObjectIndex)
             {
                 final AlphabetDatabase.SoundObjectInfo rawSoundObject = rawSoundObjects[soundObjectIndex];
-                final int ImageId = rawSoundObject.imageId; // alphabetDatabase.getRandomImageIdByWordId(RawSoundObject.word.id);
-                final int SoundId = rawSoundObject.soundId; // alphabetDatabase.getRandomSoundIdByWordId(RawSoundObject.word.id);
+                final int imageId = rawSoundObject.imageId;
+                final int soundId = rawSoundObject.soundId;
 
                 // Object must contain both image and sound
-                if ((ImageId == DatabaseConstant.InvalidDatabaseIndex) || (SoundId == DatabaseConstant.InvalidDatabaseIndex))
+                if ((imageId == DatabaseConstant.InvalidDatabaseIndex) || (soundId == DatabaseConstant.InvalidDatabaseIndex))
                     continue;
 
                 Resources resources = getResources();
-                final String PackageName = getActivity().getPackageName();
+                final int imageResourceId = DatabaseHelpers.getDrawableIdByName(resources, alphabetDatabase.getImageFileNameById(imageId));
+                final int soundResourceId = DatabaseHelpers.getSoundIdByName(resources, alphabetDatabase.getSoundFileNameById(soundId));
 
-                final int ImageResourceId = DatabaseHelpers.getDrawableIdByName(resources, alphabetDatabase.getImageFileNameById(ImageId));
-                final int SoundResourceId = resources.getIdentifier(alphabetDatabase.getSoundFileNameById(SoundId),
-                        Constant.RawResourcesTag, PackageName);
-
-                if ((ImageResourceId != 0) && (SoundResourceId != 0))
-                    resultDisplayObjects.add(new SoundObject(rawSoundObject.word.word, ImageResourceId,SoundResourceId));
+                if ((imageResourceId != 0) && (soundResourceId != 0))
+                    resultDisplayObjects.add(new SoundObject(rawSoundObject.word.word, imageResourceId, soundResourceId));
             }
 
             m_state.soundObjects = new SoundObject[resultDisplayObjects.size()];
@@ -239,8 +297,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
         super.onDestroy();
 
         // release media player
-        if (m_mediaPlayer != null)
-            m_mediaPlayer.release();
+        m_mediaPlayerManager.stop();
     }
 
     @Override
@@ -248,14 +305,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
     {
         super.onPause();
 
-        if (m_mediaPlayer == null)
-            return;
-
-        if (m_mediaPlayer.isPlaying())
-        {
-            m_mediaPlayer.pause();
-            m_isResumed = true;
-        }
+        m_mediaPlayerManager.pause();
     }
 
     @Override
@@ -263,24 +313,21 @@ public class CharacterMultipleObjectsFragment extends Fragment
     {
         super.onResume();
 
-        if (m_mediaPlayer == null)
-            return;
-
-        if (m_isResumed)
-        {
-            m_isResumed = false;
-            m_mediaPlayer.start();
-        }
+        m_mediaPlayerManager.resume();
     }
 
     private void onListViewItemSelected(int elementId)
     {
-        if (m_mediaPlayer != null)
-            m_mediaPlayer.stop();
-        m_isResumed = false;
+        m_mediaPlayerManager.stop();
 
-        m_mediaPlayer = MediaPlayer.create(getActivity(), m_state.soundObjects[elementId].wordSoundResourceId);
-        m_mediaPlayer.start();
+        try
+        {
+            m_mediaPlayerManager.play(m_state.soundObjects[elementId].wordSoundResourceId);
+        }
+        catch (CommonException exp)
+        {
+            Log.e(LogTag, "Failed to play sound: " + m_state.soundObjects[elementId].wordSoundResourceId);
+        }
     }
 
     private void onForwardButtonClick()
@@ -297,6 +344,6 @@ public class CharacterMultipleObjectsFragment extends Fragment
 
     private CharacterMultipleObjectsState m_state;
 
-    private MediaPlayer m_mediaPlayer;
-    private boolean m_isResumed;
+    private CoreServiceLocator m_serviceLocator;
+    private IMediaPlayerManager m_mediaPlayerManager;
 }
