@@ -67,7 +67,12 @@ public class FindCharacterFragment extends Fragment
         {
             this.stage = _stage;
             this.columnsCount = _columnsCount;
-            this.elementsSelection = new MatrixAccessor<>(new Boolean[_elementsCount], this.columnsCount);
+
+            Boolean[] selectionArray = new Boolean[_elementsCount];
+            for (int i = 0; i < selectionArray.length; ++i)
+                selectionArray[i] = false;
+
+            this.elementsSelection = new MatrixAccessor<>(selectionArray, this.columnsCount);
         }
 
         public InternalState(@NonNull Parcel _in)
@@ -170,10 +175,13 @@ public class FindCharacterFragment extends Fragment
             final int rowIndex = elementIndex / maxRowLength;
             final int columnIndex = elementIndex % maxRowLength;
 
-            if ((m_text[rowIndex].length() < columnIndex) && (m_text[rowIndex].charAt(columnIndex) != ' '))
+            if ((columnIndex < m_text[rowIndex].length()) &&
+                    (!Character.isWhitespace(m_text[rowIndex].charAt(columnIndex))))
             {
                 TextView textView = (TextView) elements[elementIndex].findViewById(R.id.textView);
-                textView.setText(m_text[rowIndex].charAt(columnIndex));
+                final String itemText = ((Character)m_text[rowIndex].charAt(columnIndex)).toString();
+                textView.setText(itemText);
+
                 elements[elementIndex].setOnClickListener(new View.OnClickListener()
                 {
                     @Override
@@ -206,8 +214,13 @@ public class FindCharacterFragment extends Fragment
 
         // put characters
         {
+            final int gridWidth = maxRowLength * (int)getResources().getDimension(R.dimen.single_character_width);
+
             GridView charactersGridView = (GridView) fragmentView.findViewById(R.id.charactersGridView);
-            charactersGridView.setColumnWidth(maxRowLength);
+            charactersGridView.setNumColumns(maxRowLength);
+            ViewGroup.LayoutParams layoutParams = charactersGridView.getLayoutParams();
+            layoutParams.width = gridWidth;
+            charactersGridView.setLayoutParams(layoutParams);
 
             ViewAdapter adapter = new ViewAdapter();
             adapter.add(elements);
@@ -293,6 +306,8 @@ public class FindCharacterFragment extends Fragment
         {
             m_state.stage = ExerciseStage.Processed;
 
+            final String searchCharacter = ((Character)m_searchCharacter).toString();
+
             int mistakesCount = 0;
             int charactersCount = 0;
 
@@ -302,10 +317,12 @@ public class FindCharacterFragment extends Fragment
                 final int rowIndex = elementIndex / m_state.columnsCount;
                 final int columnIndex = elementIndex % m_state.columnsCount;
 
-                if ((m_text[rowIndex].length() < columnIndex) && (m_text[rowIndex].charAt(columnIndex) != ' '))
+                if ((columnIndex < m_text[rowIndex].length()) &&
+                        (!Character.isWhitespace(m_text[rowIndex].charAt(columnIndex))))
                 {
+                    String currentCharacter = ((Character)m_text[rowIndex].charAt(columnIndex)).toString();
                     final boolean isCorrect = m_state.elementsSelection.get(rowIndex, columnIndex) ==
-                            (m_text[rowIndex].charAt(columnIndex) == m_searchCharacter);
+                            currentCharacter.equalsIgnoreCase(searchCharacter);
                     final int colorId = isCorrect ? CorrectSelectionColorId : IncorrectSelectionColorId;
 
                     ++charactersCount;

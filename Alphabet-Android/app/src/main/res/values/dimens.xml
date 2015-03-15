@@ -17,4 +17,5 @@
     <dimen name="large_list_view_width">800dp</dimen>
     <dimen name="medium_list_view_width">400dp</dimen>
     <dimen name="small_button_size">150dp</dimen>
+    <dimen name="single_character_width">25dp</dimen>
 </resources>

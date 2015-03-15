@@ -36,6 +36,7 @@
     <GridView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:numColumns="15"
-        android:id="@+id/charactersGridView"/>
+        android:numColumns="20"
+        android:id="@+id/charactersGridView"
+        android:layout_gravity="center"/>
 </LinearLayout>

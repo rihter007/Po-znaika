@@ -23,7 +23,7 @@ public class MatrixAccessor<T>
     public T get(int rowIndex, int columnIndex)
     {
         final int arrayIndex = rowIndex * m_columnsCount + columnIndex;
-        if (m_elements.length < arrayIndex)
+        if (arrayIndex < m_elements.length)
             return m_elements[arrayIndex];
         return null;
     }
