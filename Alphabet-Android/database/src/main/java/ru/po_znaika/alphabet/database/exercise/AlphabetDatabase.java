@@ -543,15 +543,15 @@ public final class AlphabetDatabase
         {
             final Character characterObject = character;
 
-            String characterCountCondition = "*";
+            String characterCountCondition = "%";
             for (int i = 0; i < minSearchCharCount; ++i)
-                characterCountCondition = characterCountCondition + characterObject + "*";
+                characterCountCondition = characterCountCondition + characterObject + "%";
 
             dataReader = m_databaseConnection.rawQuery(ExtractVerseTextByAlphabetIdSqlStatement, new String[]
                     {
                             ((Integer) alphabetType.getValue()).toString(),
-                            ((Integer) maxCharactersCount).toString(),
-                            characterCountCondition
+                            characterCountCondition,
+                            ((Integer) maxCharactersCount).toString()
                     });
             if (dataReader.moveToFirst())
                 return dataReader.getString(0);
