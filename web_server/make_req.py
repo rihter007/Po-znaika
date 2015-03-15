@@ -4,7 +4,7 @@ import urllib2
 # Prepare data
 
 BaseUrl = 'http://localhost/accounts/'
-BaseUrl = 'http://po-znaika.ru/accounts/'
+#BaseUrl = 'http://po-znaika.ru/accounts/'
 fullUrl = BaseUrl + sys.argv[1]
 
 headers = {}

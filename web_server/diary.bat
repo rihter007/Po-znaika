@@ -1,1 +1,1 @@
-@make_req.py diary Login 5 Password 5 Exercise E4
+@make_req.py diary Login 5 Password 5 Exercise E2

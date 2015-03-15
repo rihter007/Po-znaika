@@ -1,0 +1,1 @@
+manage.py createsuperuser --username=admin --email=a@e.com

@@ -22,3 +22,22 @@ class License(models.Model):
     ForUser = models.ForeignKey(User)
     StartDate = models.DateField()
     EndDate = models.DateField()
+
+    
+class StudyHead(models.Model):
+    User = models.OneToOneField(User)
+    Description = models.CharField(max_length=255, blank=True)
+
+class Teacher(models.Model):
+    User = models.OneToOneField(User)
+    ForHead = models.ForeignKey(StudyHead)
+    Description = models.CharField(max_length=255, blank=True)
+
+class Class(models.Model):
+    ForHead = models.ForeignKey(StudyHead)
+    Name = models.CharField(max_length=100)
+
+class Pupil(models.Model):
+    User = models.OneToOneField(User)
+    ForClass = models.ForeignKey(Class)
+    

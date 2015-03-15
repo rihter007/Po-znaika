@@ -80,13 +80,9 @@ class MarkHandler(BaseHandler):
         self.exer = Exercise.objects.get(Name=self.exerStr)
 
     def FormResponseData(self):
-        updateValues = { 'Score': self.score, 'DateTime': self.date }
-        mark, created = Mark.objects.get_or_create(
-            ForUser=self.user, ForExercise=self.exer, defaults=updateValues)
-        if not created:
-            mark.Score = self.score
-            mark.DateTime = self.date
-            mark.save()
+        mark = Mark(ForUser=self.user, ForExercise=self.exer,
+            Score = self.score, DateTime = self.date)
+        mark.save()
         return "OK"
 
 class DiaryHandler(BaseHandler):
@@ -102,18 +98,19 @@ class DiaryHandler(BaseHandler):
         self.exer = Exercise.objects.get(Name=self.exerStr)
 
     def FormResponseData(self):
-        data = '[{'
-        data += '"User":"' + self.user.username + '",'
-        data += '"Exercise":"' + self.exer.Name + '",'
-        data += '"Score":'
+        data = '['
         try:
-            mark = Mark.objects.get(ForUser=self.user, ForExercise=self.exer)
+            marks = Mark.objects.filter(ForUser=self.user, ForExercise=self.exer)
+            for mark in marks:
+                data += '{"User":"' + self.user.username + '",'
+                data += '"Exercise":"' + self.exer.Name + '",'
+                data += '"Score":'
+                data += '"' + str(mark.Score) + '",'
+                data += '"Date":"' + str(mark.DateTime) + '"'
+                data += '}, '
         except Exception as e:
             data += '"-1"'
-        else:
-            data += '"' + str(mark.Score) + '",'
-            data += '"Date":"' + str(mark.DateTime) + '"'
-        data += '}]'
+        data += ']'
         return data
 
 class LicenseHandler(BaseHandler):
@@ -131,7 +128,7 @@ class LicenseHandler(BaseHandler):
             #print e - this string fails at real server
             data += '"Trial"'
         else:
-            data += '"Commerce",'
+            data += '"Commercial",'
             data += '"StartDate":"' + str(license.StartDate)  + '",'
             data += '"EndDate":"' + str(license.EndDate)  + '",'
             data += '"Status":'

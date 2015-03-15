@@ -11,8 +11,32 @@ from forms import LoginForm
 from models import Exercise
 from models import Course
 from models import Mark
+from models import StudyHead
+from models import Teacher
+from models import Class
+from models import Pupil
 
 # Create your views here.
+
+def MakeSchool(head):
+    schoolList = ""
+    h = StudyHead.objects.get()
+
+    schoolList += "Teachers: "
+    teachers = Teacher.objects.filter(ForHead = h)
+    for teacher in teachers:
+        schoolList += teacher.User.username + ", "
+    schoolList += "\r\n"
+
+    schoolList += "Classes and pupils: \r\n"
+    classes = Class.objects.filter(ForHead = h)
+    for cls in classes:
+        schoolList += "* " + cls.Name + "\r\n"
+        pupils = Pupil.objects.filter(ForClass = cls)
+        for pupil in pupils:
+            schoolList += "  - " + pupil.User.username + "\r\n"        
+        
+    return schoolList
 
 def MakeDiary(user):
     diariesList = ""
@@ -26,10 +50,11 @@ def MakeDiary(user):
             marks = Mark.objects.filter(ForUser = user, ForExercise = exercise)
             if len(marks) == 0:
                 diariesList += "?"
-            elif len(marks) == 1:
-                diariesList += str(marks[0].Score)+" ("+str(marks[0].DateTime)[:16]+")"
             else:
-                diariesList += "too many marks!"
+                for mark in marks:
+                    diariesList += str(mark.Score)+" ("+str(mark.DateTime)[:16]+")"
+                    if len(marks) > 1 and mark != marks[len(marks)-1]:
+                        diariesList += "; "
             diariesList += "\r\n"
     return diariesList
 
@@ -48,6 +73,12 @@ def UsersPage(request):
     user = request.user
     is_logged = user.is_authenticated()
     diariesList = is_logged and MakeDiary(user) or ""
+    schoolList = is_logged and MakeSchool("sh") or ""
+    
+    heads = StudyHead.objects.all()
+    teachers = Teacher.objects.all()
+    classes = Class.objects.all()
+    pupils = Pupil.objects.all()
     
     users = User.objects.all()
     courses = Course.objects.all()

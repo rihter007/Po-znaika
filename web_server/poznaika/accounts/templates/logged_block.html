@@ -1,11 +1,39 @@
-Your diary:
+Shool structure:
+<font size=+1>
+<pre>
+{{ schoolList }}
+</pre>
+</font>
+
+
+Heads:<BR>
+{% for head in heads %}
+{{ head.User.username}} ({{ head.Description}})<BR>
+{%endfor%}
+
+<BR>Teachers:<BR>
+{% for teacher in teachers %}
+{{ teacher.User.username}} ({{ teacher.Description}})<BR>
+{%endfor%}
+
+<BR>Classes:<BR>
+{% for class in classes %}
+{{ class.Name}}<BR>
+{%endfor%}
+
+<BR>Pupils:<BR>
+{% for pupil in pupils %}
+{{ pupil.User.username}}<BR>
+{%endfor%}
+
+<BR><BR>Your diary:
 <font size=+1>
 <pre>
 {{ diariesList }}
 </pre>
 </font>
 
-Exercises:<BR>
+<BR>Exercises:<BR>
 {% for exercise in exercises %}
 {{ exercise.Name}} ({{ exercise.Description}})<BR>
 {%endfor%}
