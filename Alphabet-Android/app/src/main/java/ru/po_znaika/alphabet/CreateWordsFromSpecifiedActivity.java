@@ -161,7 +161,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     {
         final Bundle arguments = getIntent().getExtras();
         m_exerciseName = arguments.getString(ExerciseNameTag);
-        m_alphabetType = AlphabetDatabase.AlphabetType.getTypeByValue(arguments.getInt(Constant.AlphabetTypeTag));
+        m_alphabetType = AlphabetDatabase.AlphabetType.getTypeByValue(arguments.getInt(AlphabetTypeTag));
 
         if (savedInstanceState == null)
             m_state = new ActivityInternalState();

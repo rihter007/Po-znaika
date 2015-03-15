@@ -14,7 +14,7 @@ public class Helpers
         int maxRowLength = 0;
         for (String str : rows)
         {
-            if (maxRowLength > str.length())
+            if (maxRowLength < str.length())
                 maxRowLength = str.length();
         }
         return maxRowLength;

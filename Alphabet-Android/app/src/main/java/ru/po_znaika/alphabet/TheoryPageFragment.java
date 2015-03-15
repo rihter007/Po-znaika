@@ -115,8 +115,8 @@ public class TheoryPageFragment extends Fragment
         // process sound
         if (m_theorySoundId != DatabaseConstant.InvalidDatabaseIndex)
         {
-            final String ResourceFileName = m_alphabetDatabase.getSoundFileNameById(m_theorySoundId);
-            final int soundResourceId = getResources().getIdentifier(ResourceFileName, Constant.RawResourcesTag, getActivity().getPackageName());
+            final String resourceFileName = m_alphabetDatabase.getSoundFileNameById(m_theorySoundId);
+            final int soundResourceId = DatabaseHelpers.getSoundIdByName(getResources(), resourceFileName);
             if (soundResourceId == 0)
             {
                 Log.e(LogTag, String.format("Failed to obtain sound by id:\"%d\"", soundResourceId));

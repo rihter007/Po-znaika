@@ -170,10 +170,12 @@ public final class WordGatherFragment extends Fragment
         if (savedInstanceState == null)
         {
             final Bundle arguments = getArguments();
-            final AlphabetDatabase.AlphabetType AlphabetId = AlphabetDatabase.AlphabetType.getTypeByValue(arguments.getInt(Constant.AlphabetTypeTag));
+            final AlphabetDatabase.AlphabetType alphabetId = AlphabetDatabase.AlphabetType.
+                    getTypeByValue(arguments.getInt(AlphabetTypeTag));
 
             AlphabetDatabase alphabetDatabase = new AlphabetDatabase(getActivity(), false);
-            final Pair<AlphabetDatabase.WordInfo, Integer> wordInfo = alphabetDatabase.getRandomWordAndImageByAlphabetAndLength(AlphabetId, MinWordLength, MaxWordLength);
+            final Pair<AlphabetDatabase.WordInfo, Integer> wordInfo = alphabetDatabase.
+                    getRandomWordAndImageByAlphabetAndLength(alphabetId, MinWordLength, MaxWordLength);
             if (wordInfo == null)
             {
                 Log.e(LogTag, "Could not extract word from alphabet database");

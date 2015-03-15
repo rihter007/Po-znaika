@@ -123,7 +123,7 @@ public class CharacterMultipleObjectsFragment extends Fragment
             m_state = new CharacterMultipleObjectsState();
 
             Bundle fragmentArguments = getArguments();
-            final int characterExerciseId = fragmentArguments.getInt(Constant.CharacterExerciseIdTag);
+            final int characterExerciseId = fragmentArguments.getInt(CharacterExerciseIdTag);
             final AlphabetDatabase.CharacterExerciseInfo exerciseInfo = alphabetDatabase.getCharacterExerciseById(characterExerciseId);
             if (exerciseInfo == null)
                 throw new CommonException(CommonResultCode.InvalidExternalSource);

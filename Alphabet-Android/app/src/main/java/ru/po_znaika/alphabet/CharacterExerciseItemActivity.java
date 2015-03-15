@@ -147,7 +147,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
 
     private static final String LogTag = CharacterExerciseItemActivity.class.getName();
 
-    private static final String CharacterExerciseItemIdTag = "character_exercise_id";
+    private static final String CharacterExerciseItemIdTag = "character_exercise_item_id";
     private static final String InternalStateTag = "internal_state";
     private static final String FragmentTag = "current_fragment";
 
@@ -219,7 +219,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
 
                 // get initial parameters from intent
 
-                final int characterExerciseItemId = intentParams.getInt(Constant.CharacterExerciseIdTag);
+                final int characterExerciseItemId = intentParams.getInt(CharacterExerciseItemIdTag);
                 if (characterExerciseItemId == DatabaseConstant.InvalidDatabaseIndex)
                 {
                     Log.e(LogTag, "Invalid character exercise id");

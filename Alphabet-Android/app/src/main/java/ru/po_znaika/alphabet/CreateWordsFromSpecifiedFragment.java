@@ -153,6 +153,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         private int m_gridElementSelectionIndex;
     }
 
+    private static final String AlphabetTypeTag = "alphabet_type";
     private static final String InternalStateTag = "state";
 
     private static final int MinWordLength = 8;
@@ -169,7 +170,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         CreateWordsFromSpecifiedFragment fragment = new CreateWordsFromSpecifiedFragment();
 
         Bundle arguments = new Bundle();
-        arguments.putInt(Constant.AlphabetTypeTag, alphabetType.getValue());
+        arguments.putInt(AlphabetTypeTag, alphabetType.getValue());
         fragment.setArguments(arguments);
         return fragment;
     }
@@ -244,7 +245,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         if (m_state == null)
         {
             final Bundle arguments = getArguments();
-            final int AlphabetTypeValue = arguments.getInt(Constant.AlphabetTypeTag);
+            final int AlphabetTypeValue = arguments.getInt(AlphabetTypeTag);
 
             m_state = new CreateWordsFromSpecifiedState();
 
