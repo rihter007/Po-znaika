@@ -152,7 +152,8 @@ public class FindCharacterFragment extends Fragment
         if (arguments == null)
             throw new NullPointerException();
 
-        m_text = arguments.getString(TextTag).split("\n");
+        final String exerciseText = arguments.getString(TextTag);
+        m_text = exerciseText.split(Constant.NewLineDelimiter);
         m_searchCharacter = arguments.getChar(SearchCharacterTag);
 
         final int maxRowLength = Helpers.getMaxRowLength(m_text);
