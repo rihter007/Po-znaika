@@ -1,0 +1,79 @@
+Teachers:<BR>
+<form action='delete_teacher/' method='post'>
+{% csrf_token %}
+
+<table>
+{{ deleteTeacherForm.as_table }}
+</table>
+
+<input type="submit" value="Delete teacher(s)" />
+</form>
+
+<form action='add_teacher/' method='post'>
+{% csrf_token %}
+
+<table>
+{{ addTeacherForm.as_table }}
+</table>
+
+<input type="submit" value="Add teacher" />
+</form>
+
+<BR>
+<BR>
+
+Classes:<BR>
+<form action='delete_class/' method='post'>
+{% csrf_token %}
+
+<table>
+{{ deleteClassForm.as_table }}
+</table>
+
+<input type="submit" value="Delete class(es)" />
+</form>
+
+<form action='add_class/' method='post'>
+{% csrf_token %}
+
+<table>
+{{ addClassForm.as_table }}
+</table>
+
+<input type="submit" value="Add class" />
+</form>
+
+<BR>
+<BR>
+
+Sñhool structure:
+<font size=+1>
+<pre>
+{{ schoolList }}
+</pre>
+</font>
+
+
+Heads:<BR>
+{% for head in heads %}
+{{ head.User.username}} ({{ head.Description}})<BR>
+{%endfor%}
+
+<BR>Teachers:<BR>
+{% for teacher in teachers %}
+{{ teacher.User.username}} ({{ teacher.Description}})<BR>
+{%endfor%}
+
+<BR>Classes:<BR>
+{% for class in classes %}
+{{ class.Name}}<BR>
+{%endfor%}
+
+<BR>Pupils:<BR>
+{% for pupil in pupils %}
+{{ pupil.User.username}}<BR>
+{%endfor%}
+
+<BR>
+
+<A href="/accounts/logout/">Logout</A>

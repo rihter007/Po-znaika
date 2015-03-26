@@ -32,3 +32,14 @@ class LoginForm(forms.Form):
         if user is None or not user.is_active:
             raise forms.ValidationError("Login and password pair is incorrect!")
         return pwd
+
+        
+class AddNameForm(forms.Form):
+    Name = forms.CharField(max_length=30)
+
+class DeleteNameForm(forms.Form):
+    Names = forms.MultipleChoiceField()
+    
+    def __init__(self, choices, *args):
+        super(DeleteNameForm, self).__init__(*args)
+        self.fields['Names'] = forms.MultipleChoiceField(choices=choices)

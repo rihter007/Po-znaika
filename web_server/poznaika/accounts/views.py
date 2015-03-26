@@ -5,9 +5,12 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.template import RequestContext
+from django import forms
 
 from forms import RegisterForm
 from forms import LoginForm
+from forms import AddNameForm
+from forms import DeleteNameForm
 from models import Exercise
 from models import Course
 from models import Mark
@@ -58,6 +61,9 @@ def MakeDiary(user):
             diariesList += "\r\n"
     return diariesList
 
+def IsHead(user):
+    heads = StudyHead.objects.filter(ForUser=user)
+    return len(heads) == 1
 
 def UsersPage(request):
     if request.method == 'POST':
@@ -72,18 +78,34 @@ def UsersPage(request):
         
     user = request.user
     is_logged = user.is_authenticated()
-    diariesList = is_logged and MakeDiary(user) or ""
-    schoolList = is_logged and MakeSchool("sh") or ""
-    
-    heads = StudyHead.objects.all()
-    teachers = Teacher.objects.all()
-    classes = Class.objects.all()
-    pupils = Pupil.objects.all()
-    
-    users = User.objects.all()
-    courses = Course.objects.all()
-    exercises = Exercise.objects.all()
-    marks = Mark.objects.all()
+    if is_logged:
+        is_head = IsHead(user)
+        if is_head:
+            schoolList = is_logged and MakeSchool("sh") or ""    
+            heads = StudyHead.objects.all()
+            teachers = Teacher.objects.all()
+            classes = Class.objects.all()
+            pupils = Pupil.objects.all()
+            
+            addClassForm = AddNameForm()
+            choices = []
+            for cls in classes:
+                pair = (cls.Name, cls.Name)
+                choices.append(pair)
+            deleteClassForm = DeleteNameForm(choices)
+            
+            addTeacherForm = AddNameForm()
+            choices = []
+            for teacher in teachers:
+                pair = (teacher.User.username, teacher.User.username)
+                choices.append(pair)
+            deleteTeacherForm = DeleteNameForm(choices)
+    else:
+        diariesList = is_logged and MakeDiary(user) or ""
+        users = User.objects.all()
+        courses = Course.objects.all()
+        exercises = Exercise.objects.all()
+        marks = Mark.objects.all()
     
     return render(request, 'account_main.html', locals())
 

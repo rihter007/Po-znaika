@@ -65,7 +65,7 @@ def MakeInitialDb():
     uT1 = AddUser('th1', 'th1')
     uT2 = AddUser('th2', 'th2')
     
-    h = StudyHead(User=uH, Description="school 1")
+    h = StudyHead(ForUser=uH, Description="school 1")
     h.save()
     
     t = Teacher(User=uT1, ForHead=h, Description="math")

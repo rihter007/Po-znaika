@@ -25,7 +25,7 @@ class License(models.Model):
 
     
 class StudyHead(models.Model):
-    User = models.OneToOneField(User)
+    ForUser = models.OneToOneField(User, primary_key=True)
     Description = models.CharField(max_length=255, blank=True)
 
 class Teacher(models.Model):

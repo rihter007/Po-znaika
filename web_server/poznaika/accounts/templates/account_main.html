@@ -4,7 +4,11 @@
 
 {% if is_logged %}
     Cur user is '{{user}}'<BR><BR>
-    {% include 'logged_block.html' %}
+    {% if is_head %}
+        {% include 'head_block.html' %}
+    {% else %}
+        {% include 'user_block.html' %}
+    {% endif %}
 {% else %}
     {% include 'anonym_block.html' %}
 {% endif %}

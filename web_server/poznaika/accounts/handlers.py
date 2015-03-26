@@ -13,10 +13,16 @@ from django.utils import timezone
 
 from forms import RegisterForm
 from forms import LoginForm
+from forms import AddNameForm
+from forms import DeleteNameForm
 from models import Exercise
 from models import Course
 from models import Mark
 from models import License
+from models import Class
+from models import StudyHead
+from views import IsHead
+
 
 # Create your views here.
 
@@ -143,4 +149,3 @@ def MakeResponse(code, reason):
     response.status_code = code
     response.reason_phrase = reason
     return response
-    
