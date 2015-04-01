@@ -3,11 +3,15 @@ from django.http import HttpResponse
 
 from forms import AddNameForm
 from forms import DeleteNameForm
+from forms import AddPupilForm
+from forms import DeletePupilForm
 from models import Class
 from models import StudyHead
 from models import User
 from models import Teacher
+from models import Pupil
 from views import IsHead
+from views import IsTeacher
 
 
 def AddClass(request):
@@ -51,11 +55,43 @@ def AddTeacher(request):
 def DeleteTeacher(request):
     if request.method == 'POST':
         Names = request.POST['Names']
-        print Names
         user = request.user
         if user.is_authenticated() and IsHead(user):
             thUser = User.objects.get(username=Names)
             Teacher.objects.filter(ForHead=user, User=thUser).delete()
             thUser.delete()
+    return HttpResponseRedirect("/accounts/")
+
+def AddPupil(request):
+    if request.method == 'POST':
+        form = AddPupilForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            if user.is_authenticated() and IsTeacher(user):
+                # Gather data
+                teacher = Teacher.objects.get(User=user)
+                head = teacher.ForHead
+                className = form.cleaned_data['Class']
+                cls = Class.objects.get(ForHead=head, Name=className)
+                # Make objects
+                ppUser = User.objects.create_user(
+                    username=form.cleaned_data['Name'],
+                    password=form.cleaned_data['Name'])
+                pp = Pupil(ForClass=cls, User=ppUser)
+                ppUser.save()                
+                pp.save()
+
+    return HttpResponseRedirect("/accounts/")
+
+def DeletePupil(request):
+    if request.method == 'POST':
+        form = DeletePupilForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            if user.is_authenticated() and IsTeacher(user):
+                pupils = form.cleaned_data['Pupils']
+                for pupil in pupils:
+                    pupil.User.delete()
+                    pupil.delete()
     return HttpResponseRedirect("/accounts/")
     

@@ -14,5 +14,7 @@ urlpatterns = patterns('',
     (r'^delete_class/$', 'poznaika.accounts.changers.DeleteClass'),
     (r'^add_teacher/$', 'poznaika.accounts.changers.AddTeacher'),
     (r'^delete_teacher/$', 'poznaika.accounts.changers.DeleteTeacher'),
+    (r'^add_pupil/$', 'poznaika.accounts.changers.AddPupil'),
+    (r'^delete_pupil/$', 'poznaika.accounts.changers.DeletePupil'),
     (r'^$', 'poznaika.accounts.views.UsersPage'),
 )

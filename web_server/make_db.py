@@ -88,7 +88,7 @@ def MakeInitialDb():
     e3 = AddE("E3")
     e4 = AddE("E4")
     
-    e5 = AddE("Russian.Alphabet.WordGather")
+    e5 = AddE("Alphabet.Russian.WordGather")
     
     AddM(u1, e1, 11)
     AddM(u1, e2, 12)

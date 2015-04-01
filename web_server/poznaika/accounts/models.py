@@ -36,8 +36,14 @@ class Teacher(models.Model):
 class Class(models.Model):
     ForHead = models.ForeignKey(StudyHead)
     Name = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.Name
 
 class Pupil(models.Model):
     User = models.OneToOneField(User)
     ForClass = models.ForeignKey(Class)
     
+    def __str__(self):
+        return self.User.username + " (" + self.ForClass.Name + ")"
+        

@@ -11,6 +11,8 @@ from forms import RegisterForm
 from forms import LoginForm
 from forms import AddNameForm
 from forms import DeleteNameForm
+from forms import AddPupilForm
+from forms import DeletePupilForm
 from models import Exercise
 from models import Course
 from models import Mark
@@ -64,6 +66,10 @@ def MakeDiary(user):
 def IsHead(user):
     heads = StudyHead.objects.filter(ForUser=user)
     return len(heads) == 1
+    
+def IsTeacher(user):
+    teachers = Teacher.objects.filter(User=user)
+    return len(teachers) == 1
 
 def UsersPage(request):
     if request.method == 'POST':
@@ -100,6 +106,22 @@ def UsersPage(request):
                 pair = (teacher.User.username, teacher.User.username)
                 choices.append(pair)
             deleteTeacherForm = DeleteNameForm(choices)
+            
+        is_teacher = IsTeacher(user)
+        if is_teacher:
+            teachers = Teacher.objects.all()
+            classes = Class.objects.all()
+            pupils = Pupil.objects.all()
+            
+            choices = []
+            addPupilForm = AddPupilForm()
+            #addPupilForm.SetChoices(choices)
+            choices = []
+            for pupil in pupils:
+                pair = (pupil.User.username, pupil.User.username)
+                choices.append(pair)
+            deletePupilForm = DeletePupilForm()
+
     else:
         diariesList = is_logged and MakeDiary(user) or ""
         users = User.objects.all()

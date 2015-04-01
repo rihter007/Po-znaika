@@ -2,6 +2,10 @@ from django import forms
 from django.contrib import auth
 from django.contrib.auth.models import User
 
+from models import Pupil
+from models import Class
+
+
 class RegisterForm(forms.Form):
     UserName = forms.CharField(max_length=30)
     Password1 = forms.CharField(max_length=30)
@@ -43,3 +47,11 @@ class DeleteNameForm(forms.Form):
     def __init__(self, choices, *args):
         super(DeleteNameForm, self).__init__(*args)
         self.fields['Names'] = forms.MultipleChoiceField(choices=choices)
+
+class AddPupilForm(AddNameForm):
+    Class = forms.ModelChoiceField(Class.objects.all(), empty_label=None,
+        to_field_name="Name")
+
+class DeletePupilForm(forms.Form):
+    Pupils = forms.ModelMultipleChoiceField(Pupil.objects.all())
+        

@@ -7,7 +7,11 @@
     {% if is_head %}
         {% include 'head_block.html' %}
     {% else %}
-        {% include 'user_block.html' %}
+        {% if is_teacher %}
+            {% include 'teacher_block.html' %}
+        {% else %}
+            {% include 'user_block.html' %}
+        {% endif %}
     {% endif %}
 {% else %}
     {% include 'anonym_block.html' %}
