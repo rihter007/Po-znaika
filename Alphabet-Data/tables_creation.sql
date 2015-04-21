@@ -266,7 +266,7 @@ INSERT INTO image(_id, file_name) VALUES (96,'database_russian_ch20_print');
 INSERT INTO image(_id, file_name) VALUES (97,'database_russian_ch20_handwrite');
 INSERT INTO image(_id, file_name) VALUES (98,'database_cat');
 INSERT INTO image(_id, file_name) VALUES (99,'database_chair');
-INSERT INTO image(_id, file_name) VALUES (100,'database_TV_set');
+INSERT INTO image(_id, file_name) VALUES (100,'database_tv_set');
 INSERT INTO image(_id, file_name) VALUES (101,'database_russian_ch21_print');
 INSERT INTO image(_id, file_name) VALUES (102,'database_russian_ch21_handwrite');
 INSERT INTO image(_id, file_name) VALUES (103,'database_hive');
