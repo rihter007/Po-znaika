@@ -13,7 +13,7 @@ import ru.po_znaika.common.CommonException;
  */
 final class CharacterExerciseStepManager
 {
-    public static interface IExerciseStepFactory
+    public interface IExerciseStepFactory
     {
         Fragment createExerciseStep(@NonNull AlphabetDatabase.CharacterExerciseActionType actionType,
                                     int value) throws CommonException;

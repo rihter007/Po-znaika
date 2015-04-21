@@ -26,7 +26,7 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
 {
     private static final class WordGatherActivityState implements Parcelable
     {
-        public static enum GameStage
+        public enum GameStage
         {
             GameIsActive(0),
             GameIsFinished(1);
@@ -44,7 +44,7 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
                 return TypesMap.get(value);
             }
 
-            private GameStage(int _value)
+            GameStage(int _value)
             {
                 m_value = _value;
             }
@@ -200,6 +200,22 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
     }
 
     @Override
+    public void repeatExercise()
+    {
+        try
+        {
+            restoreInternalState(null);
+            constructUserInterface(null);
+        }
+        catch (Exception exp)
+        {
+            Log.e(LogTag, String.format("Failed to repeat exercise: \"%s\"", exp.getMessage()));
+            MessageBox.Show(this, "Fatal error", "Fatal error");
+            finish();
+        }
+    }
+
+    @Override
     public void processNextStep()
     {
         if (m_state.stage == WordGatherActivityState.GameStage.GameIsActive)
@@ -212,7 +228,7 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
             {
                m_serviceLocator.getExerciseScoreProcessor().reportExerciseScore(m_exerciseName, m_state.totalScore);
             }
-            catch (CommonException exp)
+            catch (Exception exp)
             {
                 Log.e(LogTag, String.format("Failed to save exercise score," +
                         " exercise name: \"%s\", score: \"%d\"", m_exerciseName, m_state.totalScore));
@@ -220,8 +236,8 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
 
             // process score fragment
             {
-                final ScoreFragment scoreFragment = ScoreFragment.createFragment(m_state.totalScore);
-                ProcessFragment(scoreFragment);
+                final Fragment finishFragment = ExerciseFinishedFragment.createFragment(m_state.totalScore);
+                ProcessFragment(finishFragment);
             }
         }
         else

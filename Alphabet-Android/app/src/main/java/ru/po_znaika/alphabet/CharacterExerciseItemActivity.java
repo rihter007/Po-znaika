@@ -3,6 +3,7 @@ package ru.po_znaika.alphabet;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -215,6 +216,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
             }
             else
             {
+                m_currentFragment = null;
                 Bundle intentParams = getIntent().getExtras();
 
                 // get initial parameters from intent
@@ -245,7 +247,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
                     throw new CommonException(CommonResultCode.InvalidExternalSource);
                 }
 
-                Map<Integer, CharacterExerciseItemStep> sortedExerciseSteps = new HashMap<>();
+                Map<Integer, CharacterExerciseItemStep> sortedExerciseSteps = new TreeMap<>();
                 {
                     final AlphabetDatabase.CharacterExerciseItemStepInfo[] exerciseSteps =
                             m_serviceLocator.getAlphabetDatabase().getAllCharacterExerciseStepsByCharacterExerciseItemId(characterExerciseItemId);
@@ -362,6 +364,22 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         catch (Exception exp)
         {
             Log.e(LogTag, String.format("Fatal error. Failed to process exercise step fragment, exp:\"%s\"", exp.getMessage()));
+            MessageBox.Show(this, "Fatal error", "Fatal error");
+            finish();
+        }
+    }
+
+    @Override
+    public void repeatExercise()
+    {
+        try
+        {
+            restoreInternalState(null);
+            constructUserInterface();
+        }
+        catch (Exception exp)
+        {
+            Log.e(LogTag, String.format("Failed to repeat exercise: \"%s\"", exp.getMessage()));
             MessageBox.Show(this, "Fatal error", "Fatal error");
             finish();
         }

@@ -96,6 +96,10 @@ public final class WordGatherFragment extends Fragment
 
     private static final int InvalidIndexSelectionValue = -1;
 
+    private static final int SelectionColor = Constant.Color.LightBlue;
+    private static final int CorrectSelectionColor = Constant.Color.LightGreen;
+    private static final int InCorrectSelectionColor = Constant.Color.LightRed;
+
     public static WordGatherFragment createFragment(@NonNull AlphabetDatabase.AlphabetType alphabetType)
     {
         WordGatherFragment wordGatherFragment = new WordGatherFragment();
@@ -224,7 +228,15 @@ public final class WordGatherFragment extends Fragment
                 @Override
                 public void onClick(View view)
                 {
-                    onCheckButtonClicked();
+                    try
+                    {
+                        onCheckButtonClicked();
+                    }
+                    catch (CommonException exp)
+                    {
+                        Log.e(LogTag, "Failed to process finish button, exp: " + exp.getMessage());
+                        getActivity().finish();
+                    }
                 }
             });
         }
@@ -265,7 +277,7 @@ public final class WordGatherFragment extends Fragment
 
             GridView gridView = (GridView) fragmentView.findViewById(R.id.gridView);
             ViewGroup.LayoutParams gridLayoutParameters = gridView.getLayoutParams();
-            gridLayoutParameters.width =  (int)getResources().getDimension(R.dimen.character_width) * m_gridElements.length;
+            gridLayoutParameters.width =  (int)getResources().getDimension(R.dimen.large_grid_character_width) * m_gridElements.length;
             gridView.setLayoutParams(gridLayoutParameters);
             gridView.setNumColumns(viewAdapter.getCount());
             gridView.setAdapter(viewAdapter);
@@ -297,18 +309,25 @@ public final class WordGatherFragment extends Fragment
                 }
             }
 
-            m_gridElements[m_selectedItemIndex].setBackgroundColor(getResources().getColor(android.R.color.transparent));
+            m_gridElements[m_selectedItemIndex].setBackgroundColor(Constant.Color.NoColor);
             m_selectedItemIndex = InvalidIndexSelectionValue;
         }
         else
         {
-            m_gridElements[index].setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+            m_gridElements[index].setBackgroundColor(SelectionColor);
             m_selectedItemIndex = index;
         }
     }
 
-    private void onCheckButtonClicked()
+    private void onCheckButtonClicked() throws CommonException
     {
+        final View fragmentView = getView();
+        if (fragmentView == null)
+        {
+            Log.e(LogTag, "Processing null view");
+            throw new CommonException(CommonResultCode.InvalidInternalState);
+        }
+
         if (m_state.isExerciseChecked)
         {
             int totalScore = 0;
@@ -327,16 +346,16 @@ public final class WordGatherFragment extends Fragment
         {
             for (int characterIndex = 0; characterIndex < m_state.currentGather.length; ++characterIndex)
             {
-                final int ColorId = m_state.currentGather[characterIndex] == m_state.word.charAt(characterIndex)
-                        ? android.R.color.holo_green_light : android.R.color.holo_red_light;
+                final int resultColor = m_state.currentGather[characterIndex] == m_state.word.charAt(characterIndex)
+                        ? CorrectSelectionColor : InCorrectSelectionColor;
 
-                m_gridElements[characterIndex].setBackgroundColor(getResources().getColor(ColorId));
+                m_gridElements[characterIndex].setBackgroundColor(resultColor);
             }
         }
 
         // rename "check" button to "finish"
         {
-            Button checkButton = (Button) getView().findViewById(R.id.finishButton);
+            Button checkButton = (Button) fragmentView.findViewById(R.id.finishButton);
             checkButton.setText(getResources().getString(R.string.caption_finish));
         }
 

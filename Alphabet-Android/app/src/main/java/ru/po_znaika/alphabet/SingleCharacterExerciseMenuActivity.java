@@ -2,6 +2,7 @@ package ru.po_znaika.alphabet;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -108,7 +109,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
 
             // Sort exercises in m_characterExerciseItems according to menu_position
             {
-                Map<Integer, AlphabetDatabase.CharacterExerciseItemInfo> sortedExercises = new HashMap<>();
+                Map<Integer, AlphabetDatabase.CharacterExerciseItemInfo> sortedExercises = new TreeMap<>();
 
                 for (AlphabetDatabase.CharacterExerciseItemInfo exerciseInfo : exercises)
                     sortedExercises.put(exerciseInfo.menuPosition, exerciseInfo);

@@ -136,6 +136,16 @@ public class ExerciseFinishedFragment extends Fragment
             }
         });
 
+        Button repeatButton = (Button) fragmentView.findViewById(R.id.repeatButton);
+        repeatButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                m_callback.repeatExercise();
+            }
+        });
+
         return fragmentView;
     }
 

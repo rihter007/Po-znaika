@@ -13,8 +13,8 @@ class ImageSelectionSingleExerciseState implements Parcelable
     /* Array of selectionVariants to be represented in exercise */
     public ObjectDescription[] selectionVariants;
 
-    /* Index of answer image  */
-    public int answer;
+    /* Index of answerIndex image  */
+    public int answerIndex;
 
     public ImageSelectionSingleExerciseState() {}
 
@@ -31,7 +31,7 @@ class ImageSelectionSingleExerciseState implements Parcelable
                 this.selectionVariants[objectIndex] = _in.readParcelable(ObjectDescription.class.getClassLoader());
         }
 
-        this.answer = _in.readInt();
+        this.answerIndex = _in.readInt();
     }
 
     @Override
@@ -56,7 +56,7 @@ class ImageSelectionSingleExerciseState implements Parcelable
             container.writeInt(0);
         }
 
-        container.writeInt(this.answer);
+        container.writeInt(this.answerIndex);
     }
 
     public static final Creator CREATOR = new Creator()

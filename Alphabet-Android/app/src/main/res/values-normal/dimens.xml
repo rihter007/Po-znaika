@@ -1,3 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="large_grid_character_width">20dp</dimen>
+    <dimen name="large_grid_character_height">20dp</dimen>
+    <dimen name="activity_horizontal_margin">3dp</dimen>
+    <dimen name="activity_vertical_margin">3dp</dimen>
+    <dimen name="small_margin">10dp</dimen>
+    <dimen name="medium_margin">20dp</dimen>
+    <dimen name="small_text_size">12sp</dimen>
+    <dimen name="medium_text_size">18sp</dimen>
+    <dimen name="large_text_size">24sp</dimen>
+    <dimen name="small_image_size">40dp</dimen>
+    <dimen name="medium_image_size">80dp</dimen>
+    <dimen name="large_image_size">150dp</dimen>
+    <dimen name="extra_large_image_size">200dp</dimen>
+    <dimen name="large_list_view_height">100dp</dimen>
+    <dimen name="large_list_view_width">160dp</dimen>
+    <dimen name="medium_list_view_width">80dp</dimen>
+    <dimen name="small_button_size">30dp</dimen>
+    <dimen name="single_character_width">5dp</dimen>
 </resources>

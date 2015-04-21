@@ -312,7 +312,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
             GridView sourceGrid = (GridView) fragmentView.findViewById(R.id.sourceGridView);
             final ViewGroup.LayoutParams gridLayoutParams = sourceGrid.getLayoutParams();
-            gridLayoutParams.width = (int)getResources().getDimension(R.dimen.character_width) * m_state.mainWord.word.length();
+            gridLayoutParams.width = (int)getResources().getDimension(R.dimen.large_grid_character_width) * m_state.mainWord.word.length();
             sourceGrid.setLayoutParams(gridLayoutParams);
             sourceGrid.setNumColumns(m_state.mainWord.word.length());
             sourceGrid.setAdapter(viewAdapter);
@@ -344,7 +344,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
             GridView destinationGrid = (GridView) fragmentView.findViewById(R.id.destinationGridView);
             final ViewGroup.LayoutParams gridLayoutParams = destinationGrid.getLayoutParams();
-            gridLayoutParams.width = (int)getResources().getDimension(R.dimen.character_width) * m_state.mainWord.word.length();
+            gridLayoutParams.width = (int)getResources().getDimension(R.dimen.large_grid_character_width) * m_state.mainWord.word.length();
             destinationGrid.setLayoutParams(gridLayoutParams);
             destinationGrid.setNumColumns(m_state.mainWord.word.length());
             destinationGrid.setAdapter(viewAdapter);

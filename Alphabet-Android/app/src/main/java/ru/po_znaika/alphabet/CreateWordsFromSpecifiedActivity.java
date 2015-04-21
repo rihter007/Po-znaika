@@ -28,7 +28,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
 {
     private static class ActivityInternalState implements Parcelable
     {
-        public static enum GameStage
+        public enum GameStage
         {
             GameIsActive(0),
             GameIsFinished(1);
@@ -46,7 +46,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
                 return TypesMap.get(value);
             }
 
-            private GameStage(int _value)
+            GameStage(int _value)
             {
                 m_value = _value;
             }
@@ -203,6 +203,22 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     }
 
     @Override
+    public void repeatExercise()
+    {
+        try
+        {
+            restoreInternalState(null);
+            constructUserInterface(null);
+        }
+        catch (Exception exp)
+        {
+            Log.e(LogTag, String.format("Failed to repeat exercise: \"%s\"", exp.getMessage()));
+            MessageBox.Show(this, "Fatal error", "Fatal error");
+            finish();
+        }
+    }
+
+    @Override
     public void processNextStep()
     {
         if (m_state.stage == ActivityInternalState.GameStage.GameIsActive)
@@ -218,8 +234,8 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
                 Log.e(LogTag, String.format("An exception while saving exercise score occurred, exp: \"%s\"", exp.getMessage()));
             }
 
-            final ScoreFragment scoreFragment = ScoreFragment.createFragment(m_state.totalScore);
-            ProcessFragment(scoreFragment);
+            final Fragment finishFragment = ExerciseFinishedFragment.createFragment(m_state.totalScore);
+            ProcessFragment(finishFragment);
         }
         else
         {

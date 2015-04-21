@@ -8,10 +8,10 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.CommonResultCode;
@@ -22,16 +22,18 @@ import ru.po_znaika.common.CommonResultCode;
  */
 public final class CharacterExerciseActionsFactory implements CharacterExerciseStepManager.IExerciseStepFactory
 {
-    private static enum CustomAction
+    private enum CustomAction
     {
         ObjectsContainingSound(0),
         SelectPictureWithSound(1),
-        FindCharacter(2);
+        SelectPictureWithCharacter(2),
+        FindCharacter(3);
 
         private static Map<Integer, CustomAction> ValuesMap = new HashMap<Integer, CustomAction>()
         {
             { put(ObjectsContainingSound.getValue(), ObjectsContainingSound); }
             { put(SelectPictureWithSound.getValue(), SelectPictureWithSound); }
+            { put(SelectPictureWithCharacter.getValue(), SelectPictureWithCharacter); }
             { put(FindCharacter.getValue(), FindCharacter); }
         };
 
@@ -40,7 +42,7 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
             return ValuesMap.get(value);
         }
 
-        private CustomAction(int _value)
+        CustomAction(int _value)
         {
             m_value = _value;
         }
@@ -53,19 +55,23 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
         private int m_value;
     }
 
-    private static class SoundObjectExerciseContainer
+    private static class ObjectExerciseContainer
     {
-        public int soundFlag;
+        public AlphabetDatabase.ContainRelationship containRelationship;
         public int exercisesCount;
         public int exerciseTitleResourceId;
 
-        public SoundObjectExerciseContainer(int _soundFlag, int _exercisesCount, int _exerciseTitleResourceId)
+        public ObjectExerciseContainer(AlphabetDatabase.ContainRelationship _containRelationship,
+                                       int _exercisesCount,
+                                       int _exerciseTitleResourceId)
         {
-            this.soundFlag = _soundFlag;
+            this.containRelationship = _containRelationship;
             this.exercisesCount = _exercisesCount;
             this.exerciseTitleResourceId = _exerciseTitleResourceId;
         }
     }
+
+    private static final int CorrectImagesInExerciseStep = 1;
 
     private static final int ContainsSoundImageExercisesCount = 1;
     private static final int BeginsSoundImageExercisesCount = 1;
@@ -118,74 +124,65 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                 }
                 break;
 
-                case SelectPictureWithSound:
+                case SelectPictureWithCharacter:
                 {
+                    final ObjectExerciseContainer[] objectInfoExercises = new ObjectExerciseContainer[]
+                            {
+                                    new ObjectExerciseContainer(AlphabetDatabase.ContainRelationship.Contain, ContainsSoundImageExercisesCount, R.string.caption_object_contains_character),
+                                    new ObjectExerciseContainer(AlphabetDatabase.ContainRelationship.Begin, BeginsSoundImageExercisesCount, R.string.caption_object_begins_character),
+                                    new ObjectExerciseContainer(AlphabetDatabase.ContainRelationship.End, EndsSoundImageExercisesCount, R.string.caption_object_ends_character)
+                            };
+
                     final AlphabetDatabase.CharacterExerciseInfo characterExerciseInfo = m_alphabetDatabase.getCharacterExerciseById(m_characterExerciseId);
                     if (characterExerciseInfo == null)
                         throw new CommonException(CommonResultCode.InvalidExternalSource);
 
-                    ArrayList<ImageSelectionSingleExerciseState> imageSelectionExercises = new ArrayList<>();
+                    List<ImageSelectionSingleExerciseState> imageSelectionExercises = new ArrayList<>();
 
-                    final SoundObjectExerciseContainer[] soundObjectExercises = new SoundObjectExerciseContainer[]
-                            {
-                                    new SoundObjectExerciseContainer(AlphabetDatabase.SoundObjectInfo.Contain, ContainsSoundImageExercisesCount, R.string.caption_sound_object_contains_selection),
-                                    new SoundObjectExerciseContainer(AlphabetDatabase.SoundObjectInfo.Begin, BeginsSoundImageExercisesCount, R.string.caption_sound_object_begins_selection),
-                                    new SoundObjectExerciseContainer(AlphabetDatabase.SoundObjectInfo.End, EndsSoundImageExercisesCount, R.string.caption_sound_object_ends_selection)
-                            };
-
-                    Random rand = new Random(System.currentTimeMillis());
                     Resources resources = m_context.getResources();
-                    for (SoundObjectExerciseContainer soundObjectExercise : soundObjectExercises)
+                    Random random = new Random(System.currentTimeMillis());
+                    for (ObjectExerciseContainer objectExercise : objectInfoExercises)
                     {
-                        final int thisSoundObjectsCount = soundObjectExercise.exercisesCount;
-                        final int otherSoundObjectsCount = thisSoundObjectsCount * (ImageSelectionFragment.ImagesCount - thisSoundObjectsCount);
-
-                        AlphabetDatabase.SoundObjectInfo thisSoundObjects[] = m_alphabetDatabase.getCharacterSoundObjectsByCharacterExerciseIdAndMatchFlag(
-                                m_characterExerciseId, soundObjectExercise.soundFlag, thisSoundObjectsCount);
-                        if ((thisSoundObjects == null) || (thisSoundObjects.length != thisSoundObjectsCount))
+                        AlphabetDatabase.WordObjectInfo[] thisTypeWords = m_alphabetDatabase.getRandomImageWords(characterExerciseInfo.alphabetId,
+                                characterExerciseInfo.character,
+                                objectExercise.containRelationship,
+                                false,
+                                CorrectImagesInExerciseStep);
+                        if ((thisTypeWords == null) || (thisTypeWords.length != CorrectImagesInExerciseStep))
+                            throw new CommonException(CommonResultCode.InvalidExternalSource);
+                        AlphabetDatabase.WordObjectInfo[] otherTypeWords = m_alphabetDatabase.getRandomImageWords(characterExerciseInfo.alphabetId,
+                                characterExerciseInfo.character,
+                                objectExercise.containRelationship,
+                                true,
+                                ImageSelectionFragment.ImagesCount - CorrectImagesInExerciseStep);
+                        if ((otherTypeWords == null) || (otherTypeWords.length != ImageSelectionFragment.ImagesCount - CorrectImagesInExerciseStep))
                             throw new CommonException(CommonResultCode.InvalidExternalSource);
 
-                        AlphabetDatabase.SoundObjectInfo otherSoundObjects[] = m_alphabetDatabase.getCharacterSoundObjectsByCharacterExerciseIdAndNotMatchFlag(
-                                m_characterExerciseId, soundObjectExercise.soundFlag, otherSoundObjectsCount);
-                        if ((otherSoundObjects == null) || (otherSoundObjects.length != otherSoundObjectsCount))
-                            throw new IllegalStateException();
+                        final int correctAnswerIndex = random.nextInt(ImageSelectionFragment.ImagesCount);
 
-                        for (int subExerciseIndex = 0; subExerciseIndex < thisSoundObjectsCount; ++subExerciseIndex)
+                        ImageSelectionSingleExerciseState exerciseStep = new ImageSelectionSingleExerciseState();
+                        final String exerciseTitleTemplate = resources.getString(objectExercise.exerciseTitleResourceId);
+                        if (exerciseTitleTemplate == null)
+                            throw new CommonException(CommonResultCode.InvalidExternalSource);
+
+                        exerciseStep.exerciseTitle = String.format(exerciseTitleTemplate, characterExerciseInfo.character);
+
+                        exerciseStep.selectionVariants = new ObjectDescription[ImageSelectionFragment.ImagesCount];
+                        int otherTypeWordIndex = 0;
+                        for (int imageIndex = 0; imageIndex < ImageSelectionFragment.ImagesCount; ++imageIndex)
                         {
-                            ImageSelectionSingleExerciseState singleExerciseState = new ImageSelectionSingleExerciseState();
+                            exerciseStep.answerIndex = correctAnswerIndex;
 
-                            singleExerciseState.exerciseTitle = String.format(resources.getString(soundObjectExercise.exerciseTitleResourceId),
-                                    characterExerciseInfo.character);
-                            singleExerciseState.selectionVariants = new ObjectDescription[ImageSelectionFragment.ImagesCount];
-                            singleExerciseState.answer = rand.nextInt(ImageSelectionFragment.ImagesCount);
+                            final AlphabetDatabase.WordObjectInfo processedWord = (imageIndex == correctAnswerIndex) ?
+                                    thisTypeWords[0] : otherTypeWords[otherTypeWordIndex++];
 
-                            int otherObjectsIndex = 0;
-                            for (int imageIndex = 0; imageIndex < ImageSelectionFragment.ImagesCount; ++imageIndex)
-                            {
-                                int imageIdentifier, soundIdentifier;
-                                if (imageIndex == singleExerciseState.answer)
-                                {
-                                    imageIdentifier = thisSoundObjects[subExerciseIndex].imageId;
-                                    soundIdentifier = thisSoundObjects[subExerciseIndex].soundId;
-                                }
-                                else
-                                {
-                                    final AlphabetDatabase.SoundObjectInfo otherSoundObjectInfo = otherSoundObjects[(ImageSelectionFragment.ImagesCount - 1) * subExerciseIndex + otherObjectsIndex++];
-                                    imageIdentifier = otherSoundObjectInfo.imageId;
-                                    soundIdentifier = otherSoundObjectInfo.soundId;
-                                }
+                            ObjectDescription objectDescription = new ObjectDescription(processedWord.imageFilePath,
+                                    processedWord.soundFilePath,
+                                    processedWord.word.word);
 
-                                final int imageResourceId = DatabaseHelpers.getDrawableIdByName(resources, m_alphabetDatabase.getImageFileNameById(imageIdentifier));
-                                final int soundResourceId = DatabaseHelpers.getSoundIdByName(resources,m_alphabetDatabase.getSoundFileNameById(soundIdentifier));
-
-                                if ((imageResourceId == 0) || (soundResourceId == 0))
-                                    throw new IllegalStateException();
-
-                                singleExerciseState.selectionVariants[imageIndex] = new ObjectDescription(imageResourceId, soundResourceId, null);
-                            }
-
-                            imageSelectionExercises.add(singleExerciseState);
+                            exerciseStep.selectionVariants[imageIndex] = objectDescription;
                         }
+                        imageSelectionExercises.add(exerciseStep);
                     }
                     resultFragment = ImageSelectionFragment.createFragment(imageSelectionExercises);
                 }

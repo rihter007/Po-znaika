@@ -295,7 +295,7 @@ public class ExerciseScoreProcessor implements IExerciseScoreProcessor, Closeabl
             super("ServerScoreReporter");
         }
 
-        public void reportExercisesScores(@NonNull Map<Integer, ExerciseScore> scores)
+        public synchronized void reportExercisesScores(@NonNull Map<Integer, ExerciseScore> scores)
         {
             if (isAlive())
                 return;

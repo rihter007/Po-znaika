@@ -7,4 +7,5 @@ public interface IExerciseStepCallback
 {
     void processNextStep();
     void processPreviousStep();
+    void repeatExercise();
 }

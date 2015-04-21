@@ -32,6 +32,13 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/caption_repeat"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/repeatButton"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/caption_finish"
         android:layout_gravity="center_horizontal"
         android:id="@+id/finishButton"/>

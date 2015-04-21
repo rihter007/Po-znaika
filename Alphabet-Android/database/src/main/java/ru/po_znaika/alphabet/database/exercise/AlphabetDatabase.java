@@ -32,7 +32,7 @@ public final class AlphabetDatabase
     /**
      * Types declarations
      */
-    public static enum SoundType
+    public enum SoundType
     {
         Correct(78467623),                     // crc32 of 'Correct'
         Praise(-1022835248),                   // crc32 of 'Praise'
@@ -40,7 +40,7 @@ public final class AlphabetDatabase
 
         private int m_value;
 
-        private SoundType(int _value)
+        SoundType(int _value)
         {
             this.m_value = _value;
         }
@@ -66,7 +66,7 @@ public final class AlphabetDatabase
     /**
      * Represents hardcoded type of an exercise in Alphabet studies
      */
-    public static enum ExerciseType
+    public enum ExerciseType
     {
         Character(294335127),                   // crc32 of 'Character'
         WordGather(402850721),                  // crc32 of 'WordGather'
@@ -74,7 +74,7 @@ public final class AlphabetDatabase
 
         private int m_value;
 
-        private ExerciseType(int _value)
+        ExerciseType(int _value)
         {
             this.m_value = _value;
         }
@@ -97,14 +97,14 @@ public final class AlphabetDatabase
         }
     }
 
-    public static enum CharacterExerciseActionType
+    public enum CharacterExerciseActionType
     {
         TheoryPage(1986991965),             // a crc32 of 'TheoryPage'
         CustomAction(291784361);            // a crc32 of 'CustomAction'
 
         private int m_value;
 
-        private CharacterExerciseActionType(int _value)
+        CharacterExerciseActionType(int _value)
         {
             m_value = _value;
         }
@@ -126,13 +126,13 @@ public final class AlphabetDatabase
         }
     }
 
-    public static enum AlphabetType
+    public enum AlphabetType
     {
         Russian(-345575051);               // crc32 of 'russian'
 
         private int m_value;
 
-        private AlphabetType(int _value)
+        AlphabetType(int _value)
         {
             this.m_value = _value;
         }
@@ -245,6 +245,23 @@ public final class AlphabetDatabase
 
         /*Complexity of the words, higher is the number more complex is the word (longer, harder to pronounce, rare)*/
         public int complexity;
+    }
+
+    public enum ContainRelationship
+    {
+        Contain,
+        Begin,
+        End
+    }
+
+    public static class WordObjectInfo
+    {
+        public ContainRelationship containFlag;
+
+        public WordInfo word;
+
+        public String imageFilePath;
+        public String soundFilePath;
     }
 
     /**
@@ -380,6 +397,18 @@ public final class AlphabetDatabase
             "WHERE wid.word_id = ? ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomSoundIdByWordId = "SELECT sound_id FROM word_sound_description wsd " +
             "WHERE wsd.word_id = ? ORDER BY RANDOM() LIMIT 1";
+    private static final String ExtractRandomWordAndImageByPatternAndAlphabetSqlStatement =
+            "SELECT w._id, w.word, w.complexity, img.file_name " +
+            "FROM word w, word_image_description wid, image img " +
+            "WHERE (w.alphabet_id = ?) AND (w._id = wid.word_id) AND (img._id = wid.image_id) " +
+            "AND (w.word LIKE ?) " +
+            "ORDER BY RANDOM() LIMIT ?";
+    private static final String ExtractRandomWordAndImageNotByPatternAndAlphabetSqlStatement =
+            "SELECT w._id, w.word, w.complexity, img.file_name " +
+            "FROM word w, word_image_description wid, image img " +
+            "WHERE (w.alphabet_id = ?) AND (w._id = wid.word_id) AND (img._id = wid.image_id) " +
+            "AND (NOT w.word LIKE ?) " +
+            "ORDER BY RANDOM() LIMIT ?";
 
     /**
      * SQL-expressions for theory_page table
@@ -480,7 +509,8 @@ public final class AlphabetDatabase
             }
 
             File localFileDatabase = new File(getDatabasePath());
-            localFileDatabase.createNewFile();
+            if (!localFileDatabase.createNewFile())
+                throw new RuntimeException("Failed to create new file");
             localFileDatabaseStream = new FileOutputStream(localFileDatabase);
 
             {
@@ -941,6 +971,82 @@ public final class AlphabetDatabase
                 result.imageId = dataReader.getInt(0);
                 result.soundId = dataReader.getInt(1);
                 result.message = dataReader.getString(2);
+            }
+        }
+        catch (Exception exp)
+        {
+            result = null;
+        }
+        finally
+        {
+            if (dataReader != null)
+                dataReader.close();
+        }
+
+        return result;
+    }
+
+    public WordObjectInfo[] getRandomImageWords(@NonNull AlphabetType alphabetType,
+                                                char testedChar,
+                                                @NonNull ContainRelationship containRelationship,
+                                                boolean negateRelationship,
+                                                int maxCount)
+    {
+        WordObjectInfo[] result = null;
+        Cursor dataReader = null;
+
+        try
+        {
+            String charLikePattern;
+            final Character testedCharObj = testedChar;
+            switch (containRelationship)
+            {
+                case Begin:
+                    charLikePattern = testedCharObj.toString() + "%";
+                    break;
+
+                case Contain:
+                    charLikePattern = "%" + testedCharObj.toString() + "%";
+                    break;
+
+                case End:
+                    charLikePattern = "%" + testedCharObj.toString();
+                    break;
+
+                default:
+                    throw new CommonException(CommonResultCode.InvalidArgument);
+            }
+
+            final String rawSelectionQuery = negateRelationship ? ExtractRandomWordAndImageNotByPatternAndAlphabetSqlStatement :
+                    ExtractRandomWordAndImageByPatternAndAlphabetSqlStatement;
+
+            dataReader = m_databaseConnection.rawQuery(rawSelectionQuery,
+                    new String[]
+                            {
+                                    ((Integer) alphabetType.getValue()).toString(),
+                                    charLikePattern,
+                                    ((Integer) maxCount).toString()
+                            });
+
+            if (dataReader.moveToFirst())
+            {
+                List<WordObjectInfo> resultsList = new ArrayList<>();
+                do
+                {
+                    WordObjectInfo item = new WordObjectInfo();
+                    item.containFlag = containRelationship;
+                    item.imageFilePath = dataReader.getString(3);
+                    item.word = new WordInfo();
+                    item.word.id = dataReader.getInt(0);
+                    item.word.alphabetType = alphabetType;
+                    item.word.word = dataReader.getString(1);
+                    item.word.complexity = dataReader.getInt(2);
+
+                    resultsList.add(item);
+                } while (dataReader.moveToNext());
+
+                result = new WordObjectInfo[resultsList.size()];
+                resultsList.toArray(result);
             }
         }
         catch (Exception exp)

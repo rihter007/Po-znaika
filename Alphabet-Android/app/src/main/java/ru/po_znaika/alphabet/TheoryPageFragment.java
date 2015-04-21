@@ -5,9 +5,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +20,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.TextFormatBlock;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.TextFormatter;
 
 /**
  * Describes theory page
@@ -101,10 +108,9 @@ public class TheoryPageFragment extends Fragment
 
             ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.theoryImageView);
             theoryImageView.setImageDrawable(resources.getDrawable(imageResourceId));
-        }
-        else
+        } else
         {
-            ImageView theoryImageView = (ImageView)fragmentView.findViewById(R.id.theoryImageView);
+            ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.theoryImageView);
             theoryImageView.setVisibility(View.INVISIBLE);
 
             ViewGroup.LayoutParams layoutParams = theoryImageView.getLayoutParams();
@@ -126,30 +132,42 @@ public class TheoryPageFragment extends Fragment
             m_theorySoundPlayer = MediaPlayer.create(getActivity(), soundResourceId);
             m_theorySoundPlayer.start();
             m_isResumed = false;
-        }
-        else
+        } else
         {
             m_theorySoundPlayer = null;
 
-            ImageButton playSoundButton = (ImageButton)fragmentView.findViewById(R.id.playSoundButton);
+            ImageButton playSoundButton = (ImageButton) fragmentView.findViewById(R.id.playSoundButton);
             playSoundButton.setVisibility(View.INVISIBLE);
 
-            TextView playSoundTextView = (TextView)fragmentView.findViewById(R.id.playSoundTextView);
+            TextView playSoundTextView = (TextView) fragmentView.findViewById(R.id.playSoundTextView);
             playSoundTextView.setVisibility(View.INVISIBLE);
         }
 
         // process text
+
+        if (!TextUtils.isEmpty(m_theoryMessage))
         {
-            if (!TextUtils.isEmpty(m_theoryMessage))
+            TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.theoryTextView);
+            theoryTextView.setText(null);
+            final List<TextFormatBlock> formatBlocks = TextFormatter.processText(m_theoryMessage);
+
+            for (TextFormatBlock formatBlock : formatBlocks)
             {
-                TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.theoryTextView);
-                theoryTextView.setText(m_theoryMessage);
+                Spannable spanText = new SpannableString(formatBlock.getText());
+                if (formatBlock.isColorSet())
+                {
+                    spanText.setSpan(new ForegroundColorSpan(formatBlock.getARGBColor()),
+                            0,
+                            formatBlock.getText().length(),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                theoryTextView.append(spanText);
             }
-            else
-            {
-                TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.theoryTextView);
-                theoryTextView.setVisibility(View.INVISIBLE);
-            }
+        }
+        else
+        {
+            TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.theoryTextView);
+            theoryTextView.setVisibility(View.INVISIBLE);
         }
 
         // set buttons callbacks

@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.CommonException;
 import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.IExerciseStepCallback;
@@ -57,7 +59,7 @@ public class ImageSelectionFragment extends Fragment
         {
             exercisesTryCount = new int[exerciseCount];
 
-            currentStepVariants = new boolean[exerciseCount];
+            currentStepVariants = new boolean[ImagesCount];
             currentStepNumber = 0;
         }
 
@@ -136,23 +138,25 @@ public class ImageSelectionFragment extends Fragment
 
     private static final int ScoreStep = 10;
 
-    private static final int NoSelectionColorId = android.R.color.transparent;
-    private static final int CorrectSelectionColorId = android.R.color.holo_green_light;
-    private static final int IncorrectSelectionColorId = android.R.color.holo_red_light;
+    private static final int NoSelectionColor = Constant.Color.NoColor;
+    private static final int CorrectSelectionColor = Constant.Color.LightGreen;
+    private static final int IncorrectSelectionColor = Constant.Color.LightRed;
 
-    public static ImageSelectionFragment createFragment(@NonNull Collection<ImageSelectionSingleExerciseState> singleSelectionExercises)
+    public static ImageSelectionFragment createFragment(@NonNull Collection<ImageSelectionSingleExerciseState> selectionExercises)
             throws CommonException
     {
-        if (singleSelectionExercises.size() != ImagesCount)
-            throw new CommonException(CommonResultCode.InvalidArgument);
-
+        for (ImageSelectionSingleExerciseState exerciseState : selectionExercises)
+        {
+            if ((exerciseState.selectionVariants == null) || (exerciseState.selectionVariants.length != ImagesCount))
+                throw new CommonException(CommonResultCode.InvalidArgument);
+        }
         // Image selection fragment
         ImageSelectionFragment resultFragment = new ImageSelectionFragment();
 
         {
             Bundle arguments = new Bundle();
 
-            final ArrayList<ImageSelectionSingleExerciseState> exerciseStates = new ArrayList<>(singleSelectionExercises);
+            final ArrayList<ImageSelectionSingleExerciseState> exerciseStates = new ArrayList<>(selectionExercises);
             arguments.putParcelableArrayList(ExercisesTag, exerciseStates);
             resultFragment.setArguments(arguments);
         }
@@ -188,7 +192,7 @@ public class ImageSelectionFragment extends Fragment
     /**
      * Constructs parts of user interface
      */
-    void constructUserInterface(@NonNull View fragmentView, boolean doSetUserInteraction)
+    void constructUserInterface(@NonNull View fragmentView, boolean doSetUserInteraction) throws CommonException
     {
         final ImageSelectionSingleExerciseState currentExerciseInfo = m_exerciseStates.get(m_state.currentStepNumber);
 
@@ -209,8 +213,16 @@ public class ImageSelectionFragment extends Fragment
             View selectionView = fragmentView.findViewById(LayoutViewIds[imageIndex]);
             TextView hintTextView = (TextView)fragmentView.findViewById(HintTextViewIds[imageIndex]);
 
-            uiImage.setImageDrawable(getResources().
-                    getDrawable(currentExerciseInfo.selectionVariants[imageIndex].imageResourceIndex));
+            final int imageResourceId = DatabaseHelpers.getDrawableIdByName(getResources()
+                    , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath);
+            if (imageResourceId == DatabaseConstant.InvalidDatabaseIndex)
+            {
+                Log.e(LogTag, "Failed to get resources id for : "
+                        + currentExerciseInfo.selectionVariants[imageIndex].imageFilePath);
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
+
+            uiImage.setImageDrawable(getResources().getDrawable(imageResourceId));
             if (doSetUserInteraction)
             {
                 final int ImageViewId = imageIndex;
@@ -219,7 +231,15 @@ public class ImageSelectionFragment extends Fragment
                     @Override
                     public void onClick(View view)
                     {
-                        onImageSelected(ImageViewId);
+                        try
+                        {
+                            onImageSelected(ImageViewId);
+                        }
+                        catch (CommonException exp)
+                        {
+                            Log.e(LogTag, "onImageSelected failed: " + exp.getMessage());
+                            getActivity().finish();
+                        }
                     }
                 });
             }
@@ -227,11 +247,13 @@ public class ImageSelectionFragment extends Fragment
             final boolean isVariantProcessed = m_state.currentStepVariants[imageIndex];
             if (isVariantProcessed)
             {
-                if (currentExerciseInfo.answer == imageIndex)
-                    selectionView.setBackgroundColor(CorrectSelectionColorId);
+                if (currentExerciseInfo.answerIndex == imageIndex)
+                {
+                    selectionView.setBackgroundColor(CorrectSelectionColor);
+                }
                 else
                 {
-                    selectionView.setBackgroundColor(IncorrectSelectionColorId);
+                    selectionView.setBackgroundColor(IncorrectSelectionColor);
 
                     String objectName = currentExerciseInfo.selectionVariants[imageIndex].name;
                     if (objectName == null)
@@ -241,7 +263,7 @@ public class ImageSelectionFragment extends Fragment
             }
             else
             {
-                selectionView.setBackgroundColor(NoSelectionColorId);
+                selectionView.setBackgroundColor(NoSelectionColor);
                 hintTextView.setText("");
             }
         }
@@ -349,7 +371,15 @@ public class ImageSelectionFragment extends Fragment
 
     private void onForwardButtonClick()
     {
-        processNextStep();
+        try
+        {
+            processNextStep();
+        }
+        catch (CommonException exp)
+        {
+            Log.e(LogTag, "process next step failed with: " + exp.getMessage());
+            getActivity().finish();
+        }
     }
 
     private void onBackButtonClick()
@@ -357,7 +387,7 @@ public class ImageSelectionFragment extends Fragment
         m_stepsCallback.processPreviousStep();
     }
 
-    private void onImageSelected(int selectedImageId)
+    private void onImageSelected(int selectedImageId) throws CommonException
     {
         final ImageSelectionSingleExerciseState currentExercise = m_exerciseStates.get(m_state.currentStepNumber);
 
@@ -365,14 +395,21 @@ public class ImageSelectionFragment extends Fragment
             return;
         ++m_state.exercisesTryCount[m_state.currentStepNumber];
 
-        // Decide how to react on user answer
-        final boolean isCorrectAnswer = currentExercise.answer == selectedImageId;
+        final View fragmentView = getView();
+        if (fragmentView == null)
+        {
+            Log.e(LogTag, "Fragment view is null");
+            throw new CommonException(CommonResultCode.InvalidInternalState);
+        }
+
+        // Decide how to react on user answerIndex
+        final boolean isCorrectAnswer = currentExercise.answerIndex == selectedImageId;
         if (isCorrectAnswer)
         {
             // set color
             {
-                View linearLayoutView = getView().findViewById(LayoutViewIds[selectedImageId]);
-                linearLayoutView.setBackgroundColor(getResources().getColor(CorrectSelectionColorId));
+                View linearLayoutView = fragmentView.findViewById(LayoutViewIds[selectedImageId]);
+                linearLayoutView.setBackgroundColor(CorrectSelectionColor);
             }
 
             try
@@ -388,16 +425,20 @@ public class ImageSelectionFragment extends Fragment
         {
             // set color
             {
-                View linearLayoutView = getView().findViewById(LayoutViewIds[selectedImageId]);
-                linearLayoutView.setBackgroundColor(getResources().getColor(IncorrectSelectionColorId));
+                View linearLayoutView = fragmentView.findViewById(LayoutViewIds[selectedImageId]);
+                linearLayoutView.setBackgroundColor(IncorrectSelectionColor);
             }
 
             // sound hint
-            if (currentExercise.selectionVariants[selectedImageId].soundResourceIndex != 0)
+            if (!TextUtils.isEmpty(currentExercise.selectionVariants[selectedImageId].soundFilePath))
             {
                 try
                 {
-                    m_mediaPlayerManager.play(currentExercise.selectionVariants[selectedImageId].soundResourceIndex);
+                    final int soundResourceId = DatabaseHelpers.getSoundIdByName(getResources(),
+                            currentExercise.selectionVariants[selectedImageId].soundFilePath);
+                    if (soundResourceId == 0)
+                        throw new CommonException(CommonResultCode.InvalidArgument);
+                    m_mediaPlayerManager.play(soundResourceId);
                 }
                 catch (CommonException exp)
                 {
@@ -414,13 +455,17 @@ public class ImageSelectionFragment extends Fragment
         }
     }
 
-    private void processNextStep()
+    private void processNextStep() throws CommonException
     {
+        final View fragmentView = getView();
+        if (fragmentView == null)
+            throw new CommonException(CommonResultCode.InvalidInternalState);
+
         if (m_state.currentStepNumber >= m_exerciseStates.size() - 1)
         {
             // rename button
             {
-                Button nextButton = (Button) getView().findViewById(R.id.forwardButton);
+                Button nextButton = (Button) fragmentView.findViewById(R.id.forwardButton);
                 nextButton.setText(getResources().getString(R.string.caption_finish));
                 nextButton.setOnClickListener(new View.OnClickListener()
                 {
@@ -451,7 +496,7 @@ public class ImageSelectionFragment extends Fragment
         else
         {
             ++m_state.currentStepNumber;
-            constructUserInterface(getView(), false);
+            constructUserInterface(fragmentView, false);
         }
     }
 
