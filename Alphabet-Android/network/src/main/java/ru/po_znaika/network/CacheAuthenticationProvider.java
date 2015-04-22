@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import java.util.Date;
 import java.util.Random;
 
-import ru.po_znaika.common.CommonException;
+import com.arz_x.CommonException;
 
 /**
  * Created by Rihter on 26.01.2015.

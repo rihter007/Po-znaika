@@ -4,8 +4,9 @@ import android.app.Fragment;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.arz_x.CommonException;
+
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
-import ru.po_znaika.common.CommonException;
 
 /**
  * Created by Rihter on 13.08.2014.

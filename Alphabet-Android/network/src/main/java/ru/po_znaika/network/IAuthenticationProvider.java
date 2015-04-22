@@ -2,7 +2,7 @@ package ru.po_znaika.network;
 
 import android.support.annotation.NonNull;
 
-import ru.po_znaika.common.CommonException;
+import com.arz_x.CommonException;
 
 /**
  * Created by Rihter on 19.01.2015.

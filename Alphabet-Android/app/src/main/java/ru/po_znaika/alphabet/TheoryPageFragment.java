@@ -22,12 +22,14 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
 import ru.po_znaika.alphabet.database.DatabaseHelpers;
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.ProcessUrl;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.TextFormatBlock;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.TextFormatter;
 
@@ -40,6 +42,7 @@ public class TheoryPageFragment extends Fragment
 
     private static final String TheoryTableIndexTag = "theory_table_index";
     private static final String TheoryImageIndexTag = "theory_image_index";
+    private static final String TheoryImageRedirectUrlTag = "theory_image_url_redirect";
     private static final String TheorySoundIndexTag = "theory_sound_index";
     private static final String TheoryMessageTag = "theory_message";
 
@@ -56,7 +59,7 @@ public class TheoryPageFragment extends Fragment
     /**
      * Restores all internal selectionVariants
      * @param savedInstanceState activity saved state
-     * @throws ru.po_znaika.common.CommonException
+     * @throws com.arz_x.CommonException
     */
     void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
@@ -70,12 +73,14 @@ public class TheoryPageFragment extends Fragment
         {
             AlphabetDatabase.TheoryPageInfo theoryPageInfo = m_alphabetDatabase.getTheoryPageById(TheoryTableIndex);
             m_theoryImageId = theoryPageInfo.imageId;
+            m_theoryImageRedirectUrl = theoryPageInfo.imageRedirectUrl;
             m_theorySoundId = theoryPageInfo.soundId;
             m_theoryMessage = theoryPageInfo.message;
         }
         else
         {
             m_theoryImageId = savedInstanceState.getInt(TheoryImageIndexTag);
+            m_theoryImageRedirectUrl = savedInstanceState.getString(TheoryImageRedirectUrlTag);
             m_theorySoundId = savedInstanceState.getInt(TheorySoundIndexTag);
             m_theoryMessage = savedInstanceState.getString(TheoryMessageTag);
         }
@@ -96,7 +101,7 @@ public class TheoryPageFragment extends Fragment
         // process image
         if (m_theoryImageId != DatabaseConstant.InvalidDatabaseIndex)
         {
-            Resources resources = getResources();
+            final Resources resources = getResources();
 
             final String resourceFileName = m_alphabetDatabase.getImageFileNameById(m_theoryImageId);
             final int imageResourceId = DatabaseHelpers.getDrawableIdByName(resources, resourceFileName);
@@ -108,7 +113,29 @@ public class TheoryPageFragment extends Fragment
 
             ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.theoryImageView);
             theoryImageView.setImageDrawable(resources.getDrawable(imageResourceId));
-        } else
+
+            if (m_theoryImageRedirectUrl != null)
+            {
+                theoryImageView.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        try
+                        {
+                            ProcessUrl.openUrl(getActivity(), m_theoryImageRedirectUrl);
+                        }
+                        catch (Exception exp)
+                        {
+                            MessageBox.Show(getActivity(),
+                                    resources.getString(R.string.alert_unknown_error),
+                                    resources.getString(R.string.alert_title));
+                        }
+                    }
+                });
+            }
+        }
+        else
         {
             ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.theoryImageView);
             theoryImageView.setVisibility(View.INVISIBLE);
@@ -311,6 +338,7 @@ public class TheoryPageFragment extends Fragment
         super.onSaveInstanceState(savedInstanceState);
 
         savedInstanceState.putInt(TheoryImageIndexTag, m_theoryImageId);
+        savedInstanceState.putString(TheoryImageRedirectUrlTag, m_theoryImageRedirectUrl);
         savedInstanceState.putInt(TheorySoundIndexTag, m_theorySoundId);
         savedInstanceState.putString(TheoryMessageTag, m_theoryMessage);
     }
@@ -321,6 +349,7 @@ public class TheoryPageFragment extends Fragment
     private AlphabetDatabase m_alphabetDatabase;
 
     private int m_theoryImageId;
+    private String m_theoryImageRedirectUrl;
     private int m_theorySoundId;
     private String m_theoryMessage;
 

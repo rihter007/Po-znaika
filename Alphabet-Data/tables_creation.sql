@@ -128,13 +128,13 @@ CREATE TABLE character_exercise_item_step (
 CREATE TABLE theory_page (
 	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
 	image_id INTEGER,
-	--image_redirect_url TEXT,
+	image_redirect_url TEXT,
 	sound_id INTEGER,
 	message TEXT,
 	
 	FOREIGN KEY (image_id) REFERENCES image(_id),
 	FOREIGN KEY (sound_id) REFERENCES sound(_id),
-	UNIQUE(image_id, sound_id, message) ON CONFLICT FAIL
+	UNIQUE(image_id, image_redirect_url, sound_id, message) ON CONFLICT FAIL
 );
 
 -- Represents special table that contain words with certain sound

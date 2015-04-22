@@ -18,14 +18,15 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.ExerciseScore;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.CommonHelpers;
-import ru.po_znaika.network.NetworkException;
+import com.arz_x.NetworkException;
 
 public final class DiaryActivity extends ActionBarActivity
 {

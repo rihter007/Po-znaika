@@ -1,4 +1,4 @@
-package ru.po_znaika.common;
+package com.arz_x;
 
 /**
  * Created by Rihter on 18.01.2015.

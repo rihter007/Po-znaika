@@ -20,8 +20,8 @@ import android.util.Log;
 import android.util.Pair;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
 
 /**
  * Created by Rihter on 07.08.2014.
@@ -227,6 +227,9 @@ public final class AlphabetDatabase
         /* Optional: image id for theory material */
         public int imageId;
 
+        /* Optional: url to wich redirection is processed when clicked on image */
+        public String imageRedirectUrl;
+
         /* Optional: sound id which contains oral theory description */
         public int soundId;
 
@@ -413,7 +416,10 @@ public final class AlphabetDatabase
     /**
      * SQL-expressions for theory_page table
      */
-    private static final String ExtractTheoryPageById = "SELECT image_id, sound_id, message FROM theory_page WHERE _id = ?";
+    private static final String ExtractTheoryPageById =
+            "SELECT image_id, image_redirect_url, sound_id, message " +
+            "FROM theory_page " +
+            "WHERE _id = ?";
 
     /**
      * SQL-expressions with image table
@@ -969,8 +975,9 @@ public final class AlphabetDatabase
 
                 result.id = theoryPageId;
                 result.imageId = dataReader.getInt(0);
-                result.soundId = dataReader.getInt(1);
-                result.message = dataReader.getString(2);
+                result.imageRedirectUrl = dataReader.getString(1);
+                result.soundId = dataReader.getInt(2);
+                result.message = dataReader.getString(3);
             }
         }
         catch (Exception exp)

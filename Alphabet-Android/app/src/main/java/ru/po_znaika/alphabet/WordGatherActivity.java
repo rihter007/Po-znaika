@@ -18,7 +18,8 @@ import android.util.Log;
 import java.util.HashMap;
 import java.util.Map;
 
-import ru.po_znaika.common.CommonException;
+import com.arz_x.CommonException;
+
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 

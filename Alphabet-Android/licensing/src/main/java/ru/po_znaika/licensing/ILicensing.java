@@ -2,9 +2,9 @@ package ru.po_znaika.licensing;
 
 import android.support.annotation.NonNull;
 
-import ru.po_znaika.common.CommonException;
+import com.arz_x.CommonException;
 import ru.po_znaika.network.LoginPasswordCredentials;
-import ru.po_znaika.network.NetworkException;
+import com.arz_x.NetworkException;
 
 /**
  * Created by Rihter on 19.01.2015.

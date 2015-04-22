@@ -91,6 +91,7 @@
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.2" level="project" />
     <orderEntry type="module" module-name="licensing" exported="" />
     <orderEntry type="module" module-name="network" exported="" />
+    <orderEntry type="module" module-name="arz" exported="" />
     <orderEntry type="module" module-name="common" exported="" />
     <orderEntry type="module" module-name="database" exported="" />
   </component>

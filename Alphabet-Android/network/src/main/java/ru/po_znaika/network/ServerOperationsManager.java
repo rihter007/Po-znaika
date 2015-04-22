@@ -16,8 +16,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+import com.arz_x.NetworkException;
+import com.arz_x.NetworkResultCode;
+
 import ru.po_znaika.common.ExerciseScore;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.CommonHelpers;
 

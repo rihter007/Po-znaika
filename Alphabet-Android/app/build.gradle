@@ -26,4 +26,5 @@ dependencies {
     compile project(':network')
     compile project(':database')
     compile project(':licensing')
+    compile project(':arz')
 }

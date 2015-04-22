@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
 
 /**
  * Created by Rihter on 06.03.2015.

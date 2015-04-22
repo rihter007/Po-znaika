@@ -20,9 +20,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
 import ru.po_znaika.alphabet.database.DatabaseHelpers;
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 

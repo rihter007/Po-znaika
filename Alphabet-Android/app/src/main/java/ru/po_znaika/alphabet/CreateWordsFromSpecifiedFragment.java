@@ -22,7 +22,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import ru.po_znaika.common.CommonException;
+import com.arz_x.CommonException;
+
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;

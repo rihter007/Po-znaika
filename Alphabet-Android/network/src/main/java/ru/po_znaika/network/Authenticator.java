@@ -8,8 +8,10 @@ import java.net.SocketException;
 import java.net.URL;
 import java.util.Date;
 
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+import com.arz_x.NetworkException;
+import com.arz_x.NetworkResultCode;
 
 import junit.framework.Assert;
 

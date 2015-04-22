@@ -17,13 +17,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 

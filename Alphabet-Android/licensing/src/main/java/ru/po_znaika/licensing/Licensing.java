@@ -16,13 +16,15 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.HttpURLConnection;
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
+
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
 import ru.po_znaika.network.IAuthenticationProvider;
 import ru.po_znaika.network.LoginPasswordCredentials;
 import ru.po_znaika.network.NetworkConstant;
-import ru.po_znaika.network.NetworkException;
-import ru.po_znaika.network.NetworkResultCode;
+import com.arz_x.NetworkException;
+import com.arz_x.NetworkResultCode;
 
 /**
  * Created by Rihter on 19.01.2015.

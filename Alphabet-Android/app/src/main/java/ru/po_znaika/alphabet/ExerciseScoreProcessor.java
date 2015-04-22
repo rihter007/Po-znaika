@@ -17,15 +17,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
 import ru.po_znaika.common.ExerciseScore;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.CommonHelpers;
 import ru.po_znaika.network.IServerOperations;
-import ru.po_znaika.network.NetworkException;
-import ru.po_znaika.network.NetworkResultCode;
+import com.arz_x.NetworkException;
+import com.arz_x.NetworkResultCode;
 
 /**
  * Created by Rihter on 10.02.2015.

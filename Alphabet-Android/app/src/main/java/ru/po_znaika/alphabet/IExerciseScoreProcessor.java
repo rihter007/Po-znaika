@@ -2,8 +2,9 @@ package ru.po_znaika.alphabet;
 
 import android.support.annotation.NonNull;
 
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.network.NetworkException;
+import com.arz_x.CommonException;
+
+import com.arz_x.NetworkException;
 
 /**
  * Created by Rihter on 10.02.2015.

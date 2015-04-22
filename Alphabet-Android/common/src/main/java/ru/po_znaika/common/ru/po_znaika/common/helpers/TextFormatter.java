@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
 
 /**
  * Created by Rihter on 08.04.2015.

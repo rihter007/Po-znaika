@@ -1,7 +1,6 @@
 package ru.po_znaika.alphabet;
 
 import java.util.Map;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 import android.app.Activity;
@@ -19,10 +18,11 @@ import android.widget.TextView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
 
 public class SingleCharacterExerciseMenuActivity extends Activity
 {
@@ -68,7 +68,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
 
     /**
      * Restores all internal selectionVariants
-     * @throws ru.po_znaika.common.CommonException
+     * @throws com.arz_x.CommonException
      */
     void restoreInternalState() throws CommonException
     {

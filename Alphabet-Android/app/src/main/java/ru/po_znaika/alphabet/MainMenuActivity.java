@@ -1,6 +1,5 @@
 package ru.po_znaika.alphabet;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
@@ -21,16 +20,16 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.util.Log;
 
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
 import ru.po_znaika.licensing.LicenseType;
 import ru.po_znaika.network.LoginPasswordCredentials;
-import ru.po_znaika.network.NetworkException;
-import ru.po_znaika.network.NetworkHelpers;
-import ru.po_znaika.network.NetworkResultCode;
+import com.arz_x.NetworkException;
+import com.arz_x.NetworkResultCode;
 
 public class MainMenuActivity extends ActionBarActivity
 {

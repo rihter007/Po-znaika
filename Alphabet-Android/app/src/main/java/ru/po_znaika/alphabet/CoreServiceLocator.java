@@ -6,10 +6,10 @@ import android.util.Log;
 
 import java.io.Closeable;
 
+import com.arz_x.CommonException;
+
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
-
-import ru.po_znaika.common.CommonException;
 
 import ru.po_znaika.licensing.ILicensing;
 import ru.po_znaika.licensing.Licensing;
