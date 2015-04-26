@@ -133,12 +133,12 @@ def UsersPage(request):
                 choices.append(pair)
             deletePupilForm = DeletePupilForm()
 
-    else:
-        diariesList = is_logged and MakeDiary(user) or ""
-        users = User.objects.all()
+        diariesList = MakeDiary(user)
         courses = Course.objects.all()
         exercises = Exercise.objects.all()
         marks = Mark.objects.all()
+        
+    users = User.objects.all()
     
     return render(request, 'account_main.html', locals())
 
