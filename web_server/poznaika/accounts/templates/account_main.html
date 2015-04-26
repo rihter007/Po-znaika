@@ -3,7 +3,8 @@
 {% block content %}
 
 {% if is_logged %}
-    Cur user is '{{user}}'<BR><BR>
+    Ваше имя: '{{user}}'.<BR><BR>
+    
     {% if is_head %}
         {% include 'head_block.html' %}
     {% else %}
@@ -13,6 +14,9 @@
             {% include 'user_block.html' %}
         {% endif %}
     {% endif %}
+    
+    <BR>
+    <A href="/accounts/logout/">Выйти</A>
 {% else %}
     {% include 'anonym_block.html' %}
 {% endif %}

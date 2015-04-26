@@ -1,3 +1,5 @@
+# coding=1251
+
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.contrib import auth
@@ -13,6 +15,7 @@ from forms import AddNameForm
 from forms import DeleteNameForm
 from forms import AddPupilForm
 from forms import DeletePupilForm
+from forms import ToUtf
 from models import Exercise
 from models import Course
 from models import Mark
@@ -93,19 +96,25 @@ def UsersPage(request):
             classes = Class.objects.all()
             pupils = Pupil.objects.all()
             
+            addTeacherForm = AddNameForm()
+            addTeacherForm.fields['Name'].label = ToUtf("Имя учителя")
+            choices = []
+            for teacher in teachers:
+                teacherInfo = teacher.User.username
+                if teacher.Description != "":
+                    teacherInfo += ' (' + teacher.Description + ')'
+                pair = (teacher.User.username, teacherInfo)
+                
+                choices.append(pair)
+            deleteTeacherForm = DeleteNameForm(choices, ToUtf("Список учителей"))
+            
             addClassForm = AddNameForm()
+            addClassForm.fields['Name'].label = ToUtf("Имя класса")
             choices = []
             for cls in classes:
                 pair = (cls.Name, cls.Name)
                 choices.append(pair)
-            deleteClassForm = DeleteNameForm(choices)
-            
-            addTeacherForm = AddNameForm()
-            choices = []
-            for teacher in teachers:
-                pair = (teacher.User.username, teacher.User.username)
-                choices.append(pair)
-            deleteTeacherForm = DeleteNameForm(choices)
+            deleteClassForm = DeleteNameForm(choices, ToUtf("Список классов"))
             
         is_teacher = IsTeacher(user)
         if is_teacher:
@@ -116,6 +125,8 @@ def UsersPage(request):
             choices = []
             addPupilForm = AddPupilForm()
             #addPupilForm.SetChoices(choices)
+            addPupilForm.fields['Name'].label = ToUtf("Имя ученика")
+            addPupilForm.fields['Class'].label = ToUtf("Его класс")
             choices = []
             for pupil in pupils:
                 pair = (pupil.User.username, pupil.User.username)

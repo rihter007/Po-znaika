@@ -1,14 +1,13 @@
-New user? Please <A href="/accounts/registration">register</A>!<BR><BR>
+<BR>
+Впервые на сайте? Пожалуйста <A href="/accounts/registration">зарегистрируйтесь</A>!<BR><BR>
+<BR>
 
-Already have an account? Please login:<BR>
+Уже зарегистрированы? Заходите:<BR>
 
 {% include 'login_block.html' %}
 
-Already registered users:<BR>
-<ul>
+<BR>
+У нас уже зарегистрировались:<BR>
 {% for user in users %}
-<li>
-{{user.username}} ({{user.password}})
-</li>
+{{user.username}},
 {%endfor%}
-</ul>

@@ -1,4 +1,5 @@
-Teachers:<BR>
+Работа с учителями:<BR><BR>
+
 <form action='delete_teacher/' method='post'>
 {% csrf_token %}
 
@@ -6,8 +7,10 @@ Teachers:<BR>
 {{ deleteTeacherForm.as_table }}
 </table>
 
-<input type="submit" value="Delete teacher(s)" />
+<input type="submit" value="Удалить выбранных учителей" />
 </form>
+
+<BR>
 
 <form action='add_teacher/' method='post'>
 {% csrf_token %}
@@ -16,13 +19,15 @@ Teachers:<BR>
 {{ addTeacherForm.as_table }}
 </table>
 
-<input type="submit" value="Add teacher" />
+<input type="submit" value="Добавить нового учителя" />
 </form>
 
 <BR>
 <BR>
 
-Classes:<BR>
+
+Работа с классами:<BR><BR>
+
 <form action='delete_class/' method='post'>
 {% csrf_token %}
 
@@ -30,8 +35,10 @@ Classes:<BR>
 {{ deleteClassForm.as_table }}
 </table>
 
-<input type="submit" value="Delete class(es)" />
+<input type="submit" value="Удалить выбранные классы" />
 </form>
+
+<BR>
 
 <form action='add_class/' method='post'>
 {% csrf_token %}
@@ -40,7 +47,7 @@ Classes:<BR>
 {{ addClassForm.as_table }}
 </table>
 
-<input type="submit" value="Add class" />
+<input type="submit" value="Добавить новый класс" />
 </form>
 
 <BR>
@@ -52,28 +59,3 @@ Sсhool structure:
 {{ schoolList }}
 </pre>
 </font>
-
-
-Heads:<BR>
-{% for head in heads %}
-{{ head.User.username}} ({{ head.Description}})<BR>
-{%endfor%}
-
-<BR>Teachers:<BR>
-{% for teacher in teachers %}
-{{ teacher.User.username}} ({{ teacher.Description}})<BR>
-{%endfor%}
-
-<BR>Classes:<BR>
-{% for class in classes %}
-{{ class.Name}}<BR>
-{%endfor%}
-
-<BR>Pupils:<BR>
-{% for pupil in pupils %}
-{{ pupil.User.username}}<BR>
-{%endfor%}
-
-<BR>
-
-<A href="/accounts/logout/">Logout</A>

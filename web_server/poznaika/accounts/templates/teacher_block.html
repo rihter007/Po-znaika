@@ -1,4 +1,5 @@
-Pupils:<BR>
+Работа с учениками:<BR><BR>
+
 <form action='delete_pupil/' method='post'>
 {% csrf_token %}
 
@@ -6,8 +7,10 @@ Pupils:<BR>
 {{ deletePupilForm.as_table }}
 </table>
 
-<input type="submit" value="Delete pupil(s)" />
+<input type="submit" value="Удалить выбранных учеников" />
 </form>
+
+<BR>
 
 <form action='add_pupil/' method='post'>
 {% csrf_token %}
@@ -16,40 +19,5 @@ Pupils:<BR>
 {{ addPupilForm.as_table }}
 </table>
 
-<input type="submit" value="Add pupil" />
+<input type="submit" value="Добавить нового ученика" />
 </form>
-
-<BR>
-<BR>
-
-Sсhool structure:
-<font size=+1>
-<pre>
-{{ schoolList }}
-</pre>
-</font>
-
-
-Heads:<BR>
-{% for head in heads %}
-{{ head.User.username}} ({{ head.Description}})<BR>
-{%endfor%}
-
-<BR>Teachers:<BR>
-{% for teacher in teachers %}
-{{ teacher.User.username}} ({{ teacher.Description}})<BR>
-{%endfor%}
-
-<BR>Classes:<BR>
-{% for class in classes %}
-{{ class.Name}}<BR>
-{%endfor%}
-
-<BR>Pupils:<BR>
-{% for pupil in pupils %}
-{{ pupil.User.username}}<BR>
-{%endfor%}
-
-<BR>
-
-<A href="/accounts/logout/">Logout</A>
