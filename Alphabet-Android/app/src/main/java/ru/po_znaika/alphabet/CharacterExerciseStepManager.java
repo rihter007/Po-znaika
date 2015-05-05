@@ -1,24 +1,33 @@
 package ru.po_znaika.alphabet;
 
 import android.app.Fragment;
+import android.support.annotation.NonNull;
+import android.util.Log;
+
+import com.arz_x.CommonException;
+
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
  * Created by Rihter on 13.08.2014.
  * Performs management of exercise steps represented in fragments
  */
-public class CharacterExerciseStepManager
+final class CharacterExerciseStepManager
 {
-    public static interface ICustomExerciseStepFactory
+    public interface IExerciseStepFactory
     {
-        Fragment createExerciseStep(CharacterExerciseItemStepState data);
+        Fragment createExerciseStep(@NonNull AlphabetDatabase.CharacterExerciseActionType actionType,
+                                    int value) throws CommonException;
     }
 
+    private static final String LogTag = CharacterExerciseStepManager.class.getName();
+
     public CharacterExerciseStepManager(int _currentStep,
-                                        CharacterExerciseItemStepState[] _exerciseSteps,
-                                        ICustomExerciseStepFactory _customExerciseStepFactory)
+                                        @NonNull CharacterExerciseItemStep[] _exerciseSteps,
+                                        @NonNull IExerciseStepFactory _customExerciseStepFactory)
     {
-        assert _exerciseSteps != null;
-        assert (_currentStep >= 0) && (_currentStep < _exerciseSteps.length);
+        if (_currentStep >= _exerciseSteps.length)
+            throw new IllegalArgumentException();
 
         m_currentStep = _currentStep;
         m_exerciseSteps = _exerciseSteps;
@@ -57,23 +66,19 @@ public class CharacterExerciseStepManager
         if (m_currentStep >= m_exerciseSteps.length)
             return null;
 
-        Fragment resultFragment = null;
-        switch (m_exerciseSteps[m_currentStep].actionType)
+        try
         {
-            case CustomAction:
-                assert m_exerciseStepFactory != null;
-                resultFragment = m_exerciseStepFactory.createExerciseStep(m_exerciseSteps[m_currentStep]);
-                break;
-
-            case TheoryPage:
-                resultFragment = TheoryPageFragment.createFragment(m_exerciseSteps[m_currentStep]);
-                break;
+            return m_exerciseStepFactory.createExerciseStep(m_exerciseSteps[m_currentStep].actionType,
+                    m_exerciseSteps[m_currentStep].value);
         }
-
-        return resultFragment;
+        catch (CommonException exp)
+        {
+            Log.e(LogTag, "Failed to create fragment: " + exp.getMessage());
+        }
+        return null;
     }
 
     private int m_currentStep;
-    private CharacterExerciseItemStepState[] m_exerciseSteps;
-    private ICustomExerciseStepFactory m_exerciseStepFactory;
+    private CharacterExerciseItemStep[] m_exerciseSteps;
+    private IExerciseStepFactory m_exerciseStepFactory;
 }

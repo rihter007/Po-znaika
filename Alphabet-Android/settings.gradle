@@ -1,1 +1,1 @@
-include ':app', ':common', ':network', ':database', ':licensing'
+include ':app', ':common', ':network', ':database', ':licensing', ':arz'

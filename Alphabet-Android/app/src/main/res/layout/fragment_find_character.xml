@@ -1,0 +1,42 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:orientation="vertical"
+             tools:context="ru.po_znaika.alphabet.FindCharacterFragment">
+
+    <FrameLayout
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=""
+            android:id="@+id/exerciseCaptionTextView"
+            android:layout_gravity="center_horizontal|top"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/caption_back"
+            android:id="@+id/backButton"
+            android:layout_gravity="left|top"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/caption_finish"
+            android:id="@+id/forwardButton"
+            android:layout_gravity="right|top"/>
+    </FrameLayout>
+
+    <GridView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numColumns="20"
+        android:id="@+id/charactersGridView"
+        android:layout_gravity="center"/>
+</LinearLayout>

@@ -1,27 +1,44 @@
 package ru.po_znaika.alphabet;
 
 import java.util.Map;
-import java.util.HashMap;
-import java.io.IOException;
+import java.util.TreeMap;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.app.Activity;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
-import ru.po_znaika.database.DatabaseConstant;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
 
+import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 public class SingleCharacterExerciseMenuActivity extends Activity
 {
+    private static final String LogTag = SingleCharacterExerciseMenuActivity.class.getName();
+
+    private static final String CharacterExerciseIdTag = "character_exercise_id";
+    private static final String ExerciseCharacterTag = "exercise_character";
+
+    public static void startActivity(@NonNull Context context, int characterExerciseId, char exerciseCharacter)
+    {
+        Intent intent = new Intent(context, SingleCharacterExerciseMenuActivity.class);
+        intent.putExtra(CharacterExerciseIdTag, characterExerciseId);
+        intent.putExtra(ExerciseCharacterTag, exerciseCharacter);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -30,7 +47,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
 
         try
         {
-            restoreInternalState(savedInstanceState);
+            restoreInternalState();
             constructUserInterface();
         }
         catch (Exception exp)
@@ -50,23 +67,28 @@ public class SingleCharacterExerciseMenuActivity extends Activity
     }
 
     /**
-     * Restores all internal objects
-     * @param savedInstanceState activity saved state
-     * @throws java.io.IOException
+     * Restores all internal selectionVariants
+     * @throws com.arz_x.CommonException
      */
-    void restoreInternalState(Bundle savedInstanceState) throws IOException
+    void restoreInternalState() throws CommonException
     {
         // Restore exercise id from Bundle
         {
             Bundle intentInfo = getIntent().getExtras();
 
-            m_characterExerciseId = intentInfo.getInt(Constant.CharacterExerciseIdTag);
+            m_characterExerciseId = intentInfo.getInt(CharacterExerciseIdTag);
             if (m_characterExerciseId == DatabaseConstant.InvalidDatabaseIndex)
-                throw new IllegalArgumentException();
+            {
+                Log.e(LogTag, "Invalid character exercise id");
+                throw new CommonException(CommonResultCode.InvalidInternalState);
+            }
 
-            m_character = intentInfo.getChar(Constant.CharacterTag);
+            m_character = intentInfo.getChar(ExerciseCharacterTag);
             if (m_character == '\0')
-                throw new IllegalArgumentException();
+            {
+                Log.e(LogTag, "Invalid exercise character");
+                throw new CommonException(CommonResultCode.InvalidInternalState);
+            }
         }
 
         // Prepare database
@@ -78,13 +100,16 @@ public class SingleCharacterExerciseMenuActivity extends Activity
         {
             AlphabetDatabase.CharacterExerciseItemInfo[] exercises = m_alphabetDatabase.getAllCharacterExerciseItemsByCharacterExerciseId(m_characterExerciseId);
             if (exercises == null)
-                throw new IllegalArgumentException("Failed to get character exercises from database");
+            {
+                Log.e(LogTag, "Failed to get character exercises from database");
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
             m_characterExerciseItems = new AlphabetDatabase.CharacterExerciseItemInfo[exercises.length];
 
             // Sort exercises in m_characterExerciseItems according to menu_position
             {
-                Map<Integer, AlphabetDatabase.CharacterExerciseItemInfo> sortedExercises = new HashMap<Integer, AlphabetDatabase.CharacterExerciseItemInfo>();
+                Map<Integer, AlphabetDatabase.CharacterExerciseItemInfo> sortedExercises = new TreeMap<>();
 
                 for (AlphabetDatabase.CharacterExerciseItemInfo exerciseInfo : exercises)
                     sortedExercises.put(exerciseInfo.menuPosition, exerciseInfo);
@@ -109,7 +134,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
         }
         // process menu items list view
         {
-            ArrayAdapter<String> menuItems = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+            ArrayAdapter<String> menuItems = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
             for (AlphabetDatabase.CharacterExerciseItemInfo characterExerciseInfo : m_characterExerciseItems)
                 menuItems.add(characterExerciseInfo.displayName);
@@ -129,18 +154,11 @@ public class SingleCharacterExerciseMenuActivity extends Activity
 
     private void onListViewItemSelected(int itemSelectedIndex)
     {
-        Intent intent = new Intent(this,CharacterExerciseItemActivity.class);
-
-        intent.putExtra(Constant.CharacterExerciseIdTag, m_characterExerciseId);
-        intent.putExtra(Constant.CharacterTag, m_character);
-        intent.putExtra(Constant.CharacterExerciseItemIdTag, m_characterExerciseItems[itemSelectedIndex].id);
-        intent.putExtra(Constant.CharacterExerciseItemTypeTag, m_characterExerciseItems[itemSelectedIndex].type.getValue());
-        intent.putExtra(Constant.CharacterExerciseItemTitleTag, m_characterExerciseItems[itemSelectedIndex].displayName);
-        this.startActivity(intent);
+        CharacterExerciseItemActivity.startActivity(this, m_characterExerciseItems[itemSelectedIndex].id);
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState)
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState)
     {
         super.onSaveInstanceState(savedInstanceState);
     }

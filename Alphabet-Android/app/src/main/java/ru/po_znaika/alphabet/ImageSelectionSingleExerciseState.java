@@ -6,15 +6,15 @@ import android.os.Parcelable;
 /**
  * Represents internal state of single selection exercise for ImageSelectionFragment
  */
-public class ImageSelectionSingleExerciseState implements Parcelable
+class ImageSelectionSingleExerciseState implements Parcelable
 {
     /* Describes title of an exercise*/
     public String exerciseTitle;
-    /* Array of objects to be represented in exercise */
-    public ObjectDescription[] objects;
+    /* Array of selectionVariants to be represented in exercise */
+    public ObjectDescription[] selectionVariants;
 
-    /* Index of answer image  */
-    public int answer;
+    /* Index of answerIndex image  */
+    public int answerIndex;
 
     public ImageSelectionSingleExerciseState() {}
 
@@ -25,13 +25,13 @@ public class ImageSelectionSingleExerciseState implements Parcelable
         final int ObjectsCount = _in.readInt();
         if (ObjectsCount > 0)
         {
-            this.objects = new ObjectDescription[ObjectsCount];
+            this.selectionVariants = new ObjectDescription[ObjectsCount];
 
             for (int objectIndex = 0; objectIndex < ObjectsCount; ++objectIndex)
-                this.objects[objectIndex] = _in.readParcelable(ObjectDescription.class.getClassLoader());
+                this.selectionVariants[objectIndex] = _in.readParcelable(ObjectDescription.class.getClassLoader());
         }
 
-        this.answer = _in.readInt();
+        this.answerIndex = _in.readInt();
     }
 
     @Override
@@ -45,18 +45,18 @@ public class ImageSelectionSingleExerciseState implements Parcelable
     {
         container.writeString(this.exerciseTitle);
 
-        if (this.objects != null)
+        if (this.selectionVariants != null)
         {
-            container.writeInt(this.objects.length);
-            for (int objectIndex = 0; objectIndex < this.objects.length; ++objectIndex)
-                container.writeParcelable(this.objects[objectIndex], 0);
+            container.writeInt(this.selectionVariants.length);
+            for (int objectIndex = 0; objectIndex < this.selectionVariants.length; ++objectIndex)
+                container.writeParcelable(this.selectionVariants[objectIndex], 0);
         }
         else
         {
             container.writeInt(0);
         }
 
-        container.writeInt(this.answer);
+        container.writeInt(this.answerIndex);
     }
 
     public static final Creator CREATOR = new Creator()

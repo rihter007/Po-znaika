@@ -4,8 +4,8 @@ import android.content.Context;
 
 import ru.po_znaika.common.IExercise;
 
-import ru.po_znaika.database.DatabaseConstant;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
  * Simple factory class pattern that creates and initializes all Alphabet exercises

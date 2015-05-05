@@ -8,8 +8,9 @@ using System.Diagnostics;
 
 namespace network_test_client.network
 {
-    static class CommonHttpHeaders
+    static class NetworkConstants
     {
+        public const string PoZnaikaDomainName = "http://po-znaika.ru/accounts";
         public const string LoginHeader = "Login";
         public const string PasswordHeader = "Password";
         public const string ExerciseHeader = "Exercise";
@@ -30,7 +31,7 @@ namespace network_test_client.network
                 Console.WriteLine(request.Headers);
 
                 if (string.Equals(request.Method, "post", StringComparison.InvariantCultureIgnoreCase))
-                    CommonHelpers.PrintAsciiStream(request.GetRequestStream(), request.ContentLength);                
+                    CommonHelpers.PrintAsciiStream(request.GetRequestStream());                
             }
         }
 
@@ -45,7 +46,7 @@ namespace network_test_client.network
                 Console.WriteLine("Headers:");
                 Console.WriteLine(response.Headers);
 
-                CommonHelpers.PrintAsciiStream(response.GetResponseStream(), response.ContentLength);               
+                CommonHelpers.PrintAsciiStream(response.GetResponseStream());               
             }
         }
 
@@ -58,9 +59,9 @@ namespace network_test_client.network
             request.ContentLength = 0;
 
             if (!string.IsNullOrEmpty(login))
-                request.Headers.Add(CommonHttpHeaders.LoginHeader, login);
+                request.Headers.Add(NetworkConstants.LoginHeader, login);
             if (!string.IsNullOrEmpty(password))
-                request.Headers.Add(CommonHttpHeaders.PasswordHeader, password);
+                request.Headers.Add(NetworkConstants.PasswordHeader, password);
 
             return request;
         }

@@ -17,7 +17,17 @@ import android.widget.TextView;
  */
 public class ScoreFragment extends Fragment
 {
-    public static final String ScoreTag = "score";
+    private static final String ScoreTag = "score";
+
+    public static ScoreFragment createFragment(int score)
+    {
+        ScoreFragment scoreFragment = new ScoreFragment();
+
+        Bundle arguments = new Bundle();
+        arguments.putInt(ScoreTag, score);
+        scoreFragment.setArguments(arguments);
+        return scoreFragment;
+    }
 
     public ScoreFragment()
     {

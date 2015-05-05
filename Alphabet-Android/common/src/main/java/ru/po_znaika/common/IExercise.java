@@ -21,6 +21,7 @@ public interface IExercise
 
     /* Returns a unique id of the exercise */
     int getId();
+
     /* Returns exercise internal format name */
     String getName();
 

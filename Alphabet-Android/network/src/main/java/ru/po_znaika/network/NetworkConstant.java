@@ -6,8 +6,8 @@ package ru.po_znaika.network;
  */
 public class NetworkConstant
 {
-    public static final String ServiceDomainName = "software.po-znaika.ru";
-    public static final String ServiceUrl = "https://" + ServiceDomainName + '/';
+    public static final String ServiceDomainName = "po-znaika.ru/accounts";
+    public static final String ServiceUrl = "http://" + ServiceDomainName + '/';
 
     public static final String LoginHeader = "Login";
     public static final String PasswordHeader = "Password";

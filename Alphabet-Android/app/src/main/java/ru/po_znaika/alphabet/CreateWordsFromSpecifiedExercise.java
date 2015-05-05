@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Log;
 
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.IExercise;
-import ru.po_znaika.database.DatabaseConstant;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
  * Represents an exercise for creation sub words from the main
@@ -35,11 +37,15 @@ public class CreateWordsFromSpecifiedExercise implements IExercise
 
             if (exerciseInfo.imageId != DatabaseConstant.InvalidDatabaseIndex)
             {
-                final String DisplayImageFileName = _alphabetDatabase.getImageFileNameById(exerciseInfo.imageId);
-                if (TextUtils.isEmpty(DisplayImageFileName))
+                final String displayImageFileName = _alphabetDatabase.getImageFileNameById(exerciseInfo.imageId);
+                if (TextUtils.isEmpty(displayImageFileName))
+                {
+                    Log.e(CreateWordsFromSpecifiedExercise.class.getName(),
+                            String.format("Could not get image file name with id: %d", exerciseInfo.imageId));
                     throw new IllegalArgumentException();
+                }
 
-                m_exerciseDisplayImageResourceId = m_context.getResources().getIdentifier(DisplayImageFileName, Constant.DrawableResourcesTag, m_context.getPackageName());
+                m_exerciseDisplayImageResourceId = DatabaseHelpers.getDrawableIdByName(m_context.getResources(), displayImageFileName);
                 if (m_exerciseDisplayImageResourceId == 0)
                     throw new IllegalArgumentException();
             }
@@ -52,11 +58,7 @@ public class CreateWordsFromSpecifiedExercise implements IExercise
     */
     public void process()
     {
-        Intent intent = new Intent(m_context, CreateWordsFromSpecifiedActivity.class);
-        intent.putExtra(Constant.ExerciseIdTag, m_exerciseId);
-        intent.putExtra(Constant.AlphabetTypeTag, AlphabetDatabase.AlphabetType.Russian.getValue());
-
-        m_context.startActivity(intent);
+        CreateWordsFromSpecifiedActivity.startActivity(m_context, m_exerciseName, AlphabetDatabase.AlphabetType.Russian);
     }
 
     /* Returns a unique id of the exercise */

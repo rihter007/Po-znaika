@@ -2,7 +2,8 @@ package ru.po_znaika.network;
 
 import android.support.annotation.NonNull;
 
-import ru.po_znaika.common.CommonException;
+import com.arz_x.CommonException;
+import com.arz_x.NetworkException;
 
 /**
  * Created by Rihter on 19.01.2015.
@@ -15,7 +16,7 @@ public interface IAuthentication
      * @param login User logic to authenticate
      * @param password User password
      * @return Authentication token used if operation succeeded
-     * @throws ru.po_znaika.common.CommonException
+     * @throws com.arz_x.CommonException
      * @throws NetworkException
      */
     AuthenticationToken authenticate(@NonNull String login, String password)

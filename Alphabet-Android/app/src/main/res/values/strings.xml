@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="assert_error">Ошибка времени исполнения</string>
+    <string name="ok">Ok</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="main_menu_caption">Выбери упражнение:</string>
@@ -11,23 +13,27 @@
     <string name="action_about">О приложении</string>
     <string name="action_synchronize">Синхронизировать</string>
     <string name="action_clear">Очистить</string>
-    <string name="alert_title">Внимание</string>
+    <string name="failed_sync_diary">Не удалось обновить дневник.
+        Проверьте подключение к Интернету или повторите попытку позже</string>
     <string name="failed_play_sound">Не удалось запустить звук</string>
     <string name="failed_exercise_start">Не удалось запустить упражнение :(</string>
-    <string name="failed_exercise_step">Ошибка при работе приложения :(</string>
+    <string name="failed_action">Ошибка при работе приложения :(</string>
     <string name="sound_exercise_caption">Предметы со звуком:</string>
     <string name="play_title">Прослушать</string>
-    <string name="button_previous">Назад</string>
-    <string name="button_next">Далее</string>
-    <string name="button_check">Проверить</string>
+    <string name="caption_previous">Назад</string>
+    <string name="caption_next">Далее</string>
+    <string name="caption_check">Проверить</string>
     <string name="button_create">Создать</string>
-    <string name="sound_objects_caption">Предметы со звуком: </string>
+    <string name="sound_objects_caption">Предметы со звуком буквы </string>
     <string name="caption_finish">Завершить</string>
+    <string name="caption_repeat">Повторить</string>
     <string name="caption_score">Ты набрал %d очков</string>
     <string name="caption_diary">Дневник</string>
-    <string name="caption_sound_object_contains_selection">Выбери предмет со звуком %s</string>
-    <string name="caption_sound_object_begins_selection">Выбери предмет начинающийся со звука %s</string>
-    <string name="caption_sound_object_ends_selection">Выбери предмет заканчивающийся на звук %s</string>
+    <string name="caption_find_character">Найди букву %s</string>
+    <string name="caption_exercise_finished">Поздравляем, упражнение завершено</string>
+    <string name="caption_object_contains_character">Выбери предмет с буквой \'%s\'</string>
+    <string name="caption_object_begins_character">Выбери предмет начинающийся с буквы \'%s\'</string>
+    <string name="caption_object_ends_character">Выбери предмет заканчивающийся на букву \'%s\'</string>
     <string name="caption_date">Дата</string>
     <string name="caption_exercise_name">Название упражнения</string>
     <string name="caption_exercise_score">Набранные очки</string>
@@ -37,10 +43,28 @@
     <string name="caption_back">Назад</string>
     <string name="caption_skip">Пропустить</string>
     <string name="caption_abc_book">Букварь</string>
-    <string name="caption_current_character_count">Найдено %d букв</string>
+    <string name="caption_current_character_count">Найдено букв: %d</string>
+    <string name="caption_login">Логин</string>
+    <string name="caption_password">Пароль</string>
+    <string name="caption_authorize">Войти</string>
+    <string name="caption_cancel">Отмена</string>
+    <string name="caption_license_scroll_title">Выберите период дневника</string>
+    <string name="caption_days_selected">Выбрано %d дней</string>
+    <string name="alert_title">Внимание</string>
+    <string name="alert_unknown_error">Произошла неизвестная ошибка</string>
+    <string name="alert_bad_credentials">Некорректный логин и/или пароль</string>
+    <string name="alert_finish_exercise">Завершить упражнение?</string>
+    <string name="alert_exit_exercise">Выйти из упражнения?</string>
     <string name="alert_incorrect_word_creation">Некорректное слово</string>
     <string name="alert_word_already_exists">Данное слово уже существует</string>
     <string name="alert_sure_word_skip">Пропустить данное слово?</string>
+    <string name="alert_login_password_not_empty">Поля логин и пароль не должны быть пустыми</string>
+    <string name="alert_no_active_license">Отсутствует текущая активная лицензия</string>
+    <string name="alert_login_password_incorrect">Введены неверные логин/пароль</string>
+    <string name="alert_no_connection">Ошибка доступа сети. Проверьте подключение к Интернету.</string>
+    <string name="alert_application_activated">Приложение успешно активировано</string>
+    <string name="alert_no_license">Отсутствует текущая активная лицензия\n
+        Посетите http://po-znaika.ru для получения дополнительной информации</string>
     <string name="app_name">По-знайка: Алфавит</string>
     <string name="title_activity_character_exercise_item">По-знайка: Упражнение </string>
     <string name="title_activity_character_exercise_menu">По-знайка: Букварь</string>
@@ -49,5 +73,8 @@
     <string name="title_activity_word_gather">По-знайка: Слово рассыпалось</string>
     <string name="title_activity_create_words_from_specified">По-знайка: Создай слова</string>
     <string name="hello_world">Hello world!</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

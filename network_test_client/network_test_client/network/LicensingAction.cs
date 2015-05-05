@@ -8,9 +8,16 @@ namespace network_test_client.network
 {
     class LicensingAction : INetworkAction
     {
+        private const string DefaultUrl = NetworkConstants.PoZnaikaDomainName + "/license";
+
         public void SetUrl(string url)
         {
             m_url = url;
+        }
+
+        public string GetUrl()
+        {
+            return m_url;
         }
 
         public void SetLogin(string login)
@@ -41,7 +48,7 @@ namespace network_test_client.network
             }
         }
 
-        private string m_url;
+        private string m_url = DefaultUrl;
         private string m_login;
         private string m_password;
     }

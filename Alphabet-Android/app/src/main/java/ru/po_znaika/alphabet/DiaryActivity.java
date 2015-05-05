@@ -1,30 +1,50 @@
 package ru.po_znaika.alphabet;
 
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.GridView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
-import ru.po_znaika.database.diary.DiaryDatabase;
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
 
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
+import ru.po_znaika.common.ExerciseScore;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.CommonHelpers;
+import com.arz_x.NetworkException;
 
-public class DiaryActivity extends ActionBarActivity
+public final class DiaryActivity extends ActionBarActivity
 {
+    private static final String LogTag = DiaryActivity.class.getName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary);
+
+        m_serviceLocator = new CoreServiceLocator(this);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        new CloseAsyncTask(m_serviceLocator).execute();
     }
 
     @Override
@@ -39,19 +59,20 @@ public class DiaryActivity extends ActionBarActivity
         }
         catch (Exception exp)
         {
-
+            return false;
         }
         return true;
     }
 
-    private void constructUserInterface() throws IOException
+    private void constructUserInterface() throws CommonException
     {
-        TextAdapter textAdapter = new TextAdapter(this);
+        TextAdapter textAdapter;
 
         // fill grid caption
         {
-            Resources resources = getResources();
+            final Resources resources = getResources();
 
+            textAdapter = new TextAdapter(this, resources.getDimension(R.dimen.small_text_size));
             textAdapter.add(resources.getString(R.string.caption_date));
             textAdapter.add(resources.getString(R.string.caption_exercise_name));
             textAdapter.add(resources.getString(R.string.caption_exercise_score));
@@ -59,13 +80,13 @@ public class DiaryActivity extends ActionBarActivity
 
         AlphabetDatabase alphabetDatabase = new AlphabetDatabase(this, false);
 
-        DiaryDatabase diaryDatabase = new DiaryDatabase(this);
-        DiaryDatabase.ExerciseDiaryShortInfo diaryNotes[] = diaryDatabase.getAllDiaryRecordsOrderedByDate();
+        DiaryDatabase diaryDatabase = m_serviceLocator.getDiaryDatabase();
+        ExerciseScore diaryNotes[] = diaryDatabase.getAllDiaryRecordsOrderedByDate();
 
         if ((diaryNotes != null) && (diaryNotes.length > 0))
         {
-            Map<Integer, String> exerciseNamesMap = new HashMap<Integer, String>();
-            for (DiaryDatabase.ExerciseDiaryShortInfo diaryNote : diaryNotes)
+            Map<String, String> exerciseNamesMap = new HashMap<>();
+            for (ExerciseScore diaryNote : diaryNotes)
             {
                 Calendar noteTime = new GregorianCalendar();
                 noteTime.setTime(diaryNote.date);
@@ -78,17 +99,17 @@ public class DiaryActivity extends ActionBarActivity
                         noteTime.get(Calendar.MINUTE)
                 ));
 
-                String exerciseTitle = null;
-                if (exerciseNamesMap.containsKey(diaryNote.exerciseId))
+                String exerciseTitle;
+                if (exerciseNamesMap.containsKey(diaryNote.exerciseName))
                 {
-                    exerciseTitle = exerciseNamesMap.get(diaryNote.exerciseId);
+                    exerciseTitle = exerciseNamesMap.get(diaryNote.exerciseName);
                 }
                 else
                 {
-                    exerciseTitle = alphabetDatabase.getExerciseDisplayNameById(diaryNote.exerciseId);
+                    exerciseTitle = alphabetDatabase.getExerciseDisplayNameByIdName(diaryNote.exerciseName);
                     if (exerciseTitle == null)
-                        exerciseTitle = alphabetDatabase.getCharacterItemDisplayNameById(diaryNote.exerciseId);
-                    exerciseNamesMap.put(diaryNote.exerciseId, exerciseTitle);
+                        exerciseTitle = alphabetDatabase.getCharacterItemDisplayNameByIdName(diaryNote.exerciseName);
+                    exerciseNamesMap.put(diaryNote.exerciseName, exerciseTitle);
                 }
 
                 if (!TextUtils.isEmpty(exerciseTitle))
@@ -111,11 +132,86 @@ public class DiaryActivity extends ActionBarActivity
         switch (ItemId)
         {
             case R.id.action_synchronize:
-                break;
+            {
+                final Resources resources = getResources();
 
-            case R.id.action_clear:
-                break;
+                View dialogView = getLayoutInflater().inflate(R.layout.dialog_diary_synchronization, null);
+                final TextView selectedDaysView = (TextView)dialogView.findViewById(R.id.daysSelectedTextView);
+                final SeekBar seekBarView = (SeekBar)dialogView.findViewById(R.id.seekBar);
+                seekBarView.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+                {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+                    {
+                        final String captionString = String.format(resources.getString(R.string.caption_days_selected), progress);
+                        selectedDaysView.setText(captionString);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar)
+                    {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar)
+                    {
+
+                    }
+                });
+
+                // Draw initial progress
+                {
+                    final String initialCaptionString = String.format(resources.getString(R.string.caption_days_selected), seekBarView.getProgress());
+                    selectedDaysView.setText(initialCaptionString);
+                }
+
+                AlertDialogHelper.showAlertDialog(this, dialogView, resources.getString(R.string.ok)
+                        , resources.getString(R.string.caption_cancel)
+                        , new AlertDialogHelper.IDialogResultListener()
+                {
+                    @Override
+                    public void onDialogProcessed(@NonNull AlertDialogHelper.DialogResult dialogResult)
+                    {
+                        if (dialogResult == AlertDialogHelper.DialogResult.NegativeSelected)
+                            return;
+
+                        Calendar minExerciseRecordDate = Calendar.getInstance();
+                        minExerciseRecordDate.setTime(new Date());
+                        minExerciseRecordDate.add(Calendar.DATE, -seekBarView.getProgress());
+
+                        DiaryDatabase diaryDatabase = m_serviceLocator.getDiaryDatabase();
+                        try
+                        {
+                            ExerciseScore[] syncExercises = m_serviceLocator.getServerOperations()
+                                    .getExercisesScores("Alphabet.Russian",
+                                            CommonHelpers.beginOfTheDay(minExerciseRecordDate.getTime()),
+                                            null);
+
+                            // incorrect realization
+                            if (syncExercises == null)
+                                throw new CommonException(CommonResultCode.InvalidInternalState);
+
+                            for (ExerciseScore exercise : syncExercises)
+                            {
+                                diaryDatabase.insertExerciseScore(exercise.date, exercise.exerciseName, exercise.score);
+                            }
+                        }
+                        catch (CommonException | NetworkException exp)
+                        {
+                            MessageBox.Show(DiaryActivity.this, resources.getString(R.string.failed_sync_diary),
+                                    resources.getString(R.string.alert_title));
+                            return;
+                        }
+
+                        diaryDatabase.deleteRecordsOlderThan(minExerciseRecordDate.getTime());
+                    }
+                });
+            }
+            break;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private CoreServiceLocator m_serviceLocator;
 }

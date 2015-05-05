@@ -2,10 +2,14 @@ package ru.po_znaika.alphabet;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridView;
@@ -13,16 +17,26 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
 import ru.po_znaika.common.IExercise;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 public class CharacterExerciseMenuActivity extends Activity
 {
+    private static String LogTag = CharacterExerciseMenuActivity.class.getName();
+
+    public static void startActivity(@NonNull Context context)
+    {
+        Intent intent = new Intent(context, CharacterExerciseMenuActivity.class);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -50,16 +64,19 @@ public class CharacterExerciseMenuActivity extends Activity
         }
     }
 
-    private void restoreInternalState() throws IOException
+    private void restoreInternalState() throws CommonException
     {
         AlphabetDatabase alphabetDatabase = new AlphabetDatabase(this, false);
         AlphabetDatabase.ExerciseShortInfo[] characterExercisesInfo = alphabetDatabase.getAllExercisesShortInfoByType(AlphabetDatabase.ExerciseType.Character);
         if (characterExercisesInfo == null)
-            throw new IllegalArgumentException();
+        {
+            Log.e(LogTag, "Failed to get any exercises");
+            throw new CommonException(CommonResultCode.InvalidExternalSource);
+        }
 
-        ExerciseFactory exerciseFactory = new ExerciseFactory(this, alphabetDatabase);
+        final ExerciseFactory exerciseFactory = new ExerciseFactory(this, alphabetDatabase);
 
-        Map<String, IExercise> exerciseMap = new TreeMap<String, IExercise>();
+        Map<String, IExercise> exerciseMap = new TreeMap<>();
         for (AlphabetDatabase.ExerciseShortInfo exerciseShortInfo : characterExercisesInfo)
         {
             IExercise characterExercise = exerciseFactory.CreateExerciseFromId(exerciseShortInfo.id, exerciseShortInfo.type);

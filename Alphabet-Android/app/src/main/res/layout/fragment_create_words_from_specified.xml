@@ -26,7 +26,7 @@
             <GridView
                 android:layout_marginTop="@dimen/small_margin"
                 android:layout_width="200dp"
-                android:layout_height="@dimen/character_height"
+                android:layout_height="@dimen/large_grid_character_height"
                 android:horizontalSpacing="1dp"
                 android:verticalSpacing="1dp"
                 android:id="@+id/sourceGridView"
@@ -56,7 +56,7 @@
             <GridView
                 android:layout_marginTop="@dimen/small_margin"
                 android:layout_width="200dp"
-                android:layout_height="@dimen/character_height"
+                android:layout_height="@dimen/large_grid_character_height"
                 android:id="@+id/destinationGridView"
                 android:horizontalSpacing="1dp"
                 android:verticalSpacing="1dp"
@@ -114,17 +114,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <ListView
-                android:layout_width="@dimen/medium_list_view_width"
-                android:layout_height="wrap_content"
-                android:id="@+id/wordsListView"/>
-
             <TextView
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text=""
                 android:id="@+id/charactersCountTextView"/>
+
+            <ListView
+                android:layout_width="@dimen/medium_list_view_width"
+                android:layout_height="wrap_content"
+                android:id="@+id/wordsListView"/>
+
         </LinearLayout>
 
         <LinearLayout

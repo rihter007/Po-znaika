@@ -19,7 +19,8 @@
     <ImageButton
         android:layout_width="@dimen/small_image_size"
         android:layout_height="@dimen/small_image_size"
-        android:id="@+id/backImageButton"/>
+        android:id="@+id/backImageButton"
+        android:src="@drawable/arrow_left"/>
 
     <GridView
         android:layout_marginTop="@dimen/small_margin"

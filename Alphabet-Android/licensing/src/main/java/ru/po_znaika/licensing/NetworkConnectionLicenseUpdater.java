@@ -17,17 +17,17 @@ public class NetworkConnectionLicenseUpdater extends BroadcastReceiver
 {
     public NetworkConnectionLicenseUpdater()
     {
-        m_authProvider = new CacheAuthenticationProvider();
+        m_authProvider = null; //new CacheAuthenticationProvider();
     }
 
     public void onReceive(Context context, Intent intent)
     {
-        ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+       /* ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo network = connectivityManager.getActiveNetworkInfo();
         if ((network == null) || (network.getState() != NetworkInfo.State.CONNECTED))
             return;
 
-        Licensing licensing = new Licensing(m_authProvider);
+        Licensing licensing = new Licensing(context, m_authProvider);
 
         try
         {
@@ -37,6 +37,7 @@ public class NetworkConnectionLicenseUpdater extends BroadcastReceiver
         {
             // just ignore
         }
+        */
     }
 
     private IAuthenticationProvider m_authProvider;

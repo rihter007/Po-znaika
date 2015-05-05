@@ -1,7 +1,7 @@
 package ru.po_znaika.alphabet;
 
 /**
- * Created by Rihter on 24.08.2014.
+ * Created by Rihter on 10.02.2015.
  */
 public interface IScoreNotification
 {

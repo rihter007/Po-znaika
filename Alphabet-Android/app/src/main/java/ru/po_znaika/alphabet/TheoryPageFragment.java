@@ -1,16 +1,17 @@
 package ru.po_znaika.alphabet;
 
-import java.lang.String;
-import java.io.IOException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,44 +20,52 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.IExerciseStepCallback;
-import ru.po_znaika.database.DatabaseConstant;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.ProcessUrl;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.TextFormatBlock;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.TextFormatter;
 
 /**
  * Describes theory page
  */
 public class TheoryPageFragment extends Fragment
 {
-    private static final String TheoryTableIndexTag = "theory_table_index";
+    private static final String LogTag = TheoryPageFragment.class.getName();
 
+    private static final String TheoryTableIndexTag = "theory_table_index";
     private static final String TheoryImageIndexTag = "theory_image_index";
+    private static final String TheoryImageRedirectUrlTag = "theory_image_url_redirect";
     private static final String TheorySoundIndexTag = "theory_sound_index";
     private static final String TheoryMessageTag = "theory_message";
 
-    public static TheoryPageFragment createFragment(CharacterExerciseItemStepState state)
+    public static TheoryPageFragment createFragment(int theoryPageDatabaseId)
     {
-        assert state != null;
-
         TheoryPageFragment pageFragment = new TheoryPageFragment();
         Bundle fragmentArguments = new Bundle();
-        fragmentArguments.putInt(TheoryTableIndexTag, state.value);
+        fragmentArguments.putInt(TheoryTableIndexTag, theoryPageDatabaseId);
         pageFragment.setArguments(fragmentArguments);
 
         return pageFragment;
     }
 
     /**
-     * Restores all internal objects
+     * Restores all internal selectionVariants
      * @param savedInstanceState activity saved state
-     * @throws java.io.IOException
+     * @throws com.arz_x.CommonException
     */
-    void restoreInternalState(Bundle savedInstanceState) throws IOException
+    void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         m_alphabetDatabase = new AlphabetDatabase(getActivity(), false);
 
         Bundle fragmentArguments = getArguments();
-        assert fragmentArguments != null;
         final Integer TheoryTableIndex = fragmentArguments.getInt(TheoryTableIndexTag);
 
         // Restore essential internal members
@@ -64,12 +73,14 @@ public class TheoryPageFragment extends Fragment
         {
             AlphabetDatabase.TheoryPageInfo theoryPageInfo = m_alphabetDatabase.getTheoryPageById(TheoryTableIndex);
             m_theoryImageId = theoryPageInfo.imageId;
+            m_theoryImageRedirectUrl = theoryPageInfo.imageRedirectUrl;
             m_theorySoundId = theoryPageInfo.soundId;
             m_theoryMessage = theoryPageInfo.message;
         }
         else
         {
             m_theoryImageId = savedInstanceState.getInt(TheoryImageIndexTag);
+            m_theoryImageRedirectUrl = savedInstanceState.getString(TheoryImageRedirectUrlTag);
             m_theorySoundId = savedInstanceState.getInt(TheorySoundIndexTag);
             m_theoryMessage = savedInstanceState.getString(TheoryMessageTag);
         }
@@ -78,28 +89,55 @@ public class TheoryPageFragment extends Fragment
     /**
      * Constructs parts of user interface
      */
-    void constructUserInterface(View fragmentView)
+    void constructUserInterface(View fragmentView) throws CommonException
     {
         if ((m_theoryImageId == DatabaseConstant.InvalidDatabaseIndex) && (m_theorySoundId == DatabaseConstant.InvalidDatabaseIndex) &&
                 (TextUtils.isEmpty(m_theoryMessage)))
-            throw new IllegalArgumentException(); // TODO: fatal
+        {
+            Log.e(LogTag, "Invalid data");
+            throw new CommonException(CommonResultCode.InvalidInternalState);
+        }
 
         // process image
         if (m_theoryImageId != DatabaseConstant.InvalidDatabaseIndex)
         {
-            Resources resources = getResources();
+            final Resources resources = getResources();
 
-            final String ResourceFileName = m_alphabetDatabase.getImageFileNameById(m_theoryImageId);
-            final int ImageResourceId = resources.getIdentifier(ResourceFileName, Constant.DrawableResourcesTag, getActivity().getPackageName());
-            if (ImageResourceId == 0)
-                throw new IllegalArgumentException();
+            final String resourceFileName = m_alphabetDatabase.getImageFileNameById(m_theoryImageId);
+            final int imageResourceId = DatabaseHelpers.getDrawableIdByName(resources, resourceFileName);
+            if (imageResourceId == 0)
+            {
+                Log.e(LogTag, String.format("Failed to obtain sound by id:\"%d\"", imageResourceId));
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
             ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.theoryImageView);
-            theoryImageView.setImageDrawable(resources.getDrawable(ImageResourceId));
+            theoryImageView.setImageDrawable(resources.getDrawable(imageResourceId));
+
+            if (m_theoryImageRedirectUrl != null)
+            {
+                theoryImageView.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        try
+                        {
+                            ProcessUrl.openUrl(getActivity(), m_theoryImageRedirectUrl);
+                        }
+                        catch (Exception exp)
+                        {
+                            MessageBox.Show(getActivity(),
+                                    resources.getString(R.string.alert_unknown_error),
+                                    resources.getString(R.string.alert_title));
+                        }
+                    }
+                });
+            }
         }
         else
         {
-            ImageView theoryImageView = (ImageView)fragmentView.findViewById(R.id.theoryImageView);
+            ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.theoryImageView);
             theoryImageView.setVisibility(View.INVISIBLE);
 
             ViewGroup.LayoutParams layoutParams = theoryImageView.getLayoutParams();
@@ -110,38 +148,53 @@ public class TheoryPageFragment extends Fragment
         // process sound
         if (m_theorySoundId != DatabaseConstant.InvalidDatabaseIndex)
         {
-            final String ResourceFileName = m_alphabetDatabase.getSoundFileNameById(m_theorySoundId);
-            final int SoundResourceId = getResources().getIdentifier(ResourceFileName, Constant.RawResourcesTag, getActivity().getPackageName());
-            if (SoundResourceId == 0)
-                throw new IllegalArgumentException();
+            final String resourceFileName = m_alphabetDatabase.getSoundFileNameById(m_theorySoundId);
+            final int soundResourceId = DatabaseHelpers.getSoundIdByName(getResources(), resourceFileName);
+            if (soundResourceId == 0)
+            {
+                Log.e(LogTag, String.format("Failed to obtain sound by id:\"%d\"", soundResourceId));
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
-            m_theorySoundPlayer = MediaPlayer.create(getActivity(), SoundResourceId);
+            m_theorySoundPlayer = MediaPlayer.create(getActivity(), soundResourceId);
             m_theorySoundPlayer.start();
             m_isResumed = false;
-        }
-        else
+        } else
         {
             m_theorySoundPlayer = null;
 
-            ImageButton playSoundButton = (ImageButton)fragmentView.findViewById(R.id.playSoundButton);
+            ImageButton playSoundButton = (ImageButton) fragmentView.findViewById(R.id.playSoundButton);
             playSoundButton.setVisibility(View.INVISIBLE);
 
-            TextView playSoundTextView = (TextView)fragmentView.findViewById(R.id.playSoundTextView);
+            TextView playSoundTextView = (TextView) fragmentView.findViewById(R.id.playSoundTextView);
             playSoundTextView.setVisibility(View.INVISIBLE);
         }
 
         // process text
+
+        if (!TextUtils.isEmpty(m_theoryMessage))
         {
-            if (!TextUtils.isEmpty(m_theoryMessage))
+            TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.theoryTextView);
+            theoryTextView.setText(null);
+            final List<TextFormatBlock> formatBlocks = TextFormatter.processText(m_theoryMessage);
+
+            for (TextFormatBlock formatBlock : formatBlocks)
             {
-                TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.theoryTextView);
-                theoryTextView.setText(m_theoryMessage);
+                Spannable spanText = new SpannableString(formatBlock.getText());
+                if (formatBlock.isColorSet())
+                {
+                    spanText.setSpan(new ForegroundColorSpan(formatBlock.getARGBColor()),
+                            0,
+                            formatBlock.getText().length(),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                theoryTextView.append(spanText);
             }
-            else
-            {
-                TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.theoryTextView);
-                theoryTextView.setVisibility(View.INVISIBLE);
-            }
+        }
+        else
+        {
+            TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.theoryTextView);
+            theoryTextView.setVisibility(View.INVISIBLE);
         }
 
         // set buttons callbacks
@@ -220,7 +273,7 @@ public class TheoryPageFragment extends Fragment
         catch (Exception exp)
         {
             Resources resources = getResources();
-            AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.failed_exercise_step),
+            AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.failed_action),
                     resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
                     {
                         @Override
@@ -285,6 +338,7 @@ public class TheoryPageFragment extends Fragment
         super.onSaveInstanceState(savedInstanceState);
 
         savedInstanceState.putInt(TheoryImageIndexTag, m_theoryImageId);
+        savedInstanceState.putString(TheoryImageRedirectUrlTag, m_theoryImageRedirectUrl);
         savedInstanceState.putInt(TheorySoundIndexTag, m_theorySoundId);
         savedInstanceState.putString(TheoryMessageTag, m_theoryMessage);
     }
@@ -295,6 +349,7 @@ public class TheoryPageFragment extends Fragment
     private AlphabetDatabase m_alphabetDatabase;
 
     private int m_theoryImageId;
+    private String m_theoryImageRedirectUrl;
     private int m_theorySoundId;
     private String m_theoryMessage;
 

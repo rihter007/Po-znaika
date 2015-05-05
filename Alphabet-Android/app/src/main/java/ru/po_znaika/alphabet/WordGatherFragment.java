@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,15 +20,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
 
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.IExerciseStepCallback;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
  * Fragment for processing word gather exercise
  */
-public class WordGatherFragment extends Fragment
+public final class WordGatherFragment extends Fragment
 {
     private static class WordGatherState implements Parcelable
     {
@@ -81,7 +85,10 @@ public class WordGatherFragment extends Fragment
         };
     }
 
-    private static final String StateTag = "state";
+    private static final String LogTag = WordGatherFragment.class.getName();
+
+    private static final String AlphabetTypeTag = "alphabet_type";
+    private static final String InternalStateTag = "internal_state";
 
     private static final int MinWordLength = 6;
     private static final int MaxWordLength = 10;
@@ -90,6 +97,18 @@ public class WordGatherFragment extends Fragment
 
     private static final int InvalidIndexSelectionValue = -1;
 
+    private static final int SelectionColor = Constant.Color.LightBlue;
+    private static final int CorrectSelectionColor = Constant.Color.LightGreen;
+    private static final int InCorrectSelectionColor = Constant.Color.LightRed;
+
+    public static WordGatherFragment createFragment(@NonNull AlphabetDatabase.AlphabetType alphabetType)
+    {
+        WordGatherFragment wordGatherFragment = new WordGatherFragment();
+        Bundle arguments = new Bundle();
+        arguments.putInt(AlphabetTypeTag, alphabetType.getValue());
+        wordGatherFragment.setArguments(arguments);
+        return  wordGatherFragment;
+    }
 
     public WordGatherFragment()
     {
@@ -148,27 +167,42 @@ public class WordGatherFragment extends Fragment
     {
         super.onSaveInstanceState(savedInstanceState);
 
-        savedInstanceState.putParcelable(StateTag, m_state);
+        savedInstanceState.putParcelable(InternalStateTag, m_state);
     }
 
-    private void restoreInternalState(Bundle savedInstanceState) throws IOException
+    private void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         if (savedInstanceState == null)
         {
             final Bundle arguments = getArguments();
-            final AlphabetDatabase.AlphabetType AlphabetId = AlphabetDatabase.AlphabetType.getTypeByValue(arguments.getInt(Constant.AlphabetTypeTag));
+            final AlphabetDatabase.AlphabetType alphabetId = AlphabetDatabase.AlphabetType.
+                    getTypeByValue(arguments.getInt(AlphabetTypeTag));
 
             AlphabetDatabase alphabetDatabase = new AlphabetDatabase(getActivity(), false);
-            Pair<AlphabetDatabase.WordInfo, Integer> wordInfo = alphabetDatabase.getRandomWordAndImageByAlphabetAndLength(AlphabetId, MinWordLength, MaxWordLength);
+            final Pair<AlphabetDatabase.WordInfo, Integer> wordInfo = alphabetDatabase.
+                    getRandomWordAndImageByAlphabetAndLength(alphabetId, MinWordLength, MaxWordLength);
             if (wordInfo == null)
-                throw new IllegalArgumentException();
+            {
+                Log.e(LogTag, "Could not extract word from alphabet database");
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
-            final int ImageResourceId = getResources().getIdentifier(alphabetDatabase.getImageFileNameById(wordInfo.second), Constant.DrawableResourcesTag, getActivity().getPackageName());
-            if (ImageResourceId == 0)
-                throw new IllegalArgumentException();
+            final String imageName = alphabetDatabase.getImageFileNameById(wordInfo.second);
+            if (imageName == null)
+            {
+                Log.e(LogTag, "Could not to extract image by id: " + wordInfo.second.toString());
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
+
+            final int imageResourceId = DatabaseHelpers.getDrawableIdByName(getResources(), imageName);
+            if (imageResourceId == 0)
+            {
+                Log.e(LogTag, String.format("Could not extract image for name: \"%s\"", imageName));
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
             m_state = new WordGatherState();
-            m_state.imageResourceId = ImageResourceId;
+            m_state.imageResourceId = imageResourceId;
             m_state.word = wordInfo.first.word;
             m_state.currentGather = m_state.word.toCharArray();
             m_state.isExerciseChecked = false;
@@ -179,30 +213,38 @@ public class WordGatherFragment extends Fragment
         }
         else
         {
-            m_state = savedInstanceState.getParcelable(StateTag);
+            m_state = savedInstanceState.getParcelable(InternalStateTag);
         }
 
         m_selectedItemIndex = InvalidIndexSelectionValue;
     }
 
-    private void constructUserInterface(View fragmentView)
+    private void constructUserInterface(@NonNull View fragmentView)
     {
         // process Button onclick listener
         {
-            Button button = (Button) fragmentView.findViewById(R.id.finishButton);
+            final Button button = (Button) fragmentView.findViewById(R.id.finishButton);
             button.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View view)
                 {
-                    onCheckButtonClicked();
+                    try
+                    {
+                        onCheckButtonClicked();
+                    }
+                    catch (CommonException exp)
+                    {
+                        Log.e(LogTag, "Failed to process finish button, exp: " + exp.getMessage());
+                        getActivity().finish();
+                    }
                 }
             });
         }
 
         // Set image hint
         {
-            ImageView imageHint = (ImageView) fragmentView.findViewById(R.id.imageView);
+            final ImageView imageHint = (ImageView) fragmentView.findViewById(R.id.imageView);
             imageHint.setImageDrawable(getResources().getDrawable(m_state.imageResourceId));
         }
 
@@ -219,13 +261,13 @@ public class WordGatherFragment extends Fragment
                     TextView textView = (TextView) layout.findViewById(R.id.textView);
                     textView.setText(((Character)m_state.currentGather[chIndex]).toString());
 
-                    final int CharacterIndex = chIndex;
+                    final int characterIndex = chIndex;
                     layout.setOnClickListener(new View.OnClickListener()
                     {
                         @Override
                         public void onClick(View view)
                         {
-                            onGridElementClicked(CharacterIndex);
+                            onGridElementClicked(characterIndex);
                         }
                     });
 
@@ -236,7 +278,7 @@ public class WordGatherFragment extends Fragment
 
             GridView gridView = (GridView) fragmentView.findViewById(R.id.gridView);
             ViewGroup.LayoutParams gridLayoutParameters = gridView.getLayoutParams();
-            gridLayoutParameters.width =  (int)getResources().getDimension(R.dimen.character_width) * m_gridElements.length;
+            gridLayoutParameters.width =  (int)getResources().getDimension(R.dimen.large_grid_character_width) * m_gridElements.length;
             gridView.setLayoutParams(gridLayoutParameters);
             gridView.setNumColumns(viewAdapter.getCount());
             gridView.setAdapter(viewAdapter);
@@ -268,18 +310,25 @@ public class WordGatherFragment extends Fragment
                 }
             }
 
-            m_gridElements[m_selectedItemIndex].setBackgroundColor(getResources().getColor(android.R.color.transparent));
+            m_gridElements[m_selectedItemIndex].setBackgroundColor(Constant.Color.NoColor);
             m_selectedItemIndex = InvalidIndexSelectionValue;
         }
         else
         {
-            m_gridElements[index].setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+            m_gridElements[index].setBackgroundColor(SelectionColor);
             m_selectedItemIndex = index;
         }
     }
 
-    private void onCheckButtonClicked()
+    private void onCheckButtonClicked() throws CommonException
     {
+        final View fragmentView = getView();
+        if (fragmentView == null)
+        {
+            Log.e(LogTag, "Processing null view");
+            throw new CommonException(CommonResultCode.InvalidInternalState);
+        }
+
         if (m_state.isExerciseChecked)
         {
             int totalScore = 0;
@@ -298,16 +347,16 @@ public class WordGatherFragment extends Fragment
         {
             for (int characterIndex = 0; characterIndex < m_state.currentGather.length; ++characterIndex)
             {
-                final int ColorId = m_state.currentGather[characterIndex] == m_state.word.charAt(characterIndex)
-                        ? android.R.color.holo_green_light : android.R.color.holo_red_light;
+                final int resultColor = m_state.currentGather[characterIndex] == m_state.word.charAt(characterIndex)
+                        ? CorrectSelectionColor : InCorrectSelectionColor;
 
-                m_gridElements[characterIndex].setBackgroundColor(getResources().getColor(ColorId));
+                m_gridElements[characterIndex].setBackgroundColor(resultColor);
             }
         }
 
         // rename "check" button to "finish"
         {
-            Button checkButton = (Button) getView().findViewById(R.id.finishButton);
+            Button checkButton = (Button) fragmentView.findViewById(R.id.finishButton);
             checkButton.setText(getResources().getString(R.string.caption_finish));
         }
 

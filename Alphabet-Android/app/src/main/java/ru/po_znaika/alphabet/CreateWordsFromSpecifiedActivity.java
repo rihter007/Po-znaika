@@ -5,35 +5,72 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.arz_x.CommonException;
 
 import ru.po_znaika.common.IExerciseStepCallback;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
-import ru.po_znaika.server_feedback.IServerFeedback;
-import ru.po_znaika.server_feedback.ServerCacheFeedback;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 public class CreateWordsFromSpecifiedActivity extends Activity implements IExerciseStepCallback, IScoreNotification
 {
-    private static class CreateWordsFromSpecifiedActivityState implements Parcelable
+    private static class ActivityInternalState implements Parcelable
     {
-        public int totalScore;
-        public boolean isExerciseStep;
-
-        public CreateWordsFromSpecifiedActivityState()
+        public enum GameStage
         {
-            this.totalScore = 0;
-            this.isExerciseStep = true;
+            GameIsActive(0),
+            GameIsFinished(1);
+
+            private static final Map<Integer, GameStage> TypesMap = new HashMap<Integer, GameStage>()
+            {
+                {
+                    put(GameIsActive.getValue(), GameIsActive);
+                    put(GameIsFinished.getValue(), GameIsFinished);
+                }
+            };
+
+            public static GameStage getTypeByValue(int value)
+            {
+                return TypesMap.get(value);
+            }
+
+            GameStage(int _value)
+            {
+                m_value = _value;
+            }
+
+            public int getValue()
+            {
+                return m_value;
+            }
+
+            private int m_value;
         }
 
-        public CreateWordsFromSpecifiedActivityState(Parcel _in)
+        public int totalScore;
+        public GameStage stage;
+
+        public ActivityInternalState()
+        {
+            this.totalScore = 0;
+            this.stage = GameStage.GameIsActive;
+        }
+
+        public ActivityInternalState(Parcel _in)
         {
             this.totalScore = _in.readInt();
-            this.isExerciseStep = _in.readByte() > 0;
+            this.stage = GameStage.getTypeByValue(_in.readInt());
         }
 
         @Override
@@ -46,25 +83,38 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
         public void writeToParcel(Parcel container, int flags)
         {
             container.writeInt(this.totalScore);
-            container.writeByte((byte)(this.isExerciseStep ? 1 : 0));
+            container.writeInt(this.stage.getValue());
         }
 
         public static final Creator CREATOR = new Creator()
         {
-            public CreateWordsFromSpecifiedActivityState createFromParcel(Parcel in)
+            public ActivityInternalState createFromParcel(Parcel in)
             {
-                return new CreateWordsFromSpecifiedActivityState(in);
+                return new ActivityInternalState(in);
             }
 
-            public CreateWordsFromSpecifiedActivityState[] newArray(int size)
+            public ActivityInternalState[] newArray(int size)
             {
-                return new CreateWordsFromSpecifiedActivityState[size];
+                return new ActivityInternalState[size];
             }
         };
     }
 
-    private static final String StateTag = "state";
+    private static final String LogTag = CreateWordsFromSpecifiedActivity.class.getName();
+
+    private static final String ExerciseNameTag = "exercise_name";
+    private static final String AlphabetTypeTag = "alphabet_type";
+    private static final String InternalStateTag = "internal_state";
     private static final String FragmentTag = "fragment";
+
+    public static void startActivity(@NonNull Context context, @NonNull String exerciseName, @NonNull AlphabetDatabase.AlphabetType alphabetType)
+    {
+        Intent intent = new Intent(context, CreateWordsFromSpecifiedActivity.class);
+        intent.putExtra(ExerciseNameTag, exerciseName);
+        intent.putExtra(AlphabetTypeTag, alphabetType.getValue());
+
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -74,6 +124,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
 
         try
         {
+            m_serviceLocator = new CoreServiceLocator(this);
             restoreInternalState(savedInstanceState);
             constructUserInterface(savedInstanceState);
         }
@@ -96,53 +147,37 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState)
     {
-        savedInstanceState.putParcelable(StateTag, m_state);
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.putParcelable(InternalStateTag, m_state);
+
+        final FragmentManager fragmentManager = getFragmentManager();
+        final Fragment currentFragment = fragmentManager.findFragmentByTag(FragmentTag);
+        fragmentManager.putFragment(savedInstanceState, FragmentTag, currentFragment);
     }
 
     private void restoreInternalState(Bundle savedInstanceState)
     {
         final Bundle arguments = getIntent().getExtras();
-        m_exerciseId = arguments.getInt(Constant.ExerciseIdTag);
-        m_alphabetType = AlphabetDatabase.AlphabetType.getTypeByValue(arguments.getInt(Constant.AlphabetTypeTag));
+        m_exerciseName = arguments.getString(ExerciseNameTag);
+        m_alphabetType = AlphabetDatabase.AlphabetType.getTypeByValue(arguments.getInt(AlphabetTypeTag));
 
         if (savedInstanceState == null)
-            m_state = new CreateWordsFromSpecifiedActivityState();
+            m_state = new ActivityInternalState();
         else
-            m_state = savedInstanceState.getParcelable(StateTag);
-
-        m_serverFeedback = new ServerCacheFeedback(this);
+            m_state = savedInstanceState.getParcelable(InternalStateTag);
     }
 
     private void constructUserInterface(Bundle savedInstanceState)
     {
-        Fragment currentFragment = null;
+        Fragment currentFragment;
 
         if (savedInstanceState == null)
         {
-            if (m_state.isExerciseStep)
-            {
-                CreateWordsFromSpecifiedFragment createWordsFromSpecifiedFragment = new CreateWordsFromSpecifiedFragment();
-
-                {
-                    Bundle arguments = new Bundle();
-                    arguments.putInt(Constant.AlphabetTypeTag, m_alphabetType.getValue());
-                    createWordsFromSpecifiedFragment.setArguments(arguments);
-                }
-
-                currentFragment = createWordsFromSpecifiedFragment;
-            }
+            if (m_state.stage == ActivityInternalState.GameStage.GameIsActive)
+                currentFragment = CreateWordsFromSpecifiedFragment.createFragment(m_alphabetType);
             else
-            {
-                ScoreFragment scoreFragment = new ScoreFragment();
-
-                {
-                    Bundle arguments = new Bundle();
-                    arguments.putInt(ScoreFragment.ScoreTag, m_state.totalScore);
-                    scoreFragment.setArguments(arguments);
-                }
-
-                currentFragment = scoreFragment;
-            }
+                currentFragment = ScoreFragment.createFragment(m_state.totalScore);
         }
         else
         {
@@ -164,25 +199,42 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     public void setScore(int score)
     {
         m_state.totalScore = score;
-        m_serverFeedback.reportExerciseResult(m_exerciseId, m_state.totalScore);
+    }
+
+    @Override
+    public void repeatExercise()
+    {
+        try
+        {
+            restoreInternalState(null);
+            constructUserInterface(null);
+        }
+        catch (Exception exp)
+        {
+            Log.e(LogTag, String.format("Failed to repeat exercise: \"%s\"", exp.getMessage()));
+            MessageBox.Show(this, "Fatal error", "Fatal error");
+            finish();
+        }
     }
 
     @Override
     public void processNextStep()
     {
-        if (m_state.isExerciseStep)
+        if (m_state.stage == ActivityInternalState.GameStage.GameIsActive)
         {
-            m_state.isExerciseStep = false;
+            m_state.stage = ActivityInternalState.GameStage.GameIsFinished;
 
-            ScoreFragment scoreFragment = new ScoreFragment();
-
+            try
             {
-                Bundle arguments = new Bundle();
-                arguments.putInt(ScoreFragment.ScoreTag, m_state.totalScore);
-                scoreFragment.setArguments(arguments);
+                m_serviceLocator.getExerciseScoreProcessor().reportExerciseScore(m_exerciseName, m_state.totalScore);
+            }
+            catch (CommonException exp)
+            {
+                Log.e(LogTag, String.format("An exception while saving exercise score occurred, exp: \"%s\"", exp.getMessage()));
             }
 
-            ProcessFragment(scoreFragment);
+            final Fragment finishFragment = ExerciseFinishedFragment.createFragment(m_state.totalScore);
+            ProcessFragment(finishFragment);
         }
         else
         {
@@ -196,10 +248,9 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
         finish();
     }
 
-    private int m_exerciseId;
+    private String m_exerciseName;
     private AlphabetDatabase.AlphabetType m_alphabetType;
+    private ActivityInternalState m_state;
 
-    private CreateWordsFromSpecifiedActivityState m_state;
-
-    private IServerFeedback m_serverFeedback;
+    private CoreServiceLocator m_serviceLocator;
 }

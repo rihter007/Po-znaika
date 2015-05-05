@@ -2,7 +2,7 @@ package ru.po_znaika.network;
 
 import android.support.annotation.NonNull;
 
-import ru.po_znaika.common.CommonException;
+import com.arz_x.CommonException;
 
 /**
  * Created by Rihter on 19.01.2015.
@@ -10,6 +10,9 @@ import ru.po_znaika.common.CommonException;
  */
 public interface IAuthenticationProvider
 {
-    AuthenticationToken getAuthenticationToken() throws NetworkException, CommonException;
-    LoginPasswordCredentials getLoginPasswordCredentials() throws CommonException;
+    String getAccountName();
+    AuthenticationToken getAuthenticationToken();
+
+    LoginPasswordCredentials getLoginPasswordCredentials();
+    void setLoginPasswordCredentials(@NonNull String login, @NonNull String password) throws CommonException;
 }

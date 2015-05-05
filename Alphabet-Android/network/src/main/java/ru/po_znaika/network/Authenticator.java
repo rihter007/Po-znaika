@@ -8,8 +8,10 @@ import java.net.SocketException;
 import java.net.URL;
 import java.util.Date;
 
-import ru.po_znaika.common.CommonException;
-import ru.po_znaika.common.CommonResultCode;
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
+import com.arz_x.NetworkException;
+import com.arz_x.NetworkResultCode;
 
 import junit.framework.Assert;
 
@@ -48,7 +50,7 @@ public class Authenticator implements IAuthentication
             final String tokenField = urlConnection.getHeaderField("token");
             final String expirationField = urlConnection.getHeaderField("expiration");
             if ((TextUtils.isEmpty(tokenField)) || (TextUtils.isEmpty(expirationField)))
-                throw new NetworkException(NetworkResultCode.BrokenProtocol);
+                throw new NetworkException(NetworkResultCode.Unknown);
             long utcExpirationDate = 0;
 
             try
@@ -57,7 +59,7 @@ public class Authenticator implements IAuthentication
             }
             catch (NumberFormatException exp)
             {
-                throw new NetworkException(NetworkResultCode.BrokenProtocol);
+                throw new NetworkException(NetworkResultCode.Unknown);
             }
 
             AuthenticationToken token = new AuthenticationToken();
@@ -71,7 +73,7 @@ public class Authenticator implements IAuthentication
         }
         catch (SocketException exp)
         {
-            throw new NetworkException(NetworkResultCode.ConnectionTimeout);
+            throw new NetworkException(NetworkResultCode.Unknown);
         }
         catch (Exception exp)
         {

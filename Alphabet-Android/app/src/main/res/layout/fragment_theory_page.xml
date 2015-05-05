@@ -13,14 +13,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:text="@string/button_previous"
+            android:layout_marginLeft="@dimen/small_margin"
+            android:text="@string/caption_previous"
             android:id="@+id/backButton"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:text="@string/button_next"
+            android:layout_marginRight="@dimen/small_margin"
+            android:text="@string/caption_next"
             android:id="@+id/forwardButton"/>
     </RelativeLayout>
 
@@ -33,18 +35,26 @@
             android:gravity="center_vertical|left">
 
             <ImageView
-                android:layout_width="@dimen/large_image_size"
-                android:layout_height="@dimen/large_image_size"
+                android:layout_width="@dimen/extra_large_image_size"
+                android:layout_height="@dimen/extra_large_image_size"
                 android:id="@+id/theoryImageView"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:scrollbars="vertical"
-                android:layout_gravity="center_horizontal"
-                android:text=""
-                android:id="@+id/theoryTextView"/>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:scrollbars="vertical"
+                    android:singleLine="false"
+                    android:layout_gravity="center_horizontal"
+                    android:text=""
+                    android:id="@+id/theoryTextView"/>
+
+                </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"

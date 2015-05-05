@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "ru.po_znaika.alphabet"
-        minSdkVersion 10
+        minSdkVersion 11
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -20,9 +20,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:21.0.2'
     compile project(':common')
     compile project(':network')
     compile project(':database')
+    compile project(':licensing')
+    compile project(':arz')
 }

@@ -6,26 +6,26 @@ import android.os.Parcelable;
 /**
  * Represents single object description in different aspects
  */
-public class ObjectDescription implements Parcelable
+class ObjectDescription implements Parcelable
 {
-    public int imageResourceIndex;
-    public int soundResourceIndex;
+    public String imageFilePath;
+    public String soundFilePath;
 
     public String name;
 
     public ObjectDescription() {}
 
-    public ObjectDescription(int _imageResourceIndex, int _soundResourceIndex, String _name)
+    public ObjectDescription(String _imageResourceIndex, String _soundResourceIndex, String _name)
     {
-        this.imageResourceIndex = _imageResourceIndex;
-        this.soundResourceIndex = _soundResourceIndex;
+        this.imageFilePath = _imageResourceIndex;
+        this.soundFilePath = _soundResourceIndex;
         this.name = _name;
     }
 
     public ObjectDescription(Parcel _in)
     {
-        this.imageResourceIndex = _in.readInt();
-        this.soundResourceIndex = _in.readInt();
+        this.imageFilePath = _in.readString();
+        this.soundFilePath = _in.readString();
 
         this.name = _in.readString();
     }
@@ -39,8 +39,8 @@ public class ObjectDescription implements Parcelable
     @Override
     public void writeToParcel(Parcel container, int flags)
     {
-        container.writeInt(this.imageResourceIndex);
-        container.writeInt(this.soundResourceIndex);
+        container.writeString(this.imageFilePath);
+        container.writeString(this.soundFilePath);
         container.writeString(this.name);
     }
 

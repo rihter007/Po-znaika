@@ -1,8 +1,5 @@
 package ru.po_znaika.alphabet;
 
-import java.io.IOException;
-import java.lang.String;
-
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
@@ -10,19 +7,187 @@ import java.util.TreeMap;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.util.Log;
+
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
 
 import ru.po_znaika.common.IExercise;
-import ru.po_znaika.database.alphabet.AlphabetDatabase;
+import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
+import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
+import ru.po_znaika.licensing.LicenseType;
+import ru.po_znaika.network.LoginPasswordCredentials;
+import com.arz_x.NetworkException;
+import com.arz_x.NetworkResultCode;
 
 public class MainMenuActivity extends ActionBarActivity
 {
+    private static final String LogTag = "MainMenuActivity";
+
+    private class LicenseProcessingTask extends AsyncTask<String, Integer, LicenseType>
+    {
+        @Override
+        protected LicenseType doInBackground(String... credentialParts)
+        {
+            try
+            {
+                m_serviceLocator.getExerciseScoreProcessor().syncCache();
+            }
+            catch (CommonException | NetworkException exp)
+            {
+                if ((exp instanceof  NetworkException) &&
+                        (((NetworkException)exp).getResultCode() == NetworkResultCode.AuthenticationError))
+                {
+                    m_serviceLocator.getExerciseScoreProcessor().clearCache();
+                }
+                else
+                {
+                    m_networkErrorCode = NetworkResultCode.NoConnection;
+                    return null;
+                }
+            }
+
+            LoginPasswordCredentials credentials = new LoginPasswordCredentials();
+            credentials.login = credentialParts[0];
+            credentials.password = credentialParts[1];
+
+            try
+            {
+                m_serviceLocator.getAuthenticationProvider().setLoginPasswordCredentials(credentials.login, credentials.password);
+                final LicenseType accountLicense = m_serviceLocator.getLicensing().getCurrentLicenseInfo(credentials);
+                return accountLicense;
+            }
+            catch (NetworkException exp)
+            {
+                Log.e(LogTag, "License processing network exception: " + exp.getMessage());
+                m_networkErrorCode = exp.getResultCode();
+            }
+            catch (CommonException exp)
+            {
+                Log.e(LogTag, "License processing common exception: " + exp.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(LicenseType accountLicense)
+        {
+            Resources resources = getResources();
+            if (accountLicense != null)
+            {
+                if (!LicenseType.isActive(accountLicense))
+                {
+                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_no_active_license),
+                            resources.getString(R.string.alert_title));
+                    return;
+                }
+
+                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_application_activated),
+                        resources.getString(R.string.alert_title));
+                return;
+            }
+
+            switch (m_networkErrorCode)
+            {
+                case AuthenticationError:
+                {
+                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_login_password_incorrect),
+                            resources.getString(R.string.alert_title));
+                    return;
+                }
+
+                case Unknown:
+                case NoConnection:
+                {
+                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_no_connection),
+                            resources.getString(R.string.alert_title));
+                    return;
+                }
+            }
+            if (m_commonErrorCode == CommonResultCode.InvalidArgument)
+            {
+                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_bad_credentials),
+                        resources.getString(R.string.alert_title));
+                return;
+            }
+
+            MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.failed_action),
+                    resources.getString(R.string.alert_title));
+        }
+
+        private CommonResultCode m_commonErrorCode;
+        private NetworkResultCode m_networkErrorCode;
+    }
+
+    private class ExerciseStartTask extends AsyncTask<Void, Integer, LicenseType>
+    {
+        public ExerciseStartTask(int selectedMenuPosition)
+        {
+            m_selectedMenuPosition = selectedMenuPosition;
+        }
+
+        @Override
+        protected LicenseType doInBackground(Void... params)
+        {
+            try
+            {
+                return m_serviceLocator.getLicensing().getCurrentLicenseInfo();
+            }
+            catch (CommonException | NetworkException exp)
+            {
+                Log.i(LogTag, "Licensing get exception message: " + exp.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(LicenseType licenseType)
+        {
+            // TODO: remove in future!!! hack for testing
+            if (isTestUser())
+                licenseType = LicenseType.Commercial;
+
+            if (!LicenseType.isActive(licenseType))
+            {
+                Resources resources = getResources();
+                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_no_license),
+                        resources.getString(R.string.alert_title));
+                return;
+            }
+
+            if (m_selectedMenuPosition == 0)
+            {
+                // ABC-book is selected
+                CharacterExerciseMenuActivity.startActivity(MainMenuActivity.this);
+            }
+            else
+            {
+                m_menuExercises.get(m_selectedMenuPosition - 1).process();
+            }
+        }
+
+        private int m_selectedMenuPosition;
+    }
+
+    private boolean isTestUser()
+    {
+        final LoginPasswordCredentials credentials = m_serviceLocator.getAuthenticationProvider().getLoginPasswordCredentials();
+        if ((credentials != null) && (credentials.login.equalsIgnoreCase("test")))
+            return true;
+        return false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -31,54 +196,78 @@ public class MainMenuActivity extends ActionBarActivity
 
         try
         {
-            restoreInternalState(savedInstanceState);
+            m_serviceLocator = new CoreServiceLocator(this);
+            restoreInternalState();
             constructUserInterface();
+        }
+        catch (CommonException exp)
+        {
+            MessageBox.Show(this, exp.getMessage(), getResources().getString(R.string.assert_error));
         }
         catch (Exception exp)
         {
-            MessageBox.Show(this, exp.getMessage(), exp.getMessage());
+            Log.e(MainMenuActivity.class.getName(), "onCreate: Unknown exception occurred");
+            MessageBox.Show(this, exp.getMessage(), getResources().getString(R.string.assert_error));
         }
     }
 
-    void restoreInternalState(Bundle savedInstanceState) throws IOException
+    @Override
+    protected void onDestroy()
     {
-        m_alphabetDatabase = new AlphabetDatabase(this, false);
-        m_exerciseFactory = new ExerciseFactory(this, m_alphabetDatabase);
+        super.onDestroy();
+        m_serviceLocator.close();
+    }
+
+    void restoreInternalState() throws CommonException
+    {
+        // Print account name
+        {
+            final String accountName = m_serviceLocator.getAuthenticationProvider().getAccountName();
+            if (!TextUtils.isEmpty(accountName))
+            {
+                // TODO:
+            }
+        }
+
+        ExerciseFactory exerciseFactory = new ExerciseFactory(this, m_serviceLocator.getAlphabetDatabase());
 
         // contains processed exercises in sorted order
-        Map<String, ArrayList<IExercise>> collectedExercises = new TreeMap<String, ArrayList<IExercise>>();
+        Map<String, ArrayList<IExercise>> collectedExercises = new TreeMap<>();
 
         // contains all exercises
-        AlphabetDatabase.ExerciseShortInfo[] exercisesShortInfo = m_alphabetDatabase.getAllExercisesShortInfoNotByType(AlphabetDatabase.ExerciseType.Character);
+        AlphabetDatabase.ExerciseShortInfo[] exercisesShortInfo = m_serviceLocator.getAlphabetDatabase().getAllExercisesShortInfoExceptType(AlphabetDatabase.ExerciseType.Character);
         if (exercisesShortInfo != null)
         {
             for (AlphabetDatabase.ExerciseShortInfo exerciseInfo : exercisesShortInfo)
             {
-                IExercise exercise = m_exerciseFactory.CreateExerciseFromId(exerciseInfo.id, exerciseInfo.type);
+                IExercise exercise = exerciseFactory.CreateExerciseFromId(exerciseInfo.id, exerciseInfo.type);
                 if (exercise != null)
                 {
-                    // Set tracer
-
                     final String exerciseDisplayName = exercise.getDisplayName();
+
                     // Add exercise to list
-                    ArrayList<IExercise> displayNameExercises = null;
+                    ArrayList<IExercise> displayNameExercises;
                     if (collectedExercises.containsKey(exerciseDisplayName))
                     {
                         displayNameExercises = collectedExercises.get(exerciseDisplayName);
                     }
                     else
                     {
-                        displayNameExercises = new ArrayList<IExercise>();
+                        displayNameExercises = new ArrayList<>();
                         collectedExercises.put(exerciseDisplayName, displayNameExercises);
                     }
 
                     displayNameExercises.add(exercise);
                 }
+                else
+                {
+                    Log.e(MainMenuActivity.class.getName(), String.format("Failed to create exercise with id \"%d\"", exerciseInfo.id));
+                }
             }
         }
 
         // Place exercises in sorted order
-        m_menuExercises = new ArrayList<IExercise>();
+        m_menuExercises = new ArrayList<>();
         for (Map.Entry<String, ArrayList<IExercise>> sortedExercise : collectedExercises.entrySet())
         {
             m_menuExercises.addAll(sortedExercise.getValue());
@@ -118,16 +307,7 @@ public class MainMenuActivity extends ActionBarActivity
     {
         try
         {
-            if (itemSelectedIndex == 0)
-            {
-                // ABC-book is selected
-                Intent intent = new Intent(this, CharacterExerciseMenuActivity.class);
-                startActivity(intent);
-            }
-            else
-            {
-                m_menuExercises.get(itemSelectedIndex - 1).process();
-            }
+            new ExerciseStartTask(itemSelectedIndex).execute();
         }
         catch (Exception exp)
         {
@@ -151,9 +331,45 @@ public class MainMenuActivity extends ActionBarActivity
         switch (SelectedItemId)
         {
             case R.id.action_diary:
+            {
                 Intent intent = new Intent(this, DiaryActivity.class);
                 startActivity(intent);
-                break;
+            }
+            break;
+
+            case R.id.action_authorization:
+            {
+                final Resources resources = getResources();
+                final View signInDialog = getLayoutInflater().inflate(R.layout.dialog_signin, null);
+                AlertDialogHelper.showAlertDialog(this
+                        , signInDialog
+                        , resources.getString(R.string.caption_authorize)
+                        , resources.getString(R.string.caption_cancel)
+                        , new AlertDialogHelper.IDialogResultListener()
+                        {
+                            @Override
+                            public void onDialogProcessed(@NonNull AlertDialogHelper.DialogResult dialogResult)
+                            {
+                                if (dialogResult != AlertDialogHelper.DialogResult.PositiveSelected)
+                                    return;
+
+                                EditText loginText = (EditText) signInDialog.findViewById(R.id.loginEditText);
+                                EditText passwordText = (EditText) signInDialog.findViewById(R.id.passwordEditText);
+
+                                if ((loginText.length() == 0) || (passwordText.length() == 0))
+                                {
+                                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_login_password_not_empty),
+                                            resources.getString(R.string.alert_title));
+                                    return;
+                                }
+
+                                new LicenseProcessingTask().execute(loginText.getText().toString(),
+                                        passwordText.getText().toString());
+                            }
+                        }
+                );
+            }
+            break;
 
             case R.id.action_about:
                 break;
@@ -162,8 +378,6 @@ public class MainMenuActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private AlphabetDatabase m_alphabetDatabase;
-    private ExerciseFactory m_exerciseFactory;
-
+    private CoreServiceLocator m_serviceLocator;
     private List<IExercise> m_menuExercises;
 }
