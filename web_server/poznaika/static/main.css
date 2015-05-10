@@ -1,0 +1,64 @@
+.header {
+   width:100%;
+   background-color:#639EB9;
+   border:red;
+   color:#C2DEEB;
+   font-family:'Arial';
+}
+
+.footer {
+   width:100%;
+   background-color:#36708F;
+   border:red;
+   color:#C2DEEB;
+   font-family:'Arial';
+}
+
+.menu_link {
+   color:white;
+   font-family:'Arial';
+}
+
+
+#header {
+   width:98%;
+   font-size: 14pt;
+   border: thin solid red;
+}
+#logo {
+   float: left;
+   width: 200px;
+   height: 80px;
+   border: thin solid blue;
+}
+#menu {
+   height: 80px;
+   margin-left: 220px;
+   text-align: center;
+   font-size: 24pt;
+   text-decoration: underline;
+   border: thin solid olive;
+}
+
+#years {
+   float: left;
+   width: 300px;
+   height: 49%;
+   border: thin solid lightgreen;
+}
+#footer {
+   position:absolute; bottom: 0px; width:300px;
+   border: thin solid black;
+}
+
+#map_area {
+   margin-left: 320px;
+   height:79%;
+   position:relative; bottom: 0px;
+   border: thin solid yellow;
+}
+
+#map_canvas {
+   height:100%;
+   border: thin solid brown;
+}

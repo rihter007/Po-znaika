@@ -1,16 +1,23 @@
+<!DOCTYPE html>
 <html>
 
 {% load staticfiles %}
 
 <head>
+
+<link rel="stylesheet" type="text/css" href="{% static "main.css" %}" />
+
 <title>Познайка - {% block title %}{% endblock %}</title>
 <style type="text/css">
   .errorlist { color: red }
+}
+
+}
 </style>
+
 </head>
 
-<!-- #639EB9 -->
-<body bgcolor=#DAF1FB text=#5F5760 link=white vlink=white>
+<body bgcolor=#DAF1FB text=#5F5760 link=#107DAF vlink=#107DAF>
 
 {% include "header.html" %}
 {% include "menu.html" %}

@@ -84,7 +84,7 @@ USE_TZ = False # to avoid 'naive' warning
 STATIC_URL = '/static/'
 #STATIC_ROOT = 'D:\Basil\Git\Pzn-site\poznaika\static'
 #STATIC_URL = 'http://localhost/'
-STATICFILES_DIRS = (r'D:\Basil\Git\Pzn-site\poznaika\static',)
+STATICFILES_DIRS = (r'poznaika/static',)
 
 DEFAULT_CHARSET = "utf-8"
 FILE_CHARSET = "windows-1251"
