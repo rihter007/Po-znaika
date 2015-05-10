@@ -5,6 +5,7 @@ admin.autodiscover()
 
 from django.contrib import auth
 from django.contrib.auth.views import login, logout
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = patterns('',
     # Examples:
@@ -13,7 +14,11 @@ urlpatterns = patterns('',
     
     url(r'^$', 'poznaika.start.views.StartPage'),
     url(r'^products/$', 'poznaika.products.views.ProductsPage'),
-    url(r'^company/$', 'poznaika.company.views.CompanyPage'),
+    url(r'^contacts/$', 'poznaika.company.views.ContactsPage'),
+    url(r'^about/$', 'poznaika.company.views.AboutPage'),
     
     (r'^accounts/', include('poznaika.accounts.urls')),
 )
+
+#if settings.DEBUG:
+urlpatterns += staticfiles_urlpatterns()

@@ -4,5 +4,8 @@ from django.shortcuts import render_to_response
 
 # Create your views here.
 
-def CompanyPage(request):
-   return render_to_response('company.html')
+def ContactsPage(request):
+   return render_to_response('contacts.html')
+   
+def AboutPage(request):
+   return render_to_response('about.html')
