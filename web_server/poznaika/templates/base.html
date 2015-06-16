@@ -17,12 +17,22 @@
 
 </head>
 
-<body bgcolor=#DAF1FB text=#5F5760 link=#107DAF vlink=#107DAF>
+<body bgcolor=#DAF1FB text=#5F5760 link=#107DAF vlink=#107DAF
+    leftmargin=0 rightmargin=0 topmargin=0>
 
 {% include "header.html" %}
 {% include "menu.html" %}
 
+<table border=0 width=100%>
+<TR>
+<TD width=10%/>
+
+<TD>
 {% block content %} {% endblock %}
+</TD>
+
+<TD width=10%/>
+</table>
 
 {% include "footer.html" %}
 
