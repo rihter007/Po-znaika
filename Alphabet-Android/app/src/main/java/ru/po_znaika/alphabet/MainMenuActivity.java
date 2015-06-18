@@ -5,36 +5,35 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.util.Log;
+import android.widget.ImageView;
 
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
+import com.arz_x.NetworkException;
+import com.arz_x.NetworkResultCode;
+import com.arz_x.tracer.ProductTracer;
+import com.arz_x.tracer.TraceLevel;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.product_tracer.FileTracerInstance;
 
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.licensing.LicenseType;
 import ru.po_znaika.network.LoginPasswordCredentials;
-import com.arz_x.NetworkException;
-import com.arz_x.NetworkResultCode;
-import com.arz_x.android.product_tracer.FileTracerInstance;
-import com.arz_x.tracer.TraceLevel;
 
-public class MainMenuActivity extends ActionBarActivity
+public class MainMenuActivity extends Activity
 {
     public static void startActivity(@NonNull Context context)
     {
@@ -78,12 +77,12 @@ public class MainMenuActivity extends ActionBarActivity
             }
             catch (NetworkException exp)
             {
-                Log.e(LogTag, "License processing network exception: " + exp.getMessage());
+                //Log.e(LogTag, "License processing network exception: " + exp.getMessage());
                 m_networkErrorCode = exp.getResultCode();
             }
             catch (CommonException exp)
             {
-                Log.e(LogTag, "License processing common exception: " + exp.getMessage());
+                //Log.e(LogTag, "License processing common exception: " + exp.getMessage());
                 m_commonErrorCode = exp.getResultCode();
             }
             return null;
@@ -162,7 +161,7 @@ public class MainMenuActivity extends ActionBarActivity
             }
             catch (CommonException | NetworkException exp)
             {
-                Log.i(LogTag, "Licensing get exception message: " + exp.getMessage());
+                //Log.i(LogTag, "Licensing get exception message: " + exp.getMessage());
             }
             return null;
         }
@@ -208,26 +207,35 @@ public class MainMenuActivity extends ActionBarActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
+        setRequestedOrientation(getResources().getDimension(R.dimen.orientation_flag) == 0 ?
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         try
         {
+            m_tracer = TracerHelper.continueOrCreateFileTracer(this, savedInstanceState);
+
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onCreate");
+
             m_serviceLocator = new CoreServiceLocator(this);
             restoreInternalState();
             constructUserInterface();
         }
-        catch (CommonException exp)
+        catch (Throwable exp)
         {
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
+
             AlertDialogHelper.showMessageBox(this,
                     getResources().getString(R.string.assert_error),
                     exp.getMessage());
         }
-        catch (Exception exp)
-        {
-            Log.e(MainMenuActivity.class.getName(), "onCreate: Unknown exception occurred");
-            AlertDialogHelper.showMessageBox(this,
-                    getResources().getString(R.string.assert_error),
-                    exp.getMessage());
-        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle savedInstance)
+    {
+        super.onSaveInstanceState(savedInstance);
+        ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "onSaveInstance");
+        m_tracer.saveInstance(savedInstance);
     }
 
     @Override
@@ -239,16 +247,7 @@ public class MainMenuActivity extends ActionBarActivity
 
     void restoreInternalState() throws CommonException
     {
-        // Print account name
-        {
-            final String accountName = m_serviceLocator.getAuthenticationProvider().getAccountName();
-            if (!TextUtils.isEmpty(accountName))
-            {
-                // TODO:
-            }
-        }
-
-        ExerciseFactory exerciseFactory = new ExerciseFactory(this, m_serviceLocator.getAlphabetDatabase());
+        final ExerciseFactory exerciseFactory = new ExerciseFactory(this, m_serviceLocator.getAlphabetDatabase());
 
         // contains processed exercises in sorted order
         Map<String, ArrayList<IExercise>> collectedExercises = new TreeMap<>();
@@ -280,7 +279,10 @@ public class MainMenuActivity extends ActionBarActivity
                 }
                 else
                 {
-                    Log.e(MainMenuActivity.class.getName(), String.format("Failed to create exercise with id \"%d\"", exerciseInfo.id));
+                    ProductTracer.traceMessage(m_tracer
+                            , TraceLevel.Error
+                            , LogTag
+                            , String.format("Failed to create exercise with id \"%d\"", exerciseInfo.id));
                 }
             }
         }
@@ -295,31 +297,30 @@ public class MainMenuActivity extends ActionBarActivity
 
     private void constructUserInterface()
     {
-        ListView uiListView = (ListView) findViewById(R.id.menuListView);
-        uiListView.setAdapter(null);
-
-       ImageTextAdapter listViewItemsAdapter = new ImageTextAdapter(this, R.layout.large_image_menu_item);
-
-        // add first element - alphabet
         {
-            Resources resources = getResources();
-            listViewItemsAdapter.add(resources.getDrawable(R.drawable.alphabet), resources.getString(R.string.caption_abc_book));
-        }
-
-        for (IExercise currentExercise : m_menuExercises)
-        {
-            listViewItemsAdapter.add(currentExercise.getDisplayImage(), currentExercise.getDisplayName());
-        }
-
-        uiListView.setAdapter(listViewItemsAdapter);
-        uiListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long rowId)
+            ImageView abcBookImageView = (ImageView)findViewById(R.id.abcBookImageView);
+            abcBookImageView.setOnClickListener(new View.OnClickListener()
             {
-                onListViewItemSelected((int)rowId);
-            }
-        });
+                @Override
+                public void onClick(View v)
+                {
+                    ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onClick(): abcBookImageView");
+                }
+            });
+        }
+
+        {
+            ImageView backImageView = (ImageView)findViewById(R.id.backImageView);
+            backImageView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onClick(): backImageView");
+                    finish();
+                }
+            });
+        }
     }
 
     private void onListViewItemSelected(int itemSelectedIndex)
@@ -330,17 +331,17 @@ public class MainMenuActivity extends ActionBarActivity
         }
         catch (Exception exp)
         {
-            m_tracer.traceMessage(TraceLevel.Error, String.format("Failed to start exercise task: \"%d\" is selected, " +
-                    "exception message: \"%s\"", itemSelectedIndex, exp.getMessage()));
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
 
-            Resources resources = getResources();
+            final Resources resources = getResources();
             AlertDialogHelper.showMessageBox(this,
                     resources.getString(R.string.alert_title),
                     resources.getString(R.string.failed_exercise_start));
         }
     }
 
-    @Override
+
+    //@Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -348,7 +349,7 @@ public class MainMenuActivity extends ActionBarActivity
         return true;
     }
 
-    @Override
+    //@Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         final int selectedItemId = item.getItemId();
@@ -406,7 +407,7 @@ public class MainMenuActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private CoreServiceLocator m_serviceLocator;
     private FileTracerInstance m_tracer;
+    private CoreServiceLocator m_serviceLocator;
     private List<IExercise> m_menuExercises;
 }

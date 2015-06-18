@@ -2,50 +2,76 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".MainMenuActivity"
-    android:background="#ff87e100">
+    android:background="@drawable/main_menu_background">
 
 
-    <!--TextView
-        android:text="@string/hello_world"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView" /-->
+    <ImageView
+        android:layout_width="@dimen/main_menu_sun_image_size"
+        android:layout_height="@dimen/main_menu_sun_image_size"
+        android:id="@+id/sunImageView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/small_margin"
+        android:src="@drawable/main_menu_sun"/>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true">
+    <ImageView
+        android:layout_width="@dimen/main_menu_settings_image_width"
+        android:layout_height="@dimen/main_menu_settings_image_height"
+        android:id="@+id/settingsImageView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="@dimen/small_margin"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        android:src="@drawable/main_menu_settings"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/main_menu_caption"
-            android:textSize="@dimen/medium_text_size"
-            android:id="@+id/menuCaptionTextView"
-            android:textStyle="italic"/>
+    <ImageView
+        android:layout_width="@dimen/main_menu_large_cloud_image_width"
+        android:layout_height="@dimen/main_menu_large_cloud_image_height"
+        android:id="@+id/abcBookImageView"
+        android:layout_below="@+id/settingsImageView"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/main_menu_abc_book"
+        android:clickable="true"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text=""
-            android:id="@+id/textView"
-            android:textStyle="italic"
-            android:background="#fffffc00"/>
+    <ImageView
+        android:layout_width="@dimen/main_menu_large_cloud_image_width"
+        android:layout_height="@dimen/main_menu_large_cloud_image_height"
+        android:id="@+id/wordGatherImageView"
+        android:src="@drawable/main_menu_words_gather"
+        android:layout_below="@+id/abcBookImageView"
+        android:layout_toLeftOf="@+id/sunImageView"
+        android:layout_toStartOf="@+id/sunImageView"
+        android:layout_marginTop="@dimen/main_menu_word_gather_image_margin_top"
+        android:clickable="true"/>
 
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/menuListView"
-            android:background="#ffffffff">
+    <ImageView
+        android:layout_width="@dimen/main_menu_large_cloud_image_width"
+        android:layout_height="@dimen/main_menu_large_cloud_image_height"
+        android:id="@+id/createWordsImageView"
+        android:src="@drawable/main_menu_create_words"
+        android:layout_below="@+id/wordGatherImageView"
+        android:layout_toRightOf="@+id/settingsImageView"
+        android:layout_toEndOf="@+id/settingsImageView"
+        android:layout_marginTop="@dimen/small_margin"
+        android:clickable="true"/>
 
-            </ListView>
-    </LinearLayout>
+    <ImageView
+        android:layout_width="@dimen/main_menu_back_image_size"
+        android:layout_height="@dimen/main_menu_back_image_size"
+        android:id="@+id/backImageView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="@dimen/medium_margin"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginLeft="@dimen/small_margin"
+        android:src="@drawable/arrow_back"
+        android:clickable="true"/>
+
+
 </RelativeLayout>

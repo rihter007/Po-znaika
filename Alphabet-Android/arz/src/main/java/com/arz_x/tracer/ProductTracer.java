@@ -59,6 +59,21 @@ public class ProductTracer
                 traceMessage += String.format(" message: '%s", exceptionMessage);
         }
 
+        final StackTraceElement[] callStack = exception.getStackTrace();
+        if (callStack != null)
+        {
+            final int elementsCount = Math.min(5, callStack.length);
+            for (int elementIndex = 0; elementIndex < elementsCount; ++elementIndex)
+            {
+                final StackTraceElement stackElement = callStack[elementIndex];
+                traceMessage += String.format("\n [%s:%s] %s:%s"
+                        , stackElement.getFileName()
+                        , stackElement.getLineNumber()
+                        , stackElement.getClassName()
+                        , stackElement.getMethodName());
+            }
+        }
+
         tracer.traceMessage(traceLevel, traceMessage);
     }
 

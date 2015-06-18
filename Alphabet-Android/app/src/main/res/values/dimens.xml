@@ -19,8 +19,10 @@
     <dimen name="small_button_size">150dp</dimen>
     <dimen name="single_character_width">25dp</dimen>
 
+    <!--0 - vertical orientation, 1 - horizontal orientation-->
+    <dimen name="orientation_flag">0dp</dimen>
 
-    <!-- Start activity sized -->
+    <!-- Start activity sizes -->
     <dimen name="start_activity_top_margin">20dp</dimen>
 
     <dimen name="start_activity_sun_image_size">200dp</dimen>
@@ -39,5 +41,18 @@
 
     <dimen name="start_activity_settings_image_size">60dp</dimen>
     <dimen name="start_activity_settings_margin_bottom">15dp</dimen>
+
+    <!-- Main menu activity sizes -->
+    <dimen name="main_menu_sun_image_size">180dp</dimen>
+
+    <dimen name="main_menu_settings_image_width">120dp</dimen>
+    <dimen name="main_menu_settings_image_height">90dp</dimen>
+
+    <dimen name="main_menu_large_cloud_image_width">180dp</dimen>
+    <dimen name="main_menu_large_cloud_image_height">120dp</dimen>
+
+    <dimen name="main_menu_word_gather_image_margin_top">45dp</dimen>
+
+    <dimen name="main_menu_back_image_size">60dp</dimen>
 
 </resources>

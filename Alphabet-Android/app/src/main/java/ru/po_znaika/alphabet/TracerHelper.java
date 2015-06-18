@@ -41,7 +41,7 @@ public class TracerHelper
                 , getTracesDirectory(context));
     }
 
-    public static FileTracerInstance continueOrCreateFileTracer(String internalStorage, Bundle savedInstance)
+    public static FileTracerInstance continueOrCreateFileTracer(@NonNull Context context, Bundle savedInstance)
             throws CommonException
     {
         if (savedInstance != null)
@@ -59,6 +59,6 @@ public class TracerHelper
         return FileTracerInstance.getExistingTracerInstanceOrCreate(Constant.Tracer.MaxTraceFilesCount
                 , Constant.Tracer.MaxTraceFileSize
                 , Constant.Tracer.MinTraceLevel
-                , new File(internalStorage, Constant.Tracer.TraceDirectory).getAbsolutePath());
+                , new File(getTracesDirectory(context), Constant.Tracer.TraceDirectory).getAbsolutePath());
     }
 }

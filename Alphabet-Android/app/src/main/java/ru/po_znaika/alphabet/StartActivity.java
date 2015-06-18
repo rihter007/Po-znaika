@@ -1,6 +1,7 @@
 package ru.po_znaika.alphabet;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,6 +23,8 @@ public class StartActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        setRequestedOrientation(getResources().getDimension(R.dimen.orientation_flag) == 0 ?
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         try
         {
