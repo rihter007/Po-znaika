@@ -23,10 +23,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import com.arz_x.CommonException;
+import com.arz_x.android.AlertDialogHelper;
 
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
-import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
 
 /**
  * A fragment for the Game: Create sub words from the given
@@ -194,8 +194,10 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         catch (Exception exp)
         {
             Resources resources = getResources();
-            AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.failed_exercise_start),
-                    resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
+            AlertDialogHelper.showMessageBox(getActivity(),
+                    resources.getString(R.string.alert_title),
+                    resources.getString(R.string.failed_exercise_start),
+                    false, new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i)
@@ -203,7 +205,6 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
                             getActivity().finish();
                         }
                     });
-            msgBox.show();
         }
 
         return fragmentView;
@@ -507,9 +508,9 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
             if (!isWordCorrect)
             {
                 Resources resources = getResources();
-                AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.alert_incorrect_word_creation),
-                        resources.getString(R.string.alert_title), false, null);
-                msgBox.show();
+                AlertDialogHelper.showMessageBox(getActivity(),
+                        resources.getString(R.string.alert_title),
+                        resources.getString(R.string.alert_incorrect_word_creation));
                 return;
             }
         }
@@ -518,16 +519,18 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         if (subWordIndex == -1)
         {
             Resources resources = getResources();
-            MessageBox.Show(getActivity(), resources.getString(R.string.alert_incorrect_word_creation),
-                    resources.getString(R.string.alert_title));
+            AlertDialogHelper.showMessageBox(getActivity(),
+                    resources.getString(R.string.alert_title),
+                    resources.getString(R.string.alert_incorrect_word_creation));
             return;
         }
 
         if (m_state.foundSubWords.contains(subWordIndex))
         {
             Resources resources = getResources();
-            MessageBox.Show(getActivity(), resources.getString(R.string.alert_word_already_exists),
-                    resources.getString(R.string.alert_title));
+            AlertDialogHelper.showMessageBox(getActivity(),
+                    resources.getString(R.string.alert_title),
+                    resources.getString(R.string.alert_word_already_exists));
             return;
         }
 

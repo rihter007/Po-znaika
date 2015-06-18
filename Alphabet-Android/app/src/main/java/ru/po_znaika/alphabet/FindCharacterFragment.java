@@ -18,8 +18,9 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.arz_x.android.AlertDialogHelper;
+
 import ru.po_znaika.common.IExerciseStepCallback;
-import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
 
 /**
  * Fragment for selecting specified character in text exercise

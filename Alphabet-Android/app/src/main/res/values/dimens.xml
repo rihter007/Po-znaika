@@ -18,4 +18,26 @@
     <dimen name="medium_list_view_width">400dp</dimen>
     <dimen name="small_button_size">150dp</dimen>
     <dimen name="single_character_width">25dp</dimen>
+
+
+    <!-- Start activity sized -->
+    <dimen name="start_activity_top_margin">20dp</dimen>
+
+    <dimen name="start_activity_sun_image_size">200dp</dimen>
+
+    <dimen name="start_activity_hello_pupil_image_width">90dp</dimen>
+    <dimen name="start_activity_hello_pupil_image_height">60dp</dimen>
+    <dimen name="start_activity_hello_pupil_margin_left">25dp</dimen>
+
+    <dimen name="start_activity_play_image_width">200dp</dimen>
+    <dimen name="start_activity_play_image_height">120dp</dimen>
+
+    <dimen name="start_activity_parents_image_size">150dp</dimen>
+
+    <dimen name="start_activity_exit_image_size">150dp</dimen>
+    <dimen name="start_activity_exit_margin_bottom">80dp</dimen>
+
+    <dimen name="start_activity_settings_image_size">60dp</dimen>
+    <dimen name="start_activity_settings_margin_bottom">15dp</dimen>
+
 </resources>

@@ -1,7 +1,6 @@
 package ru.po_znaika.alphabet;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -19,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.arz_x.CommonException;
+import com.arz_x.android.AlertDialogHelper;
 
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -131,16 +131,17 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
         catch (Exception exp)
         {
             Resources resources = getResources();
-            AlertDialog msgBox = MessageBox.CreateDialog(this, resources.getString(R.string.failed_exercise_start),
-                    resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
+            AlertDialogHelper.showMessageBox(this,
+                    resources.getString(R.string.alert_title),
+                    resources.getString(R.string.failed_exercise_start),
+                    false, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i)
                     {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i)
-                        {
-                            finish();
-                        }
-                    });
-            msgBox.show();
+                        finish();
+                    }
+                });
         }
     }
 
@@ -212,7 +213,10 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
         catch (Exception exp)
         {
             Log.e(LogTag, String.format("Failed to repeat exercise: \"%s\"", exp.getMessage()));
-            MessageBox.Show(this, "Fatal error", "Fatal error");
+            Resources resources = getResources();
+            AlertDialogHelper.showMessageBox(this,
+                    resources.getString(R.string.alert_title),
+                    resources.getString(R.string.alert_unknown_error));
             finish();
         }
     }

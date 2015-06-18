@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.arz_x.android.product_tracer" >
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name" >
+        <activity
+            android:name="com.arz_x.android.product_tracer.TraceActivity"
+            android:label="@string/title_activity_trace" >
+        </activity>
+    </application>
+
+</manifest>

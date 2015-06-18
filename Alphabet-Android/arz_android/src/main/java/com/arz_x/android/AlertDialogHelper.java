@@ -1,4 +1,4 @@
-package ru.po_znaika.common.ru.po_znaika.common.helpers;
+package com.arz_x.android;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -12,13 +12,13 @@ import android.view.View;
  */
 public final class AlertDialogHelper
 {
-    public static enum DialogResult
+    public enum DialogResult
     {
         PositiveSelected,
         NegativeSelected
     }
 
-    public static interface IDialogResultListener
+    public interface IDialogResultListener
     {
         void onDialogProcessed(@NonNull DialogResult dialogResult);
     }
@@ -40,6 +40,8 @@ public final class AlertDialogHelper
         private DialogResult m_result;
         private IDialogResultListener m_listener;
     }
+
+    private static final String OkButtonCaption = "OK";
 
     public static void showAlertDialog(@NonNull Context context, View dialogView,
                                        String positiveButtonCaption, String negativeButtonCaption,
@@ -70,5 +72,28 @@ public final class AlertDialogHelper
         dialogBuilder.setPositiveButton(positiveButtonCaption, positiveButtonClicker);
         dialogBuilder.setNegativeButton(negativeButtonCaption, negativeButtonClicker);
         dialogBuilder.show();
+    }
+
+    public static void showMessageBox(@NonNull Context context, String title, String message)
+    {
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(context);
+
+        dlgAlert.setMessage(message);
+        dlgAlert.setTitle(title);
+        dlgAlert.setPositiveButton(OkButtonCaption, null);
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
+    }
+
+    public static void showMessageBox(@NonNull Context context,String message, String title,
+                                           boolean isCancelable, DialogInterface.OnClickListener okButtonListener)
+    {
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(context);
+
+        dlgAlert.setMessage(message);
+        dlgAlert.setTitle(title);
+        dlgAlert.setPositiveButton(OkButtonCaption, okButtonListener);
+        dlgAlert.setCancelable(isCancelable);
+        dlgAlert.create().show();
     }
 }

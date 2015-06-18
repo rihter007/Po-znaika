@@ -4,17 +4,24 @@ package com.arz_x;
  * Created by Rihter on 18.01.2015.
  * Represents the exception that can be thrown by network library
  */
-public class NetworkException extends Exception
+public class NetworkException extends ResultCodeException
 {
     public NetworkException(NetworkResultCode resultCode)
     {
-        m_resultCode = resultCode;
+        super(resultCode.getValue());
+        m_value = resultCode;
     }
 
     public NetworkResultCode getResultCode()
     {
-        return m_resultCode;
+        return m_value;
     }
 
-    private NetworkResultCode m_resultCode;
+    @Override
+    public String getMessage()
+    {
+        return "error code: " + m_value.name();
+    }
+
+    private NetworkResultCode m_value;
 }

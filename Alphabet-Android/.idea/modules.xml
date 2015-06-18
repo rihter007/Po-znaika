@@ -5,10 +5,12 @@
       <module fileurl="file://$PROJECT_DIR$/Alphabet-Android.iml" filepath="$PROJECT_DIR$/Alphabet-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/arz/arz.iml" filepath="$PROJECT_DIR$/arz/arz.iml" />
+      <module fileurl="file://$PROJECT_DIR$/arz_android/arz_android.iml" filepath="$PROJECT_DIR$/arz_android/arz_android.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />
       <module fileurl="file://$PROJECT_DIR$/licensing/licensing.iml" filepath="$PROJECT_DIR$/licensing/licensing.iml" />
       <module fileurl="file://$PROJECT_DIR$/network/network.iml" filepath="$PROJECT_DIR$/network/network.iml" />
+      <module fileurl="file://$PROJECT_DIR$/product_tracer/product_tracer.iml" filepath="$PROJECT_DIR$/product_tracer/product_tracer.iml" />
     </modules>
   </component>
 </project>

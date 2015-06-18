@@ -20,11 +20,11 @@ import java.util.Map;
 
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
+import com.arz_x.android.AlertDialogHelper;
 
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
 import ru.po_znaika.common.ExerciseScore;
-import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.CommonHelpers;
 import com.arz_x.NetworkException;
 
@@ -199,8 +199,9 @@ public final class DiaryActivity extends ActionBarActivity
                         }
                         catch (CommonException | NetworkException exp)
                         {
-                            MessageBox.Show(DiaryActivity.this, resources.getString(R.string.failed_sync_diary),
-                                    resources.getString(R.string.alert_title));
+                            AlertDialogHelper.showMessageBox(DiaryActivity.this,
+                                    resources.getString(R.string.alert_title),
+                                    resources.getString(R.string.failed_sync_diary));
                             return;
                         }
 

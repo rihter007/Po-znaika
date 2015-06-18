@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.AsyncTask;
@@ -22,17 +23,25 @@ import android.util.Log;
 
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
+import com.arz_x.android.AlertDialogHelper;
 
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
-import ru.po_znaika.common.ru.po_znaika.common.helpers.AlertDialogHelper;
 import ru.po_znaika.licensing.LicenseType;
 import ru.po_znaika.network.LoginPasswordCredentials;
 import com.arz_x.NetworkException;
 import com.arz_x.NetworkResultCode;
+import com.arz_x.android.product_tracer.FileTracerInstance;
+import com.arz_x.tracer.TraceLevel;
 
 public class MainMenuActivity extends ActionBarActivity
 {
+    public static void startActivity(@NonNull Context context)
+    {
+        Intent intent = new Intent(context, MainMenuActivity.class);
+        context.startActivity(intent);
+    }
+
     private static final String LogTag = "MainMenuActivity";
 
     private class LicenseProcessingTask extends AsyncTask<String, Integer, LicenseType>
@@ -65,8 +74,7 @@ public class MainMenuActivity extends ActionBarActivity
             try
             {
                 m_serviceLocator.getAuthenticationProvider().setLoginPasswordCredentials(credentials.login, credentials.password);
-                final LicenseType accountLicense = m_serviceLocator.getLicensing().getCurrentLicenseInfo(credentials);
-                return accountLicense;
+                return m_serviceLocator.getLicensing().getCurrentLicenseInfo(credentials);
             }
             catch (NetworkException exp)
             {
@@ -76,6 +84,7 @@ public class MainMenuActivity extends ActionBarActivity
             catch (CommonException exp)
             {
                 Log.e(LogTag, "License processing common exception: " + exp.getMessage());
+                m_commonErrorCode = exp.getResultCode();
             }
             return null;
         }
@@ -88,13 +97,15 @@ public class MainMenuActivity extends ActionBarActivity
             {
                 if (!LicenseType.isActive(accountLicense))
                 {
-                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_no_active_license),
-                            resources.getString(R.string.alert_title));
+                    AlertDialogHelper.showMessageBox(MainMenuActivity.this,
+                            resources.getString(R.string.alert_title),
+                            resources.getString(R.string.alert_no_active_license));
                     return;
                 }
 
-                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_application_activated),
-                        resources.getString(R.string.alert_title));
+                AlertDialogHelper.showMessageBox(MainMenuActivity.this,
+                        resources.getString(R.string.alert_title),
+                        resources.getString(R.string.alert_application_activated));
                 return;
             }
 
@@ -102,28 +113,33 @@ public class MainMenuActivity extends ActionBarActivity
             {
                 case AuthenticationError:
                 {
-                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_login_password_incorrect),
-                            resources.getString(R.string.alert_title));
+                    AlertDialogHelper.showMessageBox(MainMenuActivity.this,
+                            resources.getString(R.string.alert_title),
+                            resources.getString(R.string.alert_login_password_incorrect));
                     return;
                 }
 
-                case Unknown:
+                case UnknownReason:
                 case NoConnection:
                 {
-                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_no_connection),
-                            resources.getString(R.string.alert_title));
+                    AlertDialogHelper.showMessageBox(MainMenuActivity.this,
+                            resources.getString(R.string.alert_title),
+                            resources.getString(R.string.alert_no_connection));
+
                     return;
                 }
             }
             if (m_commonErrorCode == CommonResultCode.InvalidArgument)
             {
-                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_bad_credentials),
-                        resources.getString(R.string.alert_title));
+                AlertDialogHelper.showMessageBox(MainMenuActivity.this,
+                        resources.getString(R.string.alert_title),
+                        resources.getString(R.string.alert_bad_credentials));
                 return;
             }
 
-            MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.failed_action),
-                    resources.getString(R.string.alert_title));
+            AlertDialogHelper.showMessageBox(MainMenuActivity.this,
+                    resources.getString(R.string.alert_title),
+                    resources.getString(R.string.failed_action));
         }
 
         private CommonResultCode m_commonErrorCode;
@@ -161,8 +177,9 @@ public class MainMenuActivity extends ActionBarActivity
             if (!LicenseType.isActive(licenseType))
             {
                 Resources resources = getResources();
-                MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_no_license),
-                        resources.getString(R.string.alert_title));
+                AlertDialogHelper.showMessageBox(MainMenuActivity.this,
+                        resources.getString(R.string.alert_title),
+                        resources.getString(R.string.alert_no_license));
                 return;
             }
 
@@ -183,9 +200,7 @@ public class MainMenuActivity extends ActionBarActivity
     private boolean isTestUser()
     {
         final LoginPasswordCredentials credentials = m_serviceLocator.getAuthenticationProvider().getLoginPasswordCredentials();
-        if ((credentials != null) && (credentials.login.equalsIgnoreCase("test")))
-            return true;
-        return false;
+        return (credentials != null) && (credentials.login.equalsIgnoreCase("test"));
     }
 
     @Override
@@ -202,12 +217,16 @@ public class MainMenuActivity extends ActionBarActivity
         }
         catch (CommonException exp)
         {
-            MessageBox.Show(this, exp.getMessage(), getResources().getString(R.string.assert_error));
+            AlertDialogHelper.showMessageBox(this,
+                    getResources().getString(R.string.assert_error),
+                    exp.getMessage());
         }
         catch (Exception exp)
         {
             Log.e(MainMenuActivity.class.getName(), "onCreate: Unknown exception occurred");
-            MessageBox.Show(this, exp.getMessage(), getResources().getString(R.string.assert_error));
+            AlertDialogHelper.showMessageBox(this,
+                    getResources().getString(R.string.assert_error),
+                    exp.getMessage());
         }
     }
 
@@ -311,8 +330,13 @@ public class MainMenuActivity extends ActionBarActivity
         }
         catch (Exception exp)
         {
+            m_tracer.traceMessage(TraceLevel.Error, String.format("Failed to start exercise task: \"%d\" is selected, " +
+                    "exception message: \"%s\"", itemSelectedIndex, exp.getMessage()));
+
             Resources resources = getResources();
-            MessageBox.Show(this, resources.getString(R.string.failed_exercise_start), resources.getString(R.string.alert_title));
+            AlertDialogHelper.showMessageBox(this,
+                    resources.getString(R.string.alert_title),
+                    resources.getString(R.string.failed_exercise_start));
         }
     }
 
@@ -327,8 +351,11 @@ public class MainMenuActivity extends ActionBarActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        final int SelectedItemId = item.getItemId();
-        switch (SelectedItemId)
+        final int selectedItemId = item.getItemId();
+
+        m_tracer.traceMessage(TraceLevel.Info, String.format("ActionBar item \"%d\" is selected", selectedItemId));
+
+        switch (selectedItemId)
         {
             case R.id.action_diary:
             {
@@ -358,8 +385,9 @@ public class MainMenuActivity extends ActionBarActivity
 
                                 if ((loginText.length() == 0) || (passwordText.length() == 0))
                                 {
-                                    MessageBox.Show(MainMenuActivity.this, resources.getString(R.string.alert_login_password_not_empty),
-                                            resources.getString(R.string.alert_title));
+                                    AlertDialogHelper.showMessageBox(MainMenuActivity.this,
+                                            resources.getString(R.string.alert_title),
+                                            resources.getString(R.string.alert_login_password_not_empty));
                                     return;
                                 }
 
@@ -379,5 +407,6 @@ public class MainMenuActivity extends ActionBarActivity
     }
 
     private CoreServiceLocator m_serviceLocator;
+    private FileTracerInstance m_tracer;
     private List<IExercise> m_menuExercises;
 }

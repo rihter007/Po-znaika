@@ -11,10 +11,12 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/arz" />
+            <option value="$PROJECT_DIR$/arz_android" />
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/database" />
             <option value="$PROJECT_DIR$/licensing" />
             <option value="$PROJECT_DIR$/network" />
+            <option value="$PROJECT_DIR$/product_tracer" />
           </set>
         </option>
       </GradleProjectSettings>

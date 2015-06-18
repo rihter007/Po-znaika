@@ -6,11 +6,13 @@ package com.arz_x;
  */
 public enum CommonResultCode
 {
-    UnknownReason(-675642388),                   // a crc32 of 'CommonResult.UnknownReason'
-    CodeError(1009550380),                       // a crc32 of 'CommonResult.CodeError'
-    InvalidArgument(1899941846),                 // a crc32 of 'CommonResult.InvalidArgument'
-    InvalidExternalSource(-1650335281),          // a crc32 of 'CommonResult.InvalidExternalSource'
-    InvalidInternalState(644692128);             // a crc32 of 'CommonResult.InvalidInternalState'
+    UnknownReason(0xD7BA83EC),                   // a crc32 of 'CommonResult.UnknownReason'
+    AssertError(0x69E30136),                     // a crc32 of 'CommonResult.AssertError'
+    AccessDenied(0xD506CF53),                    // a crc32 of 'CommonResult.AccessDenied'
+    NotFound(0x67E2835E),                        // a crc32 of 'CommonResult.NotFound'
+    InvalidArgument(0x713ECFD6),                 // a crc32 of 'CommonResult.InvalidArgument'
+    InvalidExternalSource(0x9DA1E1CF),           // a crc32 of 'CommonResult.InvalidExternalSource'
+    InvalidInternalState(0x266D38A0);            // a crc32 of 'CommonResult.InvalidInternalState'
 
     CommonResultCode(int value)
     {
