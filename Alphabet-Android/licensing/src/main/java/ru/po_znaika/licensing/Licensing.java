@@ -221,7 +221,7 @@ public class Licensing implements ILicensing
                     case 404:
                         throw new NetworkException(NetworkResultCode.AuthenticationError);
                     default:
-                        throw new NetworkException(NetworkResultCode.Unknown);
+                        throw new NetworkException(NetworkResultCode.UnknownReason);
                 }
             }
 
@@ -257,7 +257,7 @@ public class Licensing implements ILicensing
         catch (IOException exp)
         {
             Log.e(LogTag, exp.getMessage());
-            throw new NetworkException(NetworkResultCode.Unknown);
+            throw new NetworkException(NetworkResultCode.UnknownReason);
         }
 
         return LicenseType.NoLicense;

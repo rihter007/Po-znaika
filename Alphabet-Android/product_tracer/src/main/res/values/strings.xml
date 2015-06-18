@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Product_tracer</string>
+    <string name="title_activity_trace">Trace viewer</string>
+    <string name="caption_trace_menu">Found trace files</string>
+    <string name="caption_ok">OK</string>
+    <string name="caption_cancel">Cancel</string>
+    <string name="alert_title">Alert</string>
+    <string name="alert_file_does_not_exist">File does not exist</string>
+    <string name="alert_remove_file">Are sure to remove \'%s\'</string>
+
+    <string name="error_unknown">An unexpected error has just occurred :(</string>
+    <string name="error_assert">An assert situation occurred</string>
+    <string name="error_file_not_found">File not found</string>
+    <string name="error_assert_with_description">An assert situation: \'%s\'</string>
+    <string name="error_could_not_remove_file">Failed to remove file</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_exit">Exit</string>
+
+</resources>

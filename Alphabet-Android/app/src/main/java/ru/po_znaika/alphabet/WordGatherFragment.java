@@ -1,7 +1,6 @@
 package ru.po_znaika.alphabet;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -22,6 +21,7 @@ import android.widget.TextView;
 
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
+import com.arz_x.android.AlertDialogHelper;
 
 import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.IExerciseStepCallback;
@@ -146,9 +146,12 @@ public final class WordGatherFragment extends Fragment
         }
         catch (Exception exp)
         {
-            Resources resources = getResources();
-            AlertDialog msgBox = MessageBox.CreateDialog(getActivity(), resources.getString(R.string.failed_exercise_start),
-                    resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
+            final Resources resources = getResources();
+            AlertDialogHelper.showMessageBox(getActivity(),
+                    resources.getString(R.string.alert_title),
+                    resources.getString(R.string.failed_exercise_start),
+                    false,
+                    new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i)
@@ -156,7 +159,6 @@ public final class WordGatherFragment extends Fragment
                             getActivity().finish();
                         }
                     });
-            msgBox.show();
         }
 
         return fragmentView;

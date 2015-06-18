@@ -1,7 +1,6 @@
 package ru.po_znaika.alphabet;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,6 +22,7 @@ import java.util.TreeMap;
 
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
+import com.arz_x.android.AlertDialogHelper;
 
 import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -51,8 +51,11 @@ public class CharacterExerciseMenuActivity extends Activity
         catch (Exception exp)
         {
             Resources resources = getResources();
-            AlertDialog msgBox = MessageBox.CreateDialog(this, resources.getString(R.string.failed_exercise_start),
-                    resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
+            AlertDialogHelper.showMessageBox(this,
+                    resources.getString(R.string.failed_exercise_start),
+                    resources.getString(R.string.alert_title),
+                    false,
+                    new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i)
@@ -60,7 +63,6 @@ public class CharacterExerciseMenuActivity extends Activity
                             finish();
                         }
                     });
-            msgBox.show();
         }
     }
 
@@ -148,7 +150,9 @@ public class CharacterExerciseMenuActivity extends Activity
         catch (Exception exp)
         {
             Resources resources = getResources();
-            MessageBox.Show(this, resources.getString(R.string.failed_exercise_start), resources.getString(R.string.alert_title));
+            AlertDialogHelper.showMessageBox(this,
+                    resources.getString(R.string.alert_title),
+                    resources.getString(R.string.failed_exercise_start));
         }
     }
 

@@ -1,1 +1,1 @@
-include ':app', ':common', ':network', ':database', ':licensing', ':arz'
+include ':app', ':common', ':network', ':database', ':licensing', ':arz', ':product_tracer', ':arz_android'

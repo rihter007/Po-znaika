@@ -6,9 +6,9 @@ package com.arz_x;
  */
 public enum NetworkResultCode
 {
-    Unknown(372074748),                // a crc32 of 'NetworkResultCode.Unknown'
-    NoConnection(251784210),           // a crc32 of 'NetworkResultCode.NoConnection'
-    AuthenticationError(179229665);    // a crc32 of 'NetworkResultCode.AuthenticationError'
+    UnknownReason(0xBDF5C0F5),              // a crc32 of 'NetworkResultCode.UnknownReason'
+    NoConnection(0x0F01EC12),               // a crc32 of 'NetworkResultCode.NoConnection'
+    AuthenticationError(0x0AAED3E1);        // a crc32 of 'NetworkResultCode.AuthenticationError'
 
     NetworkResultCode(int _value)
     {

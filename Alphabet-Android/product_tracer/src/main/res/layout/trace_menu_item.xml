@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text=""
+        android:id="@+id/fileNameTextView"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginRight="@dimen/small_margin"
+        android:gravity="center|right"
+        android:layout_gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:src="@drawable/small_view"
+            android:layout_width="@dimen/small_image_size"
+            android:layout_height="@dimen/small_image_size"
+            android:id="@+id/viewImageButton"/>
+
+        <ImageButton
+            android:layout_marginLeft="@dimen/small_margin"
+            android:src="@drawable/delete"
+            android:layout_width="@dimen/small_image_size"
+            android:layout_height="@dimen/small_image_size"
+            android:id="@+id/removeImageButton"/>
+    </LinearLayout>
+</TableRow>

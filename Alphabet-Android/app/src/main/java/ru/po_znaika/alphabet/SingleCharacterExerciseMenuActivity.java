@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +19,7 @@ import android.widget.ArrayAdapter;
 
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
+import com.arz_x.android.AlertDialogHelper;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -53,8 +53,10 @@ public class SingleCharacterExerciseMenuActivity extends Activity
         catch (Exception exp)
         {
             Resources resources = getResources();
-            AlertDialog msgBox = MessageBox.CreateDialog(this, resources.getString(R.string.failed_exercise_start),
-                    resources.getString(R.string.alert_title), false, new DialogInterface.OnClickListener()
+            AlertDialogHelper.showMessageBox(this,
+                    resources.getString(R.string.alert_title),
+                    resources.getString(R.string.failed_exercise_start),
+                    false, new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i)
@@ -62,7 +64,6 @@ public class SingleCharacterExerciseMenuActivity extends Activity
                             finish();
                         }
                     });
-            msgBox.show();
         }
     }
 

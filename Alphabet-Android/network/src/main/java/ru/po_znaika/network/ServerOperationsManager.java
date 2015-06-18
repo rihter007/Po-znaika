@@ -104,7 +104,7 @@ public class ServerOperationsManager implements IServerOperations
                         throw new NetworkException(NetworkResultCode.AuthenticationError);
                 }
 
-                throw new NetworkException(NetworkResultCode.Unknown);
+                throw new NetworkException(NetworkResultCode.UnknownReason);
             }
         }
         catch (IOException exp)
@@ -171,7 +171,7 @@ public class ServerOperationsManager implements IServerOperations
                         throw new NetworkException(NetworkResultCode.AuthenticationError);
                 }
 
-                throw new NetworkException(NetworkResultCode.Unknown);
+                throw new NetworkException(NetworkResultCode.UnknownReason);
             }
 
             InputStream responseBodyStream = request.getInputStream();
