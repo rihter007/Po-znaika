@@ -106,7 +106,7 @@ public final class DiaryActivity extends ActionBarActivity
                 }
                 else
                 {
-                    exerciseTitle = alphabetDatabase.getExerciseDisplayNameByIdName(diaryNote.exerciseName);
+                    exerciseTitle = null;//alphabetDatabase.getExerciseDisplayNameByIdName(diaryNote.exerciseName);
                     if (exerciseTitle == null)
                         exerciseTitle = alphabetDatabase.getCharacterItemDisplayNameByIdName(diaryNote.exerciseName);
                     exerciseNamesMap.put(diaryNote.exerciseName, exerciseTitle);

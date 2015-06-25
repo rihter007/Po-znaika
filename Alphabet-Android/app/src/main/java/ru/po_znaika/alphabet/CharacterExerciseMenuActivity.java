@@ -5,36 +5,43 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.product_tracer.FileTracerInstance;
+import com.arz_x.tracer.ProductTracer;
+import com.arz_x.tracer.TraceLevel;
 
-import ru.po_znaika.common.IExercise;
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
+import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 public class CharacterExerciseMenuActivity extends Activity
 {
-    private static String LogTag = CharacterExerciseMenuActivity.class.getName();
-
     public static void startActivity(@NonNull Context context)
     {
         Intent intent = new Intent(context, CharacterExerciseMenuActivity.class);
         context.startActivity(intent);
+    }
+
+    private static final String LogTag = CharacterExerciseMenuActivity.class.getName();
+    private static final String PageNumberTag = "page_number";
+
+    private static final int ExercisesPerPage = 3*4;
+
+    private static class ExerciseDisplayInfo
+    {
+        public String displayImage;
+        public int characterExerciseId;
     }
 
     @Override
@@ -45,10 +52,13 @@ public class CharacterExerciseMenuActivity extends Activity
 
         try
         {
-            restoreInternalState();
+            m_tracer = TracerHelper.continueOrCreateFileTracer(this, savedInstanceState);
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onCreate");
+
+            restoreInternalState(savedInstanceState);
             constructUserInterface();
         }
-        catch (Exception exp)
+        catch (Throwable exp)
         {
             Resources resources = getResources();
             AlertDialogHelper.showMessageBox(this,
@@ -66,95 +76,235 @@ public class CharacterExerciseMenuActivity extends Activity
         }
     }
 
-    private void restoreInternalState() throws CommonException
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle savedInstance)
     {
-        AlphabetDatabase alphabetDatabase = new AlphabetDatabase(this, false);
-        AlphabetDatabase.ExerciseShortInfo[] characterExercisesInfo = alphabetDatabase.getAllExercisesShortInfoByType(AlphabetDatabase.ExerciseType.Character);
-        if (characterExercisesInfo == null)
+        super.onSaveInstanceState(savedInstance);
+
+        ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onSaveInstanceState");
+
+        try
         {
-            Log.e(LogTag, "Failed to get any exercises");
-            throw new CommonException(CommonResultCode.InvalidExternalSource);
+            savedInstance.putInt(PageNumberTag, m_pageNumber);
+            FileTracerInstance.saveInstance(m_tracer, savedInstance);
         }
-
-        final ExerciseFactory exerciseFactory = new ExerciseFactory(this, alphabetDatabase);
-
-        Map<String, IExercise> exerciseMap = new TreeMap<>();
-        for (AlphabetDatabase.ExerciseShortInfo exerciseShortInfo : characterExercisesInfo)
+        catch (Throwable exp)
         {
-            IExercise characterExercise = exerciseFactory.CreateExerciseFromId(exerciseShortInfo.id, exerciseShortInfo.type);
-            if (characterExercise != null)
-            {
-                final String ExerciseDisplayName = characterExercise.getDisplayName();
-                if (!TextUtils.isEmpty(ExerciseDisplayName))
-                    exerciseMap.put(ExerciseDisplayName, characterExercise);
-            }
-        }
-
-        {
-            m_characterExercises = new IExercise[exerciseMap.size()];
-
-            int exerciseIndex = 0;
-            final Set<Map.Entry<String, IExercise>> values = exerciseMap.entrySet();
-            for (Map.Entry<String, IExercise> exercise : values)
-                m_characterExercises[exerciseIndex++] = exercise.getValue();
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
+            throw exp;
         }
     }
 
-    private void constructUserInterface()
+    private void restoreInternalState(Bundle savedInstance) throws CommonException
     {
+        if (savedInstance == null)
+            m_pageNumber = 0;
+        else
+            m_pageNumber = savedInstance.getInt(PageNumberTag, 0);
+
+        AlphabetDatabase alphabetDatabase = new AlphabetDatabase(this, false);
+        final AlphabetDatabase.CharacterExerciseInfo[] characterExercises =
+                alphabetDatabase.getAllCharacterExercisesByAlphabetType(AlphabetDatabase.AlphabetType.Russian);
+        if (characterExercises == null)
         {
-            LayoutInflater inflater = getLayoutInflater();
-            ViewAdapter adapter = new ViewAdapter();
-            for (int exerciseId = 0; exerciseId < m_characterExercises.length; ++exerciseId)
-            {
-                LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.small_image_item, null, false);
-                ImageView imageView = (ImageView) layout.findViewById(R.id.imageView);
-                imageView.setImageDrawable(m_characterExercises[exerciseId].getDisplayImage());
-
-                final int exerciseIndex = exerciseId;
-                layout.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        onGridItemClicked(exerciseIndex);
-                    }
-                });
-
-                adapter.add(layout);
-            }
-
-            GridView menuGrid = (GridView) findViewById(R.id.gridView);
-            menuGrid.setAdapter(adapter);
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "Failed to get character exercises");
+            throw new CommonException(CommonResultCode.AssertError);
         }
 
+        Arrays.sort(characterExercises, new Comparator<AlphabetDatabase.CharacterExerciseInfo>()
         {
-            ImageButton backButton = (ImageButton) findViewById(R.id.backImageButton);
-            backButton.setOnClickListener(new View.OnClickListener()
+            @Override
+            public int compare(@NonNull AlphabetDatabase.CharacterExerciseInfo lhs
+                    , @NonNull AlphabetDatabase.CharacterExerciseInfo rhs)
             {
-                @Override
-                public void onClick(View view)
+                // Character.compare
+                if (lhs.character == rhs.character)
+                    return 0;
+                return lhs.character < rhs.character ? -1 : 1;
+            }
+        });
+
+        final DiaryDatabase diaryDatabase = new DiaryDatabase(this);
+        m_characterExercises = new ExerciseDisplayInfo[characterExercises.length];
+        for (int chExerciseIndex = 0; chExerciseIndex < characterExercises.length; ++chExerciseIndex)
+        {
+            final AlphabetDatabase.CharacterExerciseInfo currentCharacterExercise = characterExercises[chExerciseIndex];
+            final AlphabetDatabase.CharacterExerciseItemInfo[] characterExerciseItems =
+                    alphabetDatabase.getAllCharacterExerciseItemsByCharacterExerciseId(currentCharacterExercise.id);
+
+            if ((characterExerciseItems == null) || (characterExerciseItems.length == 0))
+            {
+                ProductTracer.traceMessage(m_tracer
+                        , TraceLevel.Error
+                        , LogTag
+                        , String.format("No character exercise items for %d", characterExercises[chExerciseIndex].id));
+                continue;
+            }
+
+            boolean areAllExercisesComplete = true;
+            for (AlphabetDatabase.CharacterExerciseItemInfo characterExerciseItem : characterExerciseItems)
+            {
+                final int exerciseScore = diaryDatabase.getExerciseScore(characterExerciseItem.exerciseInfo.name);
+                if (exerciseScore < characterExerciseItem.exerciseInfo.maxScore)
+                {
+                    areAllExercisesComplete = false;
+                    break;
+                }
+            }
+
+            final ExerciseDisplayInfo currentExercise = new ExerciseDisplayInfo();
+            currentExercise.displayImage = areAllExercisesComplete
+                    ? currentCharacterExercise.passedImageName : currentCharacterExercise.notPassedImageName;
+            currentExercise.characterExerciseId = currentCharacterExercise.id;
+            m_characterExercises[chExerciseIndex] = currentExercise;
+        }
+    }
+
+    private void constructUserInterface() throws CommonException
+    {
+        drawCharacterExercises();
+
+        ImageView backImageView = (ImageView)findViewById(R.id.backImageView);
+        backImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (m_pageNumber == 0)
                 {
                     finish();
+                    return;
+                }
+
+                --m_pageNumber;
+                try
+                {
+                    drawCharacterExercises();
+                }
+                catch (CommonException exp)
+                {
+                    ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
+                    AlertDialogHelper.showMessageBox(CharacterExerciseMenuActivity.this
+                            , getResources().getString(R.string.error_unknown_error)
+                            , getResources().getString(R.string.alert_title)
+                            , false
+                            , new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    finish();
+                                }
+                            }
+                    );
+                }
+            }
+        });
+
+        ImageView forwardImageView = (ImageView)findViewById(R.id.forwardImageView);
+        forwardImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if ((m_pageNumber + 1) * ExercisesPerPage < m_characterExercises.length)
+                {
+                    ++m_pageNumber;
+
+                    try
+                    {
+                        drawCharacterExercises();
+                    }
+                    catch (Exception exp)
+                    {
+                        ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
+                        AlertDialogHelper.showMessageBox(CharacterExerciseMenuActivity.this
+                                , getResources().getString(R.string.error_unknown_error)
+                                , getResources().getString(R.string.alert_title)
+                                , false
+                                , new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        finish();
+                                    }
+                                }
+                        );
+                    }
+                }
+            }
+        });
+    }
+
+    private void drawCharacterExercises() throws CommonException
+    {
+        ProductTracer.traceMessage(m_tracer, TraceLevel.Info, "Page number: " + m_pageNumber);
+
+        final int[] imageViewIds = new int[]
+                {
+                        R.id.characterImageView1,
+                        R.id.characterImageView2,
+                        R.id.characterImageView3,
+                        R.id.characterImageView4,
+                        R.id.characterImageView5,
+                        R.id.characterImageView6,
+                        R.id.characterImageView7,
+                        R.id.characterImageView8,
+                        R.id.characterImageView9,
+                        R.id.characterImageView10,
+                        R.id.characterImageView11,
+                        R.id.characterImageView12,
+                };
+
+        final int ExerciseIterateIndex = Math.min(m_characterExercises.length - ExercisesPerPage * m_pageNumber, imageViewIds.length);
+        final Resources resources = getResources();
+        for (int exerciseIndex = 0; exerciseIndex < ExerciseIterateIndex; ++exerciseIndex)
+        {
+            final int exerciseOffsetIndex = ExercisesPerPage * m_pageNumber + exerciseIndex;
+            final int drawableId = DatabaseHelpers.getDrawableIdByName(resources, m_characterExercises[exerciseOffsetIndex].displayImage);
+            if (drawableId == 0)
+            {
+                ProductTracer.traceMessage(m_tracer
+                        , TraceLevel.Error
+                        , LogTag
+                        , String.format("Failed to get image resource id for '%s'", m_characterExercises[exerciseOffsetIndex].displayImage));
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
+
+            final Drawable drawable = resources.getDrawable(drawableId);
+            if (drawable == null)
+            {
+                ProductTracer.traceMessage(m_tracer
+                        , TraceLevel.Error
+                        , LogTag
+                        , String.format("Failed to get drawable for id '%d", drawableId));
+            }
+
+            ImageView imageView = (ImageView)findViewById(imageViewIds[exerciseIndex]);
+            imageView.setImageDrawable(drawable);
+            imageView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    try
+                    {
+                        SingleCharacterExerciseMenuActivity.startActivity(CharacterExerciseMenuActivity.this
+                                , m_characterExercises[exerciseOffsetIndex].characterExerciseId);
+                    }
+                    catch (Exception exp)
+                    {
+                        AlertDialogHelper.showMessageBox(CharacterExerciseMenuActivity.this,
+                                getResources().getString(R.string.alert_title),
+                                getResources().getString(R.string.failed_exercise_start));
+                    }
                 }
             });
         }
     }
 
-    private void onGridItemClicked(int itemId)
-    {
-        try
-        {
-            m_characterExercises[itemId].process();
-        }
-        catch (Exception exp)
-        {
-            Resources resources = getResources();
-            AlertDialogHelper.showMessageBox(this,
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.failed_exercise_start));
-        }
-    }
-
-    private IExercise[] m_characterExercises;
+    private int m_pageNumber;
+    private FileTracerInstance m_tracer;
+    private ExerciseDisplayInfo[] m_characterExercises;
 }

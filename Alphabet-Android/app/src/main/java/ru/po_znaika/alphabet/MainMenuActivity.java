@@ -1,10 +1,5 @@
 package ru.po_znaika.alphabet;
 
-import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.TreeMap;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +23,6 @@ import com.arz_x.tracer.TraceLevel;
 import com.arz_x.android.AlertDialogHelper;
 import com.arz_x.android.product_tracer.FileTracerInstance;
 
-import ru.po_znaika.common.IExercise;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.licensing.LicenseType;
 import ru.po_znaika.network.LoginPasswordCredentials;
@@ -189,7 +183,7 @@ public class MainMenuActivity extends Activity
             }
             else
             {
-                m_menuExercises.get(m_selectedMenuPosition - 1).process();
+                //m_menuExercises.get(m_selectedMenuPosition - 1).process();
             }
         }
 
@@ -217,7 +211,6 @@ public class MainMenuActivity extends Activity
             ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onCreate");
 
             m_serviceLocator = new CoreServiceLocator(this);
-            restoreInternalState();
             constructUserInterface();
         }
         catch (Throwable exp)
@@ -234,8 +227,17 @@ public class MainMenuActivity extends Activity
     protected void onSaveInstanceState(@NonNull Bundle savedInstance)
     {
         super.onSaveInstanceState(savedInstance);
-        ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "onSaveInstance");
-        m_tracer.saveInstance(savedInstance);
+
+        try
+        {
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onSaveInstance");
+            FileTracerInstance.saveInstance(m_tracer, savedInstance);
+        }
+        catch (Throwable exp)
+        {
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
+            throw exp;
+        }
     }
 
     @Override
@@ -243,56 +245,6 @@ public class MainMenuActivity extends Activity
     {
         super.onDestroy();
         m_serviceLocator.close();
-    }
-
-    void restoreInternalState() throws CommonException
-    {
-        final ExerciseFactory exerciseFactory = new ExerciseFactory(this, m_serviceLocator.getAlphabetDatabase());
-
-        // contains processed exercises in sorted order
-        Map<String, ArrayList<IExercise>> collectedExercises = new TreeMap<>();
-
-        // contains all exercises
-        AlphabetDatabase.ExerciseShortInfo[] exercisesShortInfo = m_serviceLocator.getAlphabetDatabase().getAllExercisesShortInfoExceptType(AlphabetDatabase.ExerciseType.Character);
-        if (exercisesShortInfo != null)
-        {
-            for (AlphabetDatabase.ExerciseShortInfo exerciseInfo : exercisesShortInfo)
-            {
-                IExercise exercise = exerciseFactory.CreateExerciseFromId(exerciseInfo.id, exerciseInfo.type);
-                if (exercise != null)
-                {
-                    final String exerciseDisplayName = exercise.getDisplayName();
-
-                    // Add exercise to list
-                    ArrayList<IExercise> displayNameExercises;
-                    if (collectedExercises.containsKey(exerciseDisplayName))
-                    {
-                        displayNameExercises = collectedExercises.get(exerciseDisplayName);
-                    }
-                    else
-                    {
-                        displayNameExercises = new ArrayList<>();
-                        collectedExercises.put(exerciseDisplayName, displayNameExercises);
-                    }
-
-                    displayNameExercises.add(exercise);
-                }
-                else
-                {
-                    ProductTracer.traceMessage(m_tracer
-                            , TraceLevel.Error
-                            , LogTag
-                            , String.format("Failed to create exercise with id \"%d\"", exerciseInfo.id));
-                }
-            }
-        }
-
-        // Place exercises in sorted order
-        m_menuExercises = new ArrayList<>();
-        for (Map.Entry<String, ArrayList<IExercise>> sortedExercise : collectedExercises.entrySet())
-        {
-            m_menuExercises.addAll(sortedExercise.getValue());
-        }
     }
 
     private void constructUserInterface()
@@ -305,6 +257,32 @@ public class MainMenuActivity extends Activity
                 public void onClick(View v)
                 {
                     ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onClick(): abcBookImageView");
+                }
+            });
+        }
+
+        {
+            ImageView wordGatherImageView = (ImageView)findViewById(R.id.wordGatherImageView);
+            wordGatherImageView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onClick(): wordGatherImageView");
+                    launchExercise(AlphabetDatabase.ExerciseType.WordGather);
+                }
+            });
+        }
+
+        {
+            ImageView createWordsFromSpecifiedView = (ImageView)findViewById(R.id.createWordsImageView);
+            createWordsFromSpecifiedView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onClick(): createWordsImageView");
+                    launchExercise(AlphabetDatabase.ExerciseType.CreateWordsFromSpecified);
                 }
             });
         }
@@ -323,23 +301,35 @@ public class MainMenuActivity extends Activity
         }
     }
 
-    private void onListViewItemSelected(int itemSelectedIndex)
+    private void launchExercise(@NonNull AlphabetDatabase.ExerciseType exerciseType)
     {
         try
         {
-            new ExerciseStartTask(itemSelectedIndex).execute();
+            AlphabetDatabase.ExerciseInfo[] exercises = m_serviceLocator.getAlphabetDatabase()
+                    .getExerciseInfoByType(exerciseType);
+            if ((exercises == null) || (exercises.length != 1))
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+
+            switch (exerciseType)
+            {
+                case WordGather:
+                    WordGatherActivity.startActivity(this, exercises[0].name, AlphabetDatabase.AlphabetType.Russian);
+                    break;
+                case CreateWordsFromSpecified:
+                    CreateWordsFromSpecifiedActivity.startActivity(this, exercises[0].name, AlphabetDatabase.AlphabetType.Russian);
+                    break;
+                default:
+                    throw new CommonException(CommonResultCode.AssertError);
+            }
         }
-        catch (Exception exp)
+        catch (Throwable exp)
         {
             ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
-
-            final Resources resources = getResources();
-            AlertDialogHelper.showMessageBox(this,
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.failed_exercise_start));
+            AlertDialogHelper.showMessageBox(this
+                    , getResources().getString(R.string.alert_title)
+                    , getResources().getString(R.string.error_unknown_error));
         }
     }
-
 
     //@Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -409,5 +399,4 @@ public class MainMenuActivity extends Activity
 
     private FileTracerInstance m_tracer;
     private CoreServiceLocator m_serviceLocator;
-    private List<IExercise> m_menuExercises;
 }

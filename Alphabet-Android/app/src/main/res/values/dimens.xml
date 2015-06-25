@@ -55,4 +55,7 @@
 
     <dimen name="main_menu_back_image_size">60dp</dimen>
 
+    <!-- Character exercise menu activity sizes -->
+    <dimen name="character_exercise_menu_image_size">80dp</dimen>
+
 </resources>

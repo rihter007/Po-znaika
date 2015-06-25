@@ -256,17 +256,18 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
                             m_serviceLocator.getAlphabetDatabase().getAllCharacterExerciseStepsByCharacterExerciseItemId(characterExerciseItemId);
                     for (AlphabetDatabase.CharacterExerciseItemStepInfo exerciseStepInfo : exerciseSteps)
                     {
-                        sortedExerciseSteps.put(exerciseStepInfo.stepNumber,
-                                new CharacterExerciseItemStep(exerciseStepInfo.action, exerciseStepInfo.value));
+                        //sortedExerciseSteps.put(exerciseStepInfo.stepNumber,
+                        //        new CharacterExerciseItemStep(exerciseStepInfo.action, exerciseStepInfo.value));
                     }
                 }
 
-                m_state = new CharacterExerciseItemState(characterExerciseInfo.id,
+                /*m_state = new CharacterExerciseItemState(characterExerciseInfo.id,
                         characterExerciseInfo.character,
                         characterExerciseItemId,
                         characterExerciseItemInfo.name,
                         getResources().getString(R.string.title_activity_character_exercise_item) + " \"" + characterExerciseItemInfo.displayName + "\"",
                         sortedExerciseSteps.values());
+                        */
             }
         }
 
@@ -370,7 +371,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
             final Resources resources = getResources();
             AlertDialogHelper.showMessageBox(this,
                     resources.getString(R.string.alert_title),
-                    resources.getString(R.string.alert_unknown_error));
+                    resources.getString(R.string.error_unknown_error));
             finish();
         }
     }
@@ -389,7 +390,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
             final Resources resources = getResources();
             AlertDialogHelper.showMessageBox(this,
                     resources.getString(R.string.alert_title),
-                    resources.getString(R.string.alert_unknown_error));
+                    resources.getString(R.string.error_unknown_error));
             finish();
         }
     }

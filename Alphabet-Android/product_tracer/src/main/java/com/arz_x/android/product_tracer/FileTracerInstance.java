@@ -46,6 +46,8 @@ public class FileTracerInstance implements ITracer
         }
         else
         {
+            if (tracesDirectory == null)
+                throw new CommonException(CommonResultCode.InvalidArgument);
             m_tracesDirectory = tracesDirectory;
             m_tracer = ProductTracer.createNewFileTracer(tracesDirectory, minTraceLevel, maxTraceFileSize);
         }
@@ -89,7 +91,7 @@ public class FileTracerInstance implements ITracer
 
         final String traceFilePath = savedInstance.getString(TracerFileNameTag);
         final TraceLevel traceLevel = TraceLevel.getTypeByValue(savedInstance.getInt(TraceLevelTag));
-        if (traceLevel == null)
+        if ((traceFilePath == null) || (traceLevel == null))
             throw new CommonException(CommonResultCode.AssertError);
         return new FileTracerInstance(savedInstance.getInt(TracerMaxFileSize)
                 , savedInstance.getInt(TracerMaxFilesCount)
@@ -134,6 +136,14 @@ public class FileTracerInstance implements ITracer
         }
 
         return new FileTracerInstance(maxTraceFilesCount, maxTraceFileSize, minTraceLevel, null, remainTraceFile);
+    }
+
+    public static void saveInstance(FileTracerInstance tracer, Bundle savedInstance)
+    {
+        if (tracer == null)
+            return;
+
+        tracer.saveInstance(savedInstance);
     }
 
     private void initializeExistingTraceFiles()

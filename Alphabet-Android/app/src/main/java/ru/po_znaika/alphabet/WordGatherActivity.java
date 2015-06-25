@@ -216,7 +216,7 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
             final Resources resources = getResources();
             AlertDialogHelper.showMessageBox(this,
                     resources.getString(R.string.alert_title),
-                    resources.getString(R.string.alert_unknown_error));
+                    resources.getString(R.string.error_unknown_error));
             finish();
         }
     }

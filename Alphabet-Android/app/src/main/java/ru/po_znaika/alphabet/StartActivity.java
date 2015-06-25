@@ -40,7 +40,7 @@ public class StartActivity extends Activity
             final Resources resources = getResources();
             AlertDialogHelper.showMessageBox(this
                     , resources.getString(R.string.alert_title)
-                    , resources.getString(R.string.alert_unknown_error));
+                    , resources.getString(R.string.error_unknown_error));
         }
     }
 
@@ -48,9 +48,16 @@ public class StartActivity extends Activity
     protected void onSaveInstanceState(@NonNull Bundle savedInstanceState)
     {
         super.onSaveInstanceState(savedInstanceState);
-        ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "SaveInstanceState");
-
-        m_tracer.saveInstance(savedInstanceState);
+        try
+        {
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "SaveInstanceState");
+            FileTracerInstance.saveInstance(m_tracer, savedInstanceState);
+        }
+        catch (Throwable exp)
+        {
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
+            throw exp;
+        }
     }
 
     private void constructUserInterface()

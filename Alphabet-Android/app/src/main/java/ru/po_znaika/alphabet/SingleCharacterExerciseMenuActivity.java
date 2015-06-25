@@ -29,13 +29,11 @@ public class SingleCharacterExerciseMenuActivity extends Activity
     private static final String LogTag = SingleCharacterExerciseMenuActivity.class.getName();
 
     private static final String CharacterExerciseIdTag = "character_exercise_id";
-    private static final String ExerciseCharacterTag = "exercise_character";
 
-    public static void startActivity(@NonNull Context context, int characterExerciseId, char exerciseCharacter)
+    public static void startActivity(@NonNull Context context, int characterExerciseId)
     {
         Intent intent = new Intent(context, SingleCharacterExerciseMenuActivity.class);
         intent.putExtra(CharacterExerciseIdTag, characterExerciseId);
-        intent.putExtra(ExerciseCharacterTag, exerciseCharacter);
         context.startActivity(intent);
     }
 
@@ -84,12 +82,12 @@ public class SingleCharacterExerciseMenuActivity extends Activity
                 throw new CommonException(CommonResultCode.InvalidInternalState);
             }
 
-            m_character = intentInfo.getChar(ExerciseCharacterTag);
+            /*m_character = intentInfo.getChar(ExerciseCharacterTag);
             if (m_character == '\0')
             {
                 Log.e(LogTag, "Invalid exercise character");
                 throw new CommonException(CommonResultCode.InvalidInternalState);
-            }
+            }*/
         }
 
         // Prepare database
@@ -112,8 +110,8 @@ public class SingleCharacterExerciseMenuActivity extends Activity
             {
                 Map<Integer, AlphabetDatabase.CharacterExerciseItemInfo> sortedExercises = new TreeMap<>();
 
-                for (AlphabetDatabase.CharacterExerciseItemInfo exerciseInfo : exercises)
-                    sortedExercises.put(exerciseInfo.menuPosition, exerciseInfo);
+                //for (AlphabetDatabase.CharacterExerciseItemInfo exerciseInfo : exercises)
+                //    sortedExercises.put(exerciseInfo.menuPosition, exerciseInfo);
 
                 int exerciseIndex = 0;
                 for (Map.Entry<Integer, AlphabetDatabase.CharacterExerciseItemInfo> exerciseInfo : sortedExercises.entrySet())
@@ -137,8 +135,8 @@ public class SingleCharacterExerciseMenuActivity extends Activity
         {
             ArrayAdapter<String> menuItems = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
-            for (AlphabetDatabase.CharacterExerciseItemInfo characterExerciseInfo : m_characterExerciseItems)
-                menuItems.add(characterExerciseInfo.displayName);
+            //for (AlphabetDatabase.CharacterExerciseItemInfo characterExerciseInfo : m_characterExerciseItems)
+            //    menuItems.add(characterExerciseInfo.displayName);
 
             ListView menuListView = (ListView) findViewById(R.id.menuListView);
             menuListView.setOnItemClickListener(new AdapterView.OnItemClickListener()

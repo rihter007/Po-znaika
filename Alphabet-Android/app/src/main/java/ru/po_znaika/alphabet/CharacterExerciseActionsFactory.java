@@ -144,14 +144,14 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                     Random random = new Random(System.currentTimeMillis());
                     for (ObjectExerciseContainer objectExercise : objectInfoExercises)
                     {
-                        AlphabetDatabase.WordObjectInfo[] thisTypeWords = m_alphabetDatabase.getRandomImageWords(characterExerciseInfo.alphabetId,
+                        AlphabetDatabase.WordObjectInfo[] thisTypeWords = m_alphabetDatabase.getRandomImageWords(characterExerciseInfo.alphabetType,
                                 characterExerciseInfo.character,
                                 objectExercise.containRelationship,
                                 false,
                                 CorrectImagesInExerciseStep);
                         if ((thisTypeWords == null) || (thisTypeWords.length != CorrectImagesInExerciseStep))
                             throw new CommonException(CommonResultCode.InvalidExternalSource);
-                        AlphabetDatabase.WordObjectInfo[] otherTypeWords = m_alphabetDatabase.getRandomImageWords(characterExerciseInfo.alphabetId,
+                        AlphabetDatabase.WordObjectInfo[] otherTypeWords = m_alphabetDatabase.getRandomImageWords(characterExerciseInfo.alphabetType,
                                 characterExerciseInfo.character,
                                 objectExercise.containRelationship,
                                 true,
@@ -196,7 +196,7 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                     if (exerciseInfo == null)
                         throw new CommonException(CommonResultCode.InvalidExternalSource);
 
-                    final String verseText = m_alphabetDatabase.getVerseTextByAlphabet(exerciseInfo.alphabetId,
+                    final String verseText = m_alphabetDatabase.getVerseTextByAlphabet(exerciseInfo.alphabetType,
                             exerciseInfo.character, VerseMinSearchCharactersCount, VerseMaxCharactersCount);
                     if (TextUtils.isEmpty(verseText))
                         throw new CommonException(CommonResultCode.InvalidExternalSource);

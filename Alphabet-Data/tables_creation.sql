@@ -83,30 +83,43 @@ CREATE TABLE exercise (
     _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
     type INTEGER,
     name TEXT NOT NULL,
-    display_name TEXT NOT NULL,
-    image_id INTEGER,
-	
-    FOREIGN KEY(image_id) REFERENCES image(id),
-	
+	max_score INTEGER,
+		
     UNIQUE (name) ON CONFLICT FAIL
 );
 
+CREATE TABLE exercise_display_name (
+	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
+	exercise_id INTEGER NOT NULL,
+	alphabet_id INTEGER NOT NULL,
+	display_name TEXT NOT NULL,
+
+	FOREIGN KEY (exercise_id) REFERENCES exercise(_id),
+	
+	UNIQUE (exercise_id, alphabet_id) ON CONFLICT FAIL
+);
+	
 CREATE TABLE character_exercise (
     _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
-    exercise_id INTEGER NOT NULL,
     character TEXT NOT NULL,
     alphabet_id INTEGER NOT NULL,
-    FOREIGN KEY (exercise_id) REFERENCES exercise(id),
-    UNIQUE (exercise_id) ON CONFLICT FAIL
+	not_passed_image_id INTEGER NOT NULL,
+	passed_image_id INTEGER NOT NULL,
+		
+    FOREIGN KEY (exercise_id) REFERENCES exercise(_id),
+    FOREIGN KEY (not_passed_image_id) REFERENCES image(_id),
+	FOREIGN KEY (passed_image_id) REFERENCES image(_id),
+	
+	UNIQUE (exercise_id) ON CONFLICT FAIL
 );
 
 CREATE TABLE character_exercise_item (
 	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
+	exercise_id INTEGER NOT NULL,
 	character_exercise_id INTEGER NOT NULL,
-	menu_position INTEGER NOT NULL,
-	name TEXT NOT NULL,
-	display_name TEXT NOT NULL,
+	menu_element_type INTEGER NOT NULL,
 	
+	FOREIGN KEY(exercise_id) REFERENCES exercise(_id),
 	FOREIGN KEY(character_exercise_id) REFERENCES character_exercise(_id),
 	
 	UNIQUE (character_exercise_id, name) ON CONFLICT FAIL,

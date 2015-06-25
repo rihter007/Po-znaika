@@ -129,7 +129,7 @@ public class TheoryPageFragment extends Fragment
                         {
                             AlertDialogHelper.showMessageBox(getActivity(),
                                     resources.getString(R.string.alert_title),
-                                    resources.getString(R.string.alert_unknown_error));
+                                    resources.getString(R.string.error_unknown_error));
                         }
                     }
                 });

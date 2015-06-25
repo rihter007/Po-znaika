@@ -67,6 +67,12 @@ public final class DiaryDatabase extends SQLiteOpenHelper
         onCreate(database);
     }
 
+    public int getExerciseScore(@NonNull String exerciseName)
+    {
+        // todo: provide realization
+        return 0;
+    }
+
     public int insertExerciseScore(@NonNull Date dateTime, @NonNull String exerciseId, int score)
     {
         int resultId = DatabaseConstant.InvalidDatabaseIndex;

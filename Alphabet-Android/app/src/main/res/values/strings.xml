@@ -51,7 +51,7 @@
     <string name="caption_license_scroll_title">Выберите период дневника</string>
     <string name="caption_days_selected">Выбрано %d дней</string>
     <string name="alert_title">Внимание</string>
-    <string name="alert_unknown_error">Произошла неизвестная ошибка</string>
+    <string name="error_unknown_error">Произошла неизвестная ошибка</string>
     <string name="alert_bad_credentials">Некорректный логин и/или пароль</string>
     <string name="alert_finish_exercise">Завершить упражнение?</string>
     <string name="alert_exit_exercise">Выйти из упражнения?</string>

@@ -24,10 +24,4 @@ public interface IExercise
 
     /* Returns exercise internal format name */
     String getName();
-
-    /* Returns user-friendly exercise name to display */
-    String getDisplayName();
-
-    /* Returns an exercise icon */
-    Drawable getDisplayImage();
 }
