@@ -59,6 +59,6 @@ public class TracerHelper
         return FileTracerInstance.getExistingTracerInstanceOrCreate(Constant.Tracer.MaxTraceFilesCount
                 , Constant.Tracer.MaxTraceFileSize
                 , Constant.Tracer.MinTraceLevel
-                , new File(getTracesDirectory(context), Constant.Tracer.TraceDirectory).getAbsolutePath());
+                , getTracesDirectory(context));
     }
 }

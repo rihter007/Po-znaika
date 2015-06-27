@@ -70,6 +70,8 @@ public class FileTracer implements ITracer, Closeable
     @Override
     public synchronized void close()
     {
+        if (m_traceFile == null)
+            return;
         try
         {
             m_traceFile.flush();

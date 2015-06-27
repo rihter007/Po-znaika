@@ -49,7 +49,7 @@ public class TraceActivity extends ActionBarActivity implements ITraceFilesMenuC
                     TraceFilesMenuFragment.createFragment(getIntent().getExtras().getString(TracesDropFolderTag));
             drawFragment(resultFragment);
         }
-        catch (Exception exp)
+        catch (Throwable exp)
         {
             final Resources resources = getResources();
             AlertDialogHelper.showMessageBox(this,

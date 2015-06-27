@@ -11,6 +11,7 @@ import com.arz_x.tracer.ITracer;
 import com.arz_x.tracer.ProductTracer;
 import com.arz_x.tracer.TraceLevel;
 
+import java.io.Closeable;
 import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -20,7 +21,7 @@ import java.util.List;
  * Created by Rihter on 18.05.2015.
  * Helps keeping same trace file during complicated android application lifecycle
  */
-public class FileTracerInstance implements ITracer
+public class FileTracerInstance implements ITracer, Closeable
 {
     public static final int Unlimited = 0;
 
@@ -39,6 +40,7 @@ public class FileTracerInstance implements ITracer
     {
         m_maxTraceFilesCount = maxTraceFilesCount;
         m_maxTraceFileSize = maxTraceFileSize;
+        m_minTraceLevel = minTraceLevel;
         if (existingTraceFile != null)
         {
             m_tracesDirectory = new File(existingTraceFile).getParent();
@@ -51,6 +53,7 @@ public class FileTracerInstance implements ITracer
             m_tracesDirectory = tracesDirectory;
             m_tracer = ProductTracer.createNewFileTracer(tracesDirectory, minTraceLevel, maxTraceFileSize);
         }
+        m_filePath = m_tracer.getFullPathToFile();
 
         initializeExistingTraceFiles();
     }
@@ -163,14 +166,16 @@ public class FileTracerInstance implements ITracer
 
     public synchronized void saveInstance(@NonNull Bundle savedInstance)
     {
-        savedInstance.putString(TracerFileNameTag, m_tracer.getFullPathToFile());
-        savedInstance.putInt(TraceLevelTag, m_tracer.getTraceLevel().getValue());
+        savedInstance.putString(TracerFileNameTag, m_filePath);
+        savedInstance.putInt(TraceLevelTag, m_minTraceLevel.getValue());
         savedInstance.putInt(TracerMaxFilesCount, m_maxTraceFilesCount);
         savedInstance.putInt(TracerMaxFileSize, m_maxTraceFileSize);
     }
 
     public synchronized void traceMessage(TraceLevel traceLevel, String message)
     {
+        if (m_tracer == null)
+            return;
         try
         {
             if (m_tracer.isOverflow())
@@ -185,6 +190,23 @@ public class FileTracerInstance implements ITracer
         }
 
         m_tracer.traceMessage(traceLevel, message);
+    }
+
+    public void pause()
+    {
+        close();
+    }
+
+    public void resume() throws CommonException
+    {
+        if (m_tracer == null)
+            m_tracer = ProductTracer.openExistingFileTracer(m_filePath, m_minTraceLevel, m_maxTraceFileSize);
+    }
+
+    public void close()
+    {
+        m_tracer.close();
+        m_tracer = null;
     }
 
     private synchronized void processFilesCountOverflow()
@@ -202,7 +224,9 @@ public class FileTracerInstance implements ITracer
 
     private int m_maxTraceFilesCount;
     private int m_maxTraceFileSize;
+    private TraceLevel m_minTraceLevel;
     private String m_tracesDirectory;
+    private String m_filePath;
     private List<String> m_currentTraceFiles;
     private FileTracer m_tracer;
 }
