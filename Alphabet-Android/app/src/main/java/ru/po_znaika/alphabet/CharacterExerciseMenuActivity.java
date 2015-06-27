@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -50,6 +51,9 @@ public class CharacterExerciseMenuActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_character_exercise_menu);
 
+        setRequestedOrientation(getResources().getDimension(R.dimen.orientation_flag) == 0 ?
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
         try
         {
             m_tracer = TracerHelper.continueOrCreateFileTracer(this, savedInstanceState);
@@ -73,6 +77,28 @@ public class CharacterExerciseMenuActivity extends Activity
                             finish();
                         }
                     });
+        }
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        m_tracer.pause();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        try
+        {
+            m_tracer.resume();
+        }
+        catch (CommonException exp)
+        {
+            // this should never happen
+            throw new AssertionError();
         }
     }
 
@@ -137,8 +163,8 @@ public class CharacterExerciseMenuActivity extends Activity
                 ProductTracer.traceMessage(m_tracer
                         , TraceLevel.Error
                         , LogTag
-                        , String.format("No character exercise items for %d", characterExercises[chExerciseIndex].id));
-                continue;
+                        , String.format("No character exercise items for %d", currentCharacterExercise.id));
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
             }
 
             boolean areAllExercisesComplete = true;
@@ -201,37 +227,39 @@ public class CharacterExerciseMenuActivity extends Activity
             }
         });
 
+        final boolean isForwardAvailable = (m_pageNumber + 1) * ExercisesPerPage < m_characterExercises.length;
+
         ImageView forwardImageView = (ImageView)findViewById(R.id.forwardImageView);
+        forwardImageView.setVisibility(isForwardAvailable ? View.VISIBLE : View.INVISIBLE);
         forwardImageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                if ((m_pageNumber + 1) * ExercisesPerPage < m_characterExercises.length)
-                {
-                    ++m_pageNumber;
+                if (!isForwardAvailable)
+                    return;
+                ++m_pageNumber;
 
-                    try
-                    {
-                        drawCharacterExercises();
-                    }
-                    catch (Exception exp)
-                    {
-                        ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
-                        AlertDialogHelper.showMessageBox(CharacterExerciseMenuActivity.this
-                                , getResources().getString(R.string.error_unknown_error)
-                                , getResources().getString(R.string.alert_title)
-                                , false
-                                , new DialogInterface.OnClickListener()
+                try
+                {
+                    drawCharacterExercises();
+                }
+                catch (Exception exp)
+                {
+                    ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
+                    AlertDialogHelper.showMessageBox(CharacterExerciseMenuActivity.this
+                            , getResources().getString(R.string.error_unknown_error)
+                            , getResources().getString(R.string.alert_title)
+                            , false
+                            , new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
                                 {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
-                                        finish();
-                                    }
+                                    finish();
                                 }
-                        );
-                    }
+                            }
+                    );
                 }
             }
         });
@@ -262,13 +290,17 @@ public class CharacterExerciseMenuActivity extends Activity
         for (int exerciseIndex = 0; exerciseIndex < ExerciseIterateIndex; ++exerciseIndex)
         {
             final int exerciseOffsetIndex = ExercisesPerPage * m_pageNumber + exerciseIndex;
-            final int drawableId = DatabaseHelpers.getDrawableIdByName(resources, m_characterExercises[exerciseOffsetIndex].displayImage);
+            final ExerciseDisplayInfo exerciseDisplayInfo = m_characterExercises[exerciseOffsetIndex];
+            if (exerciseDisplayInfo == null)
+                continue;
+
+            final int drawableId = DatabaseHelpers.getDrawableIdByName(resources, exerciseDisplayInfo.displayImage);
             if (drawableId == 0)
             {
                 ProductTracer.traceMessage(m_tracer
                         , TraceLevel.Error
                         , LogTag
-                        , String.format("Failed to get image resource id for '%s'", m_characterExercises[exerciseOffsetIndex].displayImage));
+                        , String.format("Failed to get image resource id for '%s'", exerciseDisplayInfo.displayImage));
                 throw new CommonException(CommonResultCode.InvalidExternalSource);
             }
 
@@ -291,7 +323,7 @@ public class CharacterExerciseMenuActivity extends Activity
                     try
                     {
                         SingleCharacterExerciseMenuActivity.startActivity(CharacterExerciseMenuActivity.this
-                                , m_characterExercises[exerciseOffsetIndex].characterExerciseId);
+                                , exerciseDisplayInfo.characterExerciseId);
                     }
                     catch (Exception exp)
                     {

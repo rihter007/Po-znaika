@@ -35,7 +35,7 @@ public class MainMenuActivity extends Activity
         context.startActivity(intent);
     }
 
-    private static final String LogTag = "MainMenuActivity";
+    private static final String LogTag = MainMenuActivity.class.getName();
 
     private class LicenseProcessingTask extends AsyncTask<String, Integer, LicenseType>
     {
@@ -224,6 +224,28 @@ public class MainMenuActivity extends Activity
     }
 
     @Override
+    protected void onPause()
+    {
+        super.onPause();
+        m_tracer.pause();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        try
+        {
+            m_tracer.resume();
+        }
+        catch (CommonException exp)
+        {
+            // this should never happen
+            throw new AssertionError();
+        }
+    }
+
+    @Override
     protected void onSaveInstanceState(@NonNull Bundle savedInstance)
     {
         super.onSaveInstanceState(savedInstance);
@@ -257,6 +279,7 @@ public class MainMenuActivity extends Activity
                 public void onClick(View v)
                 {
                     ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onClick(): abcBookImageView");
+                    CharacterExerciseMenuActivity.startActivity(MainMenuActivity.this);
                 }
             });
         }

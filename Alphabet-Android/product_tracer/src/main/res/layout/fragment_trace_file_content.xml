@@ -20,11 +20,17 @@
             android:id="@+id/backImageButton"/>
     </LinearLayout>
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/contentTextView"/>
+        android:id="@+id/scrollView">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:maxLines="1000"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/contentTextView"/>
+    </ScrollView>
 
 </LinearLayout>

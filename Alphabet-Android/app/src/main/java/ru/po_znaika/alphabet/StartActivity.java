@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.arz_x.CommonException;
 import com.arz_x.android.AlertDialogHelper;
 import com.arz_x.android.product_tracer.FileTracerInstance;
 import com.arz_x.android.product_tracer.TraceActivity;
@@ -41,6 +42,28 @@ public class StartActivity extends Activity
             AlertDialogHelper.showMessageBox(this
                     , resources.getString(R.string.alert_title)
                     , resources.getString(R.string.error_unknown_error));
+        }
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        m_tracer.pause();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        try
+        {
+            m_tracer.resume();
+        }
+        catch (CommonException exp)
+        {
+            // this should never happen
+            throw new AssertionError();
         }
     }
 

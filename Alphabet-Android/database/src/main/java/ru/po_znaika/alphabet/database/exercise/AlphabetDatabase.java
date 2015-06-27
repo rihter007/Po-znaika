@@ -346,7 +346,7 @@ public final class AlphabetDatabase
     private static final String ExtractVerseTextByAlphabetIdSqlStatement =
             "SELECT verse_text " +
             "FROM verse " +
-            "WHERE (alphabet_id = ?) AND (verse_text LIKE ?) AND (length(verse_text) < ?) " +
+            "WHERE (alphabet_type = ?) AND (verse_text LIKE ?) AND (length(verse_text) < ?) " +
             "ORDER BY RANDOM() LIMIT 1";
 
     /**
@@ -362,7 +362,7 @@ public final class AlphabetDatabase
             "SELECT ce._id, ce.character, img1.file_name, img2.file_name " +
                     "FROM character_exercise ce, image img1, image img2 " +
                     "WHERE (img1._id = ce.not_passed_image_id) AND (img2._id = ce.passed_image_id) " +
-                    "      AND (alphabet_id = ?)";
+                    "      AND (ce.alphabet_type = ?)";
     private static final String ExtractCharacterExerciseByIdSqlStatement =
             "SELECT exercise_id, character, alphabet_id FROM character_exercise WHERE _id = ?";
 
@@ -371,7 +371,7 @@ public final class AlphabetDatabase
     private static final String ExtractAllCharacterExerciseItemsByCharacterExerciseIdSqlStatement =
             "SELECT chi._id, chi.menu_element_type, ex._id, ex.type, ex.name, ex.max_score " +
                     "FROM character_exercise_item chi, exercise ex " +
-                    "WHERE (chi.exercise_id = ex._id) (character_exercise_id = ?)";
+                    "WHERE (chi.exercise_id = ex._id) AND (character_exercise_id = ?)";
     private static final String ExtractAllCharacterExerciseStepsByCharacterExerciseItemIdSqlStatement =
             "SELECT _id, step_number, action, value FROM character_exercise_item_step WHERE character_exercise_item_id = ?";
     private static final String ExtractCharacterItemDisplayNameByIdSqlStatement =

@@ -1,16 +1,13 @@
 package ru.po_znaika.alphabet;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,16 +17,17 @@ import android.widget.ArrayAdapter;
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.product_tracer.FileTracerInstance;
+import com.arz_x.tracer.ProductTracer;
+import com.arz_x.tracer.TraceLevel;
+
+import java.util.Map;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 public class SingleCharacterExerciseMenuActivity extends Activity
 {
-    private static final String LogTag = SingleCharacterExerciseMenuActivity.class.getName();
-
-    private static final String CharacterExerciseIdTag = "character_exercise_id";
-
     public static void startActivity(@NonNull Context context, int characterExerciseId)
     {
         Intent intent = new Intent(context, SingleCharacterExerciseMenuActivity.class);
@@ -37,23 +35,31 @@ public class SingleCharacterExerciseMenuActivity extends Activity
         context.startActivity(intent);
     }
 
+    private static final String CharacterExerciseIdTag = "character_exercise_id";
+    private static final String LogTag = SingleCharacterExerciseMenuActivity.class.getName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_character_exercise_menu);
 
+        setRequestedOrientation(getResources().getDimension(R.dimen.orientation_flag) == 0 ?
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
         try
         {
+            m_tracer = TracerHelper.continueOrCreateFileTracer(this, savedInstanceState);
+
             restoreInternalState();
             constructUserInterface();
         }
-        catch (Exception exp)
+        catch (Throwable exp)
         {
-            Resources resources = getResources();
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
             AlertDialogHelper.showMessageBox(this,
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.failed_exercise_start),
+                    getResources().getString(R.string.alert_title),
+                    getResources().getString(R.string.failed_exercise_start),
                     false, new DialogInterface.OnClickListener()
                     {
                         @Override
@@ -63,6 +69,35 @@ public class SingleCharacterExerciseMenuActivity extends Activity
                         }
                     });
         }
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        m_tracer.pause();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        try
+        {
+            m_tracer.resume();
+        }
+        catch (CommonException exp)
+        {
+            // this should never happen
+            throw new AssertionError();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle savedInstance)
+    {
+        super.onSaveInstanceState(savedInstance);
+        FileTracerInstance.saveInstance(m_tracer, savedInstance);
     }
 
     /**
@@ -104,7 +139,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
                 throw new CommonException(CommonResultCode.InvalidExternalSource);
             }
 
-            m_characterExerciseItems = new AlphabetDatabase.CharacterExerciseItemInfo[exercises.length];
+           /* m_characterExerciseItems = new AlphabetDatabase.CharacterExerciseItemInfo[exercises.length];
 
             // Sort exercises in m_characterExerciseItems according to menu_position
             {
@@ -117,6 +152,7 @@ public class SingleCharacterExerciseMenuActivity extends Activity
                 for (Map.Entry<Integer, AlphabetDatabase.CharacterExerciseItemInfo> exerciseInfo : sortedExercises.entrySet())
                     m_characterExerciseItems[exerciseIndex++] = exerciseInfo.getValue();
             }
+            */
         }
     }
 
@@ -128,8 +164,8 @@ public class SingleCharacterExerciseMenuActivity extends Activity
         // process caption
         {
             TextView textView = (TextView) findViewById(R.id.charcterTextView);
-            final String CharacterCaption = "[" + m_character + "]";
-            textView.setText(CharacterCaption);
+            //final String CharacterCaption = "[" + m_character + "]";
+           // textView.setText(CharacterCaption);
         }
         // process menu items list view
         {
@@ -153,18 +189,11 @@ public class SingleCharacterExerciseMenuActivity extends Activity
 
     private void onListViewItemSelected(int itemSelectedIndex)
     {
-        CharacterExerciseItemActivity.startActivity(this, m_characterExerciseItems[itemSelectedIndex].id);
+        //CharacterExerciseItemActivity.startActivity(this, m_characterExerciseItems[itemSelectedIndex].id);
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle savedInstanceState)
-    {
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
+    private FileTracerInstance m_tracer;
+    private Map<AlphabetDatabase.CharacterExerciseItemType, Integer> m_characterExerciseItems;
     private AlphabetDatabase m_alphabetDatabase;
     private int m_characterExerciseId;
-    private char m_character;
-
-    private AlphabetDatabase.CharacterExerciseItemInfo[] m_characterExerciseItems;
 }

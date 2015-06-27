@@ -101,16 +101,15 @@ CREATE TABLE exercise_display_name (
 	
 CREATE TABLE character_exercise (
     _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
-    character TEXT NOT NULL,
-    alphabet_id INTEGER NOT NULL,
+	alphabet_type INTEGER NOT NULL,
+    character TEXT NOT NULL,    
 	not_passed_image_id INTEGER NOT NULL,
 	passed_image_id INTEGER NOT NULL,
 		
-    FOREIGN KEY (exercise_id) REFERENCES exercise(_id),
     FOREIGN KEY (not_passed_image_id) REFERENCES image(_id),
 	FOREIGN KEY (passed_image_id) REFERENCES image(_id),
 	
-	UNIQUE (exercise_id) ON CONFLICT FAIL
+	UNIQUE (alphabet_type, character) ON CONFLICT FAIL
 );
 
 CREATE TABLE character_exercise_item (
@@ -122,8 +121,8 @@ CREATE TABLE character_exercise_item (
 	FOREIGN KEY(exercise_id) REFERENCES exercise(_id),
 	FOREIGN KEY(character_exercise_id) REFERENCES character_exercise(_id),
 	
-	UNIQUE (character_exercise_id, name) ON CONFLICT FAIL,
-	UNIQUE (character_exercise_id, menu_position) ON CONFLICT FAIL
+	UNIQUE (character_exercise_id, exercise_id) ON CONFLICT FAIL,
+	UNIQUE (character_exercise_id, menu_element_type) ON CONFLICT FAIL
 );
 
 CREATE TABLE character_exercise_item_step (
@@ -341,6 +340,13 @@ INSERT INTO image(_id, file_name) VALUES (158,'database_russian_ch33_handwrite')
 INSERT INTO image(_id, file_name) VALUES (159,'database_apple');
 INSERT INTO image(_id, file_name) VALUES (160,'database_family');
 INSERT INTO image(_id, file_name) VALUES (161,'database_moon');
+
+-- Insert character images
+INSERT INTO image(_id, file_name) VALUES (300,'database_russian_icon_dark_ch1');
+INSERT INTO image(_id, file_name) VALUES (301,'database_russian_icon_light_ch1');
+INSERT INTO image(_id, file_name) VALUES (302,'database_russian_icon_dark_ch2');
+INSERT INTO image(_id, file_name) VALUES (303,'database_russian_icon_light_ch2');
+
 /*
 ***************************
 Sound table
@@ -355,19 +361,31 @@ Here:
 type column represents hardcoded identifiers of exercise type:
 294335127 - crc32 of 'Character'
 402850721 - crc32 of 'WordGather'
--858355490 - crc32 of 'CreateWordsFromSpecified' 
+-858355490 - crc32 of 'CreateWordsFromSpecified'
+
+CREATE TABLE exercise (
+    _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
+    type INTEGER,
+    name TEXT NOT NULL,
+	max_score INTEGER,
+		
+    UNIQUE (name) ON CONFLICT FAIL
+);
+
 ***************************
 */
-INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(-1022889626,   294335127, 'Alphabet.Russian.Character1', 'Буква А', 1);
-INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(1510908124, 294335127, 'Alphabet.Russian.Character2', 'Буква Б', 2);
-/*
-INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(-943947333,  294335127, 'Russian.Alphabet.Character3', 'Буква В', 3);
-INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(1507333144,  294335127, 'Russian.Alphabet.Character4', 'Буква Г', 4);
-*/
+
+-- Character exercises
+
+INSERT INTO exercise(_id, type, name, max_score) VALUES(1195583655, 294335127, 'Alphabet.Russian.Character1.Sound', 10);
+INSERT INTO exercise(_id, type, name, max_score) VALUES(-1441032379, 294335127, 'Alphabet.Russian.Character1.Print', 10);
+INSERT INTO exercise(_id, type, name, max_score) VALUES(-588490738, 294335127, 'Alphabet.Russian.Character1.Handwrite', 10);
+INSERT INTO exercise(_id, type, name, max_score) VALUES(-1101215443, 294335127, 'Alphabet.Russian.Character1.FindImage', 50);
+INSERT INTO exercise(_id, type, name, max_score) VALUES(1879715682, 294335127, 'Alphabet.Russian.Character1.FindCharacter', 50);
 
 -- Games
-INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(916623525,   402850721, 'Alphabet.Russian.WordGather', 'Слово рассыпалось', 5);
-INSERT INTO exercise(_id, type, name, display_name, image_id) VALUES(1264890976,   -858355490, 'Alphabet.Russian.CreateWordsFromSpecified', 'Составь слова', 6);
+INSERT INTO exercise(_id, type, name, max_score) VALUES(916623525,   402850721, 'Alphabet.Russian.WordGather', 100);
+INSERT INTO exercise(_id, type, name, max_score) VALUES(1264890976,   -858355490, 'Alphabet.Russian.CreateWordsFromSpecified', 100);
 
 /* 
 ***************************
@@ -375,43 +393,55 @@ character_exercise table
 Here:
 alphabet_id is column of hardocded alphabet identifier
 -345575051- crc32 of 'russian'
+
+CREATE TABLE character_exercise (
+    _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
+    character TEXT NOT NULL,
+    alphabet_id INTEGER NOT NULL,
+	not_passed_image_id INTEGER NOT NULL,
+	passed_image_id INTEGER NOT NULL,
+		
+    FOREIGN KEY (not_passed_image_id) REFERENCES image(_id),
+	FOREIGN KEY (passed_image_id) REFERENCES image(_id),
+	
+	UNIQUE (alphabet_id, character) ON CONFLICT FAIL
+);
 ***************************
 */
-INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(1, -1022889626, 'а', -345575051); 
-INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(2, 1510908124, 'б', -345575051); 
-/*
-INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(3, -943947333,  'в', -345575051); 
-INSERT INTO character_exercise(_id, exercise_id, character, alphabet_id) VALUES(4, 1507333144,  'г', -345575051);
-*/
+INSERT INTO character_exercise(_id, character, alphabet_type, not_passed_image_id, passed_image_id) VALUES(1, 'а', -345575051, 300, 301); 
+--INSERT INTO character_exercise(_id, character, alphabet_type, not_passed_image_id, passed_image_id) VALUES(2, 'б', -345575051, 302, 303);
 
 /* 
 ***************************
 character_exercise_item table
+
+CREATE TABLE character_exercise_item (
+	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
+	exercise_id INTEGER NOT NULL,
+	character_exercise_id INTEGER NOT NULL,
+	menu_element_type INTEGER NOT NULL,
+	
+	FOREIGN KEY(exercise_id) REFERENCES exercise(_id),
+	FOREIGN KEY(character_exercise_id) REFERENCES character_exercise(_id),
+	
+	UNIQUE (character_exercise_id, exercise_id) ON CONFLICT FAIL,
+	UNIQUE (character_exercise_id, menu_element_type) ON CONFLICT FAIL
+);
+
+CharacterSound(260157427),            // a crc32 of 'CharacterExerciseItemType.CharacterSound'
+CharacterPrint(-489091055),           // a crc32 of 'CharacterExerciseItemType.CharacterPrint'
+CharacterHandWrite(1022598804),       // a crc32 of 'CharacterExerciseItemType.CharacterHandWrite'
+FindPictureWithCharacter(-954576837), // a crc32 of 'CharacterExerciseItemType.FindPictureWithCharacter'
+FindCharacter(-226661029);            // a crc32 of 'CharacterExerciseItemType.FindCharacter'
+
 ***************************
 */
 /* Character 1 */
-INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
-    VALUES(1195583655, 1, 0, 'Alphabet.Russian.Character1.Sound', 'Звук буквы А');
-INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
-    VALUES(-1441032379, 1, 1, 'Alphabet.Russian.Character1.Print', 'Печатная буква А');
-INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
-    VALUES(-588490738, 1, 2, 'Alphabet.Russian.Character1.Handwrite', 'Прописная буква А');
-INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
-    VALUES(-1101215443, 1, 3, 'Alphabet.Russian.Character1.FindImage', 'Выбери картинку с буквой А');
-INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
-    VALUES(1879715682, 1, 4, 'Alphabet.Russian.Character1.FindCharacter', 'Выдели букву А');	
-
-/*Character 2 */
-INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
-    VALUES(1990931002, 2, 0, 'Alphabet.Russian.Character2.Sound', 'Звук буквы Б');
-INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
-    VALUES(-1678537256, 2, 1, 'Alphabet.Russian.Character2.Print', 'Печатная буква Б');
-INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
-    VALUES(1158561295, 2, 2, 'Alphabet.Russian.Character2.Handwrite', 'Прописная буква Б');
-INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
-    VALUES(666808108, 2, 3, 'Alphabet.Russian.Character2.FindImage', 'Выбери картинку с буквой Б');
-INSERT INTO character_exercise_item(_id, character_exercise_id, menu_position, name, display_name)
-    VALUES(1635206427, 2, 4, 'Alphabet.Russian.Character2.FindCharacter', 'Выдели букву Б');	
+INSERT INTO character_exercise_item(_id, exercise_id, character_exercise_id, menu_element_type) VALUES (1, 1195583655, 1, 260157427);
+INSERT INTO character_exercise_item(_id, exercise_id, character_exercise_id, menu_element_type) VALUES (2, -1441032379, 1, -489091055);
+INSERT INTO character_exercise_item(_id, exercise_id, character_exercise_id, menu_element_type) VALUES (3, -588490738, 1, 1022598804);
+INSERT INTO character_exercise_item(_id, exercise_id, character_exercise_id, menu_element_type) VALUES (4, -1101215443, 1, -954576837);
+INSERT INTO character_exercise_item(_id, exercise_id, character_exercise_id, menu_element_type) VALUES (5, 1879715682, 1, -226661029);
 	
 /* 
 ***************************
