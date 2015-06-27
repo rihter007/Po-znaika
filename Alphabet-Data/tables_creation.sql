@@ -420,6 +420,9 @@ CREATE TABLE character_exercise_item (
 	exercise_id INTEGER NOT NULL,
 	character_exercise_id INTEGER NOT NULL,
 	menu_element_type INTEGER NOT NULL,
+	not_passed_image_id INTEGER NOT NULL,
+	started_image_id INTEGER NOT NULL,
+	passed_image_id INTEGER NOT NULL,
 	
 	FOREIGN KEY(exercise_id) REFERENCES exercise(_id),
 	FOREIGN KEY(character_exercise_id) REFERENCES character_exercise(_id),

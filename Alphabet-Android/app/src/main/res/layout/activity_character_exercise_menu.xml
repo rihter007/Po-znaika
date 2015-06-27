@@ -6,150 +6,157 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:layout_marginLeft="@dimen/small_margin"
-    android:layout_marginRight="@dimen/small_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="ru.po_znaika.alphabet.CharacterExerciseMenuActivity"
               android:background="@drawable/character_menu_screen_main_background">
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="1">
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/small_margin"
+        android:layout_marginRight="@dimen/small_margin">
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView1"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1">
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView2"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView1"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView3"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
-    </RelativeLayout>
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView2"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"/>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="1">
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView3"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView4"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1">
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView5"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView4"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView6"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
-    </RelativeLayout>
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView5"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"/>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="1">
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView6"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView7"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1">
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView8"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView7"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView9"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
-    </RelativeLayout>
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView8"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"/>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="1">
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView9"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView10"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1">
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView11"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView10"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/characterImageView12"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
-    </RelativeLayout>
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView11"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"/>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="1">
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/characterImageView12"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <ImageView
-            android:layout_width="@dimen/medium_image_size"
-            android:layout_height="@dimen/medium_image_size"
-            android:id="@+id/backImageView"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:src="@drawable/character_menu_screen_back"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1">
 
-        <ImageView
-            android:layout_width="@dimen/character_exercise_menu_image_size"
-            android:layout_height="@dimen/character_exercise_menu_image_size"
-            android:id="@+id/forwardImageView"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/character_menu_screen_forward"/>
-    </RelativeLayout>
+            <ImageView
+                android:layout_width="@dimen/medium_image_size"
+                android:layout_height="@dimen/medium_image_size"
+                android:id="@+id/backImageView"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/arrow_back"/>
 
+            <ImageView
+                android:layout_width="@dimen/character_exercise_menu_image_size"
+                android:layout_height="@dimen/character_exercise_menu_image_size"
+                android:id="@+id/forwardImageView"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/arrow_forward"/>
+        </RelativeLayout>
+
+
+    </LinearLayout>
 </LinearLayout>

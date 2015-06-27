@@ -7,53 +7,161 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:background="#ff87e100"
-    tools:context="ru.po_znaika.alphabet.SingleCharacterExerciseMenuActivity">
+              tools:context="ru.po_znaika.alphabet.SingleCharacterExerciseMenuActivity"
+              android:background="@drawable/single_character_menu_background">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_vertical|left">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/characterImageView"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="@dimen/single_character_exercise_menu_elements_padding"
+            android:layout_marginStart="@dimen/single_character_exercise_menu_elements_padding"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="8">
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/medium_margin"
+            android:layout_marginStart="@dimen/medium_margin"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
 
-            <TextView
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="@dimen/abc_action_bar_default_height_material"
-                android:text=""
-                android:id="@+id/charcterTextView"
-                android:textColor="#fffff000"/>
+                android:layout_height="0px"
+                android:layout_weight="2">
 
-            <TextView
+                <ImageView
+                    android:layout_width="@dimen/single_character_exercise_menu_cloud_image_width"
+                    android:layout_height="@dimen/single_character_exercise_menu_cloud_image_height"
+                    android:id="@+id/characterSoundImageView"
+                    android:src="@drawable/character_sound_passed"/>
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/abc_action_bar_default_height_material"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/main_menu_caption"
-                android:id="@+id/menuCaptionTextView"
-                android:layout_marginLeft="10dp"/>
+                android:layout_height="0px"
+                android:layout_weight="1">
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:layout_weight="2">
 
+                <ImageView
+                    android:layout_width="@dimen/single_character_exercise_menu_cloud_image_width"
+                    android:layout_height="@dimen/single_character_exercise_menu_cloud_image_height"
+                    android:id="@+id/handwriteCharacterImageView"
+                    android:src="@drawable/character_handwrite_passed"/>
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:layout_weight="1">
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:layout_weight="2">
+
+                <ImageView
+                    android:layout_width="@dimen/single_character_exercise_menu_cloud_image_width"
+                    android:layout_height="@dimen/single_character_exercise_menu_cloud_image_height"
+                    android:id="@+id/selectCharacterImageView"
+                    android:src="@drawable/character_select_character_passed"/>
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_vertical|start">
-                <ListView
-                    android:layout_width="500dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/menuListView"
-                    android:layout_weight="1"
-                    android:background="#ffffffff"/>
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:layout_weight="1.5">
             </LinearLayout>
-    </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:layout_weight="2">
+
+                <ImageView
+                    android:layout_width="@dimen/single_character_exercise_menu_cloud_image_width"
+                    android:layout_height="@dimen/single_character_exercise_menu_cloud_image_height"
+                    android:id="@+id/characterPrintImageView"
+                    android:src="@drawable/character_print_passed"/>
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:layout_weight="1">
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:layout_weight="2">
+
+                <ImageView
+                    android:layout_width="@dimen/single_character_exercise_menu_cloud_image_width"
+                    android:layout_height="@dimen/single_character_exercise_menu_cloud_image_height"
+                    android:id="@+id/selectImageImageView"
+                    android:src="@drawable/character_select_image_passed"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:layout_weight="1">
+            </LinearLayout>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:layout_marginBottom="@dimen/small_margin">
+
+        <ImageView
+            android:layout_width="@dimen/single_character_exercise_menu_image_size"
+            android:layout_height="@dimen/single_character_exercise_menu_image_size"
+            android:id="@+id/backImageView"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="@dimen/single_character_exercise_menu_elements_padding"
+            android:layout_marginStart="@dimen/single_character_exercise_menu_elements_padding"
+            android:src="@drawable/arrow_back"/>
+
+    </RelativeLayout>
 </LinearLayout>

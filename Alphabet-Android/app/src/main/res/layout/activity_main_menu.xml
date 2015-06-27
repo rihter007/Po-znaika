@@ -73,5 +73,4 @@
         android:src="@drawable/arrow_back"
         android:clickable="true"/>
 
-
 </RelativeLayout>

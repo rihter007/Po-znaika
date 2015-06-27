@@ -58,4 +58,10 @@
     <!-- Character exercise menu activity sizes -->
     <dimen name="character_exercise_menu_image_size">80dp</dimen>
 
+    <!-- Single character exercise meny activity sizes-->
+    <dimen name="single_character_exercise_menu_image_size">80dp</dimen>
+    <dimen name="single_character_exercise_menu_cloud_image_height">110dp</dimen>
+    <dimen name="single_character_exercise_menu_cloud_image_width">180dp</dimen>
+    <dimen name="single_character_exercise_menu_elements_padding">20dp</dimen>
+
 </resources>
