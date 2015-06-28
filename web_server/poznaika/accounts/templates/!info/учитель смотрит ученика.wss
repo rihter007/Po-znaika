@@ -1,0 +1,338 @@
+<site version="3.0"><css/><components/><page id="p3777423" pageindex="0" name="index" pp="0" cp="0"><body><Component type="4" id="shape1" zorder="0" filename="shape25070577" width="1084" height="90" bgcolor="#0000FF" previewfile="" left="36" top="20" fillstyle="0" fp="0"/><Component type="2" id="text1" zorder="1" filename="text25070577" left="142" top="45" width="168" height="43" html="" newhtml="1" htmlcode="" newexhtml="1" exporthtml="" newcode="1" editcode="" rvf="" dlcount="0" imgcount="0" editorbgcolor="536870911" fp="0" lp="0"><htmlcode>&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div&gt;&lt;font color="#FFFFFF" face="Calibri" style="font-size:32px;"&gt;По-знайка !&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+</htmlcode><exportcode>&lt;div class="wpmd"&gt;
+&lt;div&gt;&lt;font color="#FFFFFF" face="Calibri" class="ws24"&gt;По-знайка !&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+</exportcode><rvf>LTggMSAzDQotOSAyIDAgMCAyIDAgMQ0KcnZzDQrzAAAADgEJU3R5bGVOYW1lBgtOb3JtYWwgdGV4
+dAhGb250TmFtZQYFQXJpYWwAAQlTdHlsZU5hbWUGBkp1bXAgMQhGb250TmFtZQYFQXJpYWwFU3R5
+bGULC2ZzVW5kZXJsaW5lAAVDb2xvcgcGY2xCbHVlBEp1bXAJAAEJU3R5bGVOYW1lBgdVbmljb2Rl
+CEZvbnROYW1lBghTZWdvZSBVSQdVbmljb2RlCQABCVN0eWxlTmFtZQYLTm9ybWFsIHRleHQIU3Rh
+bmRhcmQICEZvbnROYW1lBgdDYWxpYnJpBFNpemUCGAVDb2xvcgcHY2xXaGl0ZQAALTkgMiAwIDAg
+MiAwIDINCnJ2cw0KBwEAAA4BCVN0eWxlTmFtZQYKTGVmdCBBbGlnbgdPcHRpb25zCwAEVGFicw4A
+AAEJU3R5bGVOYW1lBghDZW50ZXJlZAlBbGlnbm1lbnQHCXJ2YUNlbnRlcgdPcHRpb25zCwAEVGFi
+cw4AAAEJU3R5bGVOYW1lBgtSaWdodCBBbGlnbglBbGlnbm1lbnQHCHJ2YVJpZ2h0B09wdGlvbnML
+AARUYWJzDgAAAQlTdHlsZU5hbWUGDVByb3RlY3QgVGFibGUHT3B0aW9ucwsNcnZwYW9SZWFkT25s
+eRFydnBhb1N0eWxlUHJvdGVjdBVydnBhb0RvTm90V2FudFJldHVybnMABFRhYnMOAAAALTkgMiAw
+IDAgMiAwIDQNCnJ2cw0KAgAAAA4AMyAxIDAgMCAwIDANCs/uLeft4Onq4CAhDQo=
+</rvf></Component><Component type="15" id="table1" zorder="2" filename="table25070577" newhtml="1" htmlcode="" html="" newexhtml="1" exporthtml="" newcode="1" editcode="" rvf="" dlcount="0" imgcount="0" editorbgcolor="536870911" width="674" height="39" left="34" top="124" fp="0" lp="0"><htmlcode>&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div&gt;&lt;TABLE bgcolor="#FFFFFF" border=1 bordercolorlight="#C0C0C0" bordercolordark="#808080"&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=269&gt;&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div&gt;&lt;font style="font-size:19px;"&gt;&lt;B&gt;Просматриваемый ученик&lt;/B&gt;&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+&lt;/TD&gt;
+&lt;TD width=356&gt;&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div align=center&gt;&lt;font style="font-size:24px;"&gt;Иванов Петр Владиленович&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;/TABLE&gt;
+&lt;/div&gt;
+&lt;/FONT&gt;
+</htmlcode><exportcode>&lt;div class="wpmd"&gt;
+&lt;div&gt;&lt;TABLE bgcolor="#FFFFFF" border=1 bordercolorlight="#C0C0C0" bordercolordark="#808080"&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=269&gt;&lt;div class="wpmd"&gt;
+&lt;div&gt;&lt;font class="ws14"&gt;&lt;B&gt;Просматриваемый ученик&lt;/B&gt;&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/TD&gt;
+&lt;TD width=356&gt;&lt;div class="wpmd"&gt;
+&lt;div align=center&gt;&lt;font class="ws18"&gt;Иванов Петр Владиленович&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;/TABLE&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</exportcode><rvf>LTggMSAzDQotOSAyIDAgMCAyIDAgMQ0KcnZzDQorAQAADgEJU3R5bGVOYW1lBgtOb3JtYWwgdGV4
+dAhGb250TmFtZQYFQXJpYWwAAQlTdHlsZU5hbWUGBkp1bXAgMQhGb250TmFtZQYFQXJpYWwFU3R5
+bGULC2ZzVW5kZXJsaW5lAAVDb2xvcgcGY2xCbHVlBEp1bXAJAAEJU3R5bGVOYW1lBgdVbmljb2Rl
+CEZvbnROYW1lBghTZWdvZSBVSQdVbmljb2RlCQABCVN0eWxlTmFtZQYLTm9ybWFsIHRleHQIU3Rh
+bmRhcmQICEZvbnROYW1lBgVBcmlhbARTaXplAhIAAQlTdHlsZU5hbWUGC05vcm1hbCB0ZXh0CFN0
+YW5kYXJkCAhGb250TmFtZQYFQXJpYWwEU2l6ZQIOBVN0eWxlCwZmc0JvbGQAAAAtOSAyIDAgMCAy
+IDAgMg0KcnZzDQoHAQAADgEJU3R5bGVOYW1lBgpMZWZ0IEFsaWduB09wdGlvbnMLAARUYWJzDgAA
+AQlTdHlsZU5hbWUGCENlbnRlcmVkCUFsaWdubWVudAcJcnZhQ2VudGVyB09wdGlvbnMLAARUYWJz
+DgAAAQlTdHlsZU5hbWUGC1JpZ2h0IEFsaWduCUFsaWdubWVudAcIcnZhUmlnaHQHT3B0aW9ucwsA
+BFRhYnMOAAABCVN0eWxlTmFtZQYNUHJvdGVjdCBUYWJsZQdPcHRpb25zCw1ydnBhb1JlYWRPbmx5
+EXJ2cGFvU3R5bGVQcm90ZWN0FXJ2cGFvRG9Ob3RXYW50UmV0dXJucwAEVGFicw4AAAAtOSAyIDAg
+MCAyIDAgNA0KcnZzDQoCAAAADgAtNjAgMyAzIDAgMiAwIA0KZWRpdHRhYmxlDQoxDQrLAQAAVFBG
+MApUUlZUYWJsZVNXABJULlRleHRSb3dTZXBhcmF0b3IGAg0KElQuVGV4dENvbFNlcGFyYXRvcgYC
+DQoNVC5Cb3JkZXJXaWR0aAIBDVQuQm9yZGVyQ29sb3IHBmNsR3JheRJULkJvcmRlckxpZ2h0Q29s
+b3IHCGNsU2lsdmVyDVQuQm9yZGVyU3R5bGUHD3J2dGJSYWlzZWRDb2xvchFULkNlbGxCb3JkZXJX
+aWR0aAIBEVQuQ2VsbEJvcmRlckNvbG9yBwZjbEdyYXkWVC5DZWxsQm9yZGVyTGlnaHRDb2xvcgcI
+Y2xTaWx2ZXIRVC5DZWxsQm9yZGVyU3R5bGUHEHJ2dGJMb3dlcmVkQ29sb3IBQwIBAgIBAgECAQJU
+RAALQy5CZXN0V2lkdGgDDQEGQy5EYXRhCjEAAAAtAAAALTggMSAzDQo0IDEgMCAwIDAgMA0Kz/Du
+8ezg8vDo4uDl7PvpIPP35e3o6g0KAAACAQIBAlREAAtDLkJlc3RXaWR0aANkAQZDLkRhdGEKMwAA
+AC8AAAAtOCAxIDMNCjMgMSAxIDAgMCAwDQrI4uDt7uIgz+Xy8CDC6+Dk6Ovl7e7i6PcNCgAAAAAA
+</rvf></Component><Component type="3" id="image1" zorder="3" filename="image25070593" left="60" top="38" width="55" height="55" originwidth="55" originheight="55" src="C:\Program Files (x86)\Web Page Maker\Resource\logo\lg01.gif" previewfile="C:\Program Files (x86)\Web Page Maker\Resource\logo\lg01.gif"/><Component type="14" id="formtext1" zorder="4" filename="form25070593" formtype="3" formname="formtext1" width="200" height="25" left="822" top="55" formvalue="Ваш логин" maxlength="0" inputtype="0"/><Component type="14" id="formbutton1" zorder="5" filename="form25070593" formtype="2" formname="formbutton1" buttontype="1" width="57" height="25" left="1044" top="55" formvalue="выход"/><Component type="4" id="shape2" zorder="6" filename="shape25070593" width="1084" height="90" bgcolor="#0000FF" previewfile="" left="34" top="528" fillstyle="0"/><Component type="2" id="text7" zorder="7" filename="text25070593" width="428" height="33" html="" left="355" top="51" newhtml="1" htmlcode="" newexhtml="1" exporthtml="" newcode="1" editcode="" rvf="" dlcount="0" imgcount="0" editorbgcolor="16777215" fp="0" lp="0"><htmlcode>&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div align=center&gt;&lt;font color="#000000" style="font-size:24px;background-color:#FFFFFF;"&gt;Иванова Изольда Петровна&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+</htmlcode><exportcode>&lt;div class="wpmd"&gt;
+&lt;div align=center&gt;&lt;font color="#000000" class="ws18" style="background-color:#FFFFFF;"&gt;Иванова Изольда Петровна&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+</exportcode><rvf>LTggMSAzDQotOSAyIDAgMCAyIDAgMQ0KcnZzDQoEAQAADgEJU3R5bGVOYW1lBgtOb3JtYWwgdGV4
+dAhGb250TmFtZQYFQXJpYWwAAQlTdHlsZU5hbWUGBkp1bXAgMQhGb250TmFtZQYFQXJpYWwFU3R5
+bGULC2ZzVW5kZXJsaW5lAAVDb2xvcgcGY2xCbHVlBEp1bXAJAAEJU3R5bGVOYW1lBgdVbmljb2Rl
+CEZvbnROYW1lBghTZWdvZSBVSQdVbmljb2RlCQABCVN0eWxlTmFtZQYLTm9ybWFsIHRleHQIU3Rh
+bmRhcmQICEZvbnROYW1lBgVBcmlhbARTaXplAhIFQ29sb3IHB2NsQmxhY2sJQmFja0NvbG9yBwdj
+bFdoaXRlAAAtOSAyIDAgMCAyIDAgMg0KcnZzDQoHAQAADgEJU3R5bGVOYW1lBgpMZWZ0IEFsaWdu
+B09wdGlvbnMLAARUYWJzDgAAAQlTdHlsZU5hbWUGCENlbnRlcmVkCUFsaWdubWVudAcJcnZhQ2Vu
+dGVyB09wdGlvbnMLAARUYWJzDgAAAQlTdHlsZU5hbWUGC1JpZ2h0IEFsaWduCUFsaWdubWVudAcI
+cnZhUmlnaHQHT3B0aW9ucwsABFRhYnMOAAABCVN0eWxlTmFtZQYNUHJvdGVjdCBUYWJsZQdPcHRp
+b25zCw1ydnBhb1JlYWRPbmx5EXJ2cGFvU3R5bGVQcm90ZWN0FXJ2cGFvRG9Ob3RXYW50UmV0dXJu
+cwAEVGFicw4AAAAtOSAyIDAgMCAyIDAgNA0KcnZzDQoCAAAADgAzIDEgMSAwIDAgMA0KyOLg7e7i
+4CDI5+7r/OTgIM/l8vDu4u3gDQo=
+</rvf></Component><Component type="2" id="text8" zorder="8" filename="text25070593" left="64" top="549" width="843" height="43" html="" newhtml="1" htmlcode="" newexhtml="1" exporthtml="" newcode="1" editcode="" rvf="" dlcount="0" imgcount="0" editorbgcolor="536870911" fp="0" lp="0"><htmlcode>&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div&gt;&lt;font color="#FFFFFF" face="Calibri" style="font-size:32px;"&gt;копирайт 2014 - 2015&amp;nbsp;&amp;nbsp; ООО "Обучающие технологии"&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+</htmlcode><exportcode>&lt;div class="wpmd"&gt;
+&lt;div&gt;&lt;font color="#FFFFFF" face="Calibri" class="ws24"&gt;копирайт 2014 - 2015&amp;nbsp;&amp;nbsp; ООО "Обучающие технологии"&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+</exportcode><rvf>LTggMSAzDQotOSAyIDAgMCAyIDAgMQ0KcnZzDQrzAAAADgEJU3R5bGVOYW1lBgtOb3JtYWwgdGV4
+dAhGb250TmFtZQYFQXJpYWwAAQlTdHlsZU5hbWUGBkp1bXAgMQhGb250TmFtZQYFQXJpYWwFU3R5
+bGULC2ZzVW5kZXJsaW5lAAVDb2xvcgcGY2xCbHVlBEp1bXAJAAEJU3R5bGVOYW1lBgdVbmljb2Rl
+CEZvbnROYW1lBghTZWdvZSBVSQdVbmljb2RlCQABCVN0eWxlTmFtZQYLTm9ybWFsIHRleHQIU3Rh
+bmRhcmQICEZvbnROYW1lBgdDYWxpYnJpBFNpemUCGAVDb2xvcgcHY2xXaGl0ZQAALTkgMiAwIDAg
+MiAwIDINCnJ2cw0KBwEAAA4BCVN0eWxlTmFtZQYKTGVmdCBBbGlnbgdPcHRpb25zCwAEVGFicw4A
+AAEJU3R5bGVOYW1lBghDZW50ZXJlZAlBbGlnbm1lbnQHCXJ2YUNlbnRlcgdPcHRpb25zCwAEVGFi
+cw4AAAEJU3R5bGVOYW1lBgtSaWdodCBBbGlnbglBbGlnbm1lbnQHCHJ2YVJpZ2h0B09wdGlvbnML
+AARUYWJzDgAAAQlTdHlsZU5hbWUGDVByb3RlY3QgVGFibGUHT3B0aW9ucwsNcnZwYW9SZWFkT25s
+eRFydnBhb1N0eWxlUHJvdGVjdBVydnBhb0RvTm90V2FudFJldHVybnMABFRhYnMOAAAALTkgMiAw
+IDAgMiAwIDQNCnJ2cw0KAgAAAA4AMyAxIDAgMCAwIDANCuru7+jw4OnyIDIwMTQgLSAyMDE1ICAg
+zs7OICLO4fP34P756OUg8uX17e7r7uPo6CINCg==
+</rvf></Component><Component type="15" id="table2" zorder="9" filename="table25161572" newhtml="1" htmlcode="" html="" newexhtml="1" exporthtml="" newcode="1" editcode="" rvf="" dlcount="0" imgcount="0" editorbgcolor="536870911" width="648" height="140" left="36" top="183" fp="0" lp="0"><htmlcode>&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div&gt;&lt;TABLE bgcolor="#FFFFFF" border=1 bordercolorlight="#C0C0C0" bordercolordark="#808080"&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=257&gt;&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div align=center&gt;&lt;font style="font-size:24px;"&gt;&lt;B&gt;Дата выполнения&lt;/B&gt;&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+&lt;/TD&gt;
+&lt;TD width=244&gt;&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div align=center&gt;&lt;font style="font-size:24px;"&gt;&lt;B&gt;Упражнение&lt;/B&gt;&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+&lt;/TD&gt;
+&lt;TD width=115&gt;&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div align=center&gt;&lt;font style="font-size:24px;"&gt;&lt;B&gt;Балл&lt;/B&gt;&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=257&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=244&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=115&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=257&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=244&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=115&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=257&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=244&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=115&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=257&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=244&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=115&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;/TABLE&gt;
+&lt;/div&gt;
+&lt;/FONT&gt;
+</htmlcode><exportcode>&lt;div class="wpmd"&gt;
+&lt;div&gt;&lt;TABLE bgcolor="#FFFFFF" border=1 bordercolorlight="#C0C0C0" bordercolordark="#808080"&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=257&gt;&lt;div class="wpmd"&gt;
+&lt;div align=center&gt;&lt;font class="ws18"&gt;&lt;B&gt;Дата выполнения&lt;/B&gt;&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/TD&gt;
+&lt;TD width=244&gt;&lt;div class="wpmd"&gt;
+&lt;div align=center&gt;&lt;font class="ws18"&gt;&lt;B&gt;Упражнение&lt;/B&gt;&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/TD&gt;
+&lt;TD width=115&gt;&lt;div class="wpmd"&gt;
+&lt;div align=center&gt;&lt;font class="ws18"&gt;&lt;B&gt;Балл&lt;/B&gt;&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=257&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=244&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=115&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=257&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=244&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=115&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=257&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=244&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=115&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=257&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=244&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;TD width=115&gt;&lt;BR&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;/TABLE&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</exportcode><rvf>LTggMSAzDQotOSAyIDAgMCAyIDAgMQ0KcnZzDQrxAAAADgEJU3R5bGVOYW1lBgtOb3JtYWwgdGV4
+dAhGb250TmFtZQYFQXJpYWwAAQlTdHlsZU5hbWUGBkp1bXAgMQhGb250TmFtZQYFQXJpYWwFU3R5
+bGULC2ZzVW5kZXJsaW5lAAVDb2xvcgcGY2xCbHVlBEp1bXAJAAEJU3R5bGVOYW1lBgdVbmljb2Rl
+CEZvbnROYW1lBghTZWdvZSBVSQdVbmljb2RlCQABCVN0eWxlTmFtZQYLTm9ybWFsIHRleHQIU3Rh
+bmRhcmQICEZvbnROYW1lBgVBcmlhbARTaXplAhIFU3R5bGULBmZzQm9sZAAAAC05IDIgMCAwIDIg
+MCAyDQpydnMNCgcBAAAOAQlTdHlsZU5hbWUGCkxlZnQgQWxpZ24HT3B0aW9ucwsABFRhYnMOAAAB
+CVN0eWxlTmFtZQYIQ2VudGVyZWQJQWxpZ25tZW50BwlydmFDZW50ZXIHT3B0aW9ucwsABFRhYnMO
+AAABCVN0eWxlTmFtZQYLUmlnaHQgQWxpZ24JQWxpZ25tZW50BwhydmFSaWdodAdPcHRpb25zCwAE
+VGFicw4AAAEJU3R5bGVOYW1lBg1Qcm90ZWN0IFRhYmxlB09wdGlvbnMLDXJ2cGFvUmVhZE9ubHkR
+cnZwYW9TdHlsZVByb3RlY3QVcnZwYW9Eb05vdFdhbnRSZXR1cm5zAARUYWJzDgAAAC05IDIgMCAw
+IDIgMCA0DQpydnMNCgIAAAAOAC02MCAzIDMgMCAyIDAgDQplZGl0dGFibGUNCjENCiEDAABUUEYw
+ClRSVlRhYmxlU1cAElQuVGV4dFJvd1NlcGFyYXRvcgYCDQoSVC5UZXh0Q29sU2VwYXJhdG9yBgIN
+Cg1ULkJvcmRlcldpZHRoAgENVC5Cb3JkZXJDb2xvcgcGY2xHcmF5ElQuQm9yZGVyTGlnaHRDb2xv
+cgcIY2xTaWx2ZXINVC5Cb3JkZXJTdHlsZQcPcnZ0YlJhaXNlZENvbG9yEVQuQ2VsbEJvcmRlcldp
+ZHRoAgERVC5DZWxsQm9yZGVyQ29sb3IHBmNsR3JheRZULkNlbGxCb3JkZXJMaWdodENvbG9yBwhj
+bFNpbHZlchFULkNlbGxCb3JkZXJTdHlsZQcQcnZ0Ykxvd2VyZWRDb2xvcgFDAgUCAwECAQIBAlRE
+AAtDLkJlc3RXaWR0aAMBAQZDLkRhdGEKKgAAACYAAAAtOCAxIDMNCjMgMSAxIDAgMCAwDQrE4PLg
+IOL77+7r7eXt6P8NCgAAAgECAQJURAALQy5CZXN0V2lkdGgD9AAGQy5EYXRhCiUAAAAhAAAALTgg
+MSAzDQozIDEgMSAwIDAgMA0K0+/w4Obt5e3o5Q0KAAACAQIBAlREAAtDLkJlc3RXaWR0aAJzBkMu
+RGF0YQofAAAAGwAAAC04IDEgMw0KMyAxIDEgMCAwIDANCsHg6+sNCgAAAgECAQJURAALQy5CZXN0
+V2lkdGgDAQEAAAIBAgECVEQAC0MuQmVzdFdpZHRoA/QAAAACAQIBAlREAAtDLkJlc3RXaWR0aAJz
+AAACAQIBAlREAAtDLkJlc3RXaWR0aAMBAQAAAgECAQJURAALQy5CZXN0V2lkdGgD9AAAAAIBAgEC
+VEQAC0MuQmVzdFdpZHRoAnMAAAIBAgECVEQAC0MuQmVzdFdpZHRoAwEBAAACAQIBAlREAAtDLkJl
+c3RXaWR0aAP0AAAAAgECAQJURAALQy5CZXN0V2lkdGgCcwAAAgECAQJURAALQy5CZXN0V2lkdGgD
+AQEAAAIBAgECVEQAC0MuQmVzdFdpZHRoA/QAAAACAQIBAlREAAtDLkJlc3RXaWR0aAJzAAAAAAA=
+</rvf></Component><Component type="14" id="formbutton2" zorder="10" filename="form25307386" formtype="2" formname="formbutton2" buttontype="1" width="200" height="28" left="946" top="127" formvalue="вернуться к классу"/><Component type="15" id="table3" zorder="11" filename="table25397149" newhtml="1" htmlcode="" html="" newexhtml="1" exporthtml="" newcode="1" editcode="" rvf="" dlcount="0" imgcount="0" editorbgcolor="536870911" width="195" height="95" left="708" top="183" fp="0" lp="0"><htmlcode>&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div&gt;&lt;TABLE bgcolor="#FFFFFF" border=1 bordercolorlight="#C0C0C0" bordercolordark="#808080"&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=175&gt;&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div align=center&gt;&lt;font style="font-size:27px;"&gt;Общий балл&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=175&gt;&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div align=center&gt;&lt;font style="font-size:27px;"&gt;&amp;nbsp;&amp;nbsp; 57&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;/TABLE&gt;
+&lt;/div&gt;
+&lt;/FONT&gt;
+</htmlcode><exportcode>&lt;div class="wpmd"&gt;
+&lt;div&gt;&lt;TABLE bgcolor="#FFFFFF" border=1 bordercolorlight="#C0C0C0" bordercolordark="#808080"&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=175&gt;&lt;div class="wpmd"&gt;
+&lt;div align=center&gt;&lt;font class="ws20"&gt;Общий балл&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=175&gt;&lt;div class="wpmd"&gt;
+&lt;div align=center&gt;&lt;font class="ws20"&gt;&amp;nbsp;&amp;nbsp; 57&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;/TABLE&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</exportcode><rvf>LTggMSAzDQotOSAyIDAgMCAyIDAgMQ0KcnZzDQriAAAADgEJU3R5bGVOYW1lBgtOb3JtYWwgdGV4
+dAhGb250TmFtZQYFQXJpYWwAAQlTdHlsZU5hbWUGBkp1bXAgMQhGb250TmFtZQYFQXJpYWwFU3R5
+bGULC2ZzVW5kZXJsaW5lAAVDb2xvcgcGY2xCbHVlBEp1bXAJAAEJU3R5bGVOYW1lBgdVbmljb2Rl
+CEZvbnROYW1lBghTZWdvZSBVSQdVbmljb2RlCQABCVN0eWxlTmFtZQYLTm9ybWFsIHRleHQIU3Rh
+bmRhcmQICEZvbnROYW1lBgVBcmlhbARTaXplAhQAAC05IDIgMCAwIDIgMCAyDQpydnMNCgcBAAAO
+AQlTdHlsZU5hbWUGCkxlZnQgQWxpZ24HT3B0aW9ucwsABFRhYnMOAAABCVN0eWxlTmFtZQYIQ2Vu
+dGVyZWQJQWxpZ25tZW50BwlydmFDZW50ZXIHT3B0aW9ucwsABFRhYnMOAAABCVN0eWxlTmFtZQYL
+UmlnaHQgQWxpZ24JQWxpZ25tZW50BwhydmFSaWdodAdPcHRpb25zCwAEVGFicw4AAAEJU3R5bGVO
+YW1lBg1Qcm90ZWN0IFRhYmxlB09wdGlvbnMLDXJ2cGFvUmVhZE9ubHkRcnZwYW9TdHlsZVByb3Rl
+Y3QVcnZwYW9Eb05vdFdhbnRSZXR1cm5zAARUYWJzDgAAAC05IDIgMCAwIDIgMCA0DQpydnMNCgIA
+AAAOAC02MCAzIDMgMCAyIDAgDQplZGl0dGFibGUNCjENCqwBAABUUEYwClRSVlRhYmxlU1cAElQu
+VGV4dFJvd1NlcGFyYXRvcgYCDQoSVC5UZXh0Q29sU2VwYXJhdG9yBgINCg1ULkJvcmRlcldpZHRo
+AgENVC5Cb3JkZXJDb2xvcgcGY2xHcmF5ElQuQm9yZGVyTGlnaHRDb2xvcgcIY2xTaWx2ZXINVC5C
+b3JkZXJTdHlsZQcPcnZ0YlJhaXNlZENvbG9yEVQuQ2VsbEJvcmRlcldpZHRoAgERVC5DZWxsQm9y
+ZGVyQ29sb3IHBmNsR3JheRZULkNlbGxCb3JkZXJMaWdodENvbG9yBwhjbFNpbHZlchFULkNlbGxC
+b3JkZXJTdHlsZQcQcnZ0Ykxvd2VyZWRDb2xvcgFDAgICAQECAQIBAlREAAtDLkJlc3RXaWR0aAOv
+AAZDLkRhdGEKJQAAACEAAAAtOCAxIDMNCjMgMSAxIDAgMCAwDQrO4fno6SDh4OvrDQoAAAIBAgEC
+VEQAC0MuQmVzdFdpZHRoA68ABkMuRGF0YQogAAAAHAAAAC04IDEgMw0KMyAxIDEgMCAwIDANCiAg
+IDU3DQoAAAAAAA==
+</rvf></Component><Component type="15" id="table4" zorder="12" filename="table25612056" newhtml="1" htmlcode="" html="" newexhtml="1" exporthtml="" newcode="1" editcode="" rvf="" dlcount="0" imgcount="0" editorbgcolor="536870911" width="195" height="95" left="934" top="183" fp="0" lp="0"><htmlcode>&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div&gt;&lt;TABLE bgcolor="#FFFFFF" border=1 bordercolorlight="#C0C0C0" bordercolordark="#808080"&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=175&gt;&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div align=center&gt;&lt;font style="font-size:27px;"&gt;&lt;B&gt;Продукт&lt;/B&gt;&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=175&gt;&lt;FONT style="font-size:13px" color="#000000" face="Arial"&gt;
+&lt;div align=center&gt;&lt;font style="font-size:27px;"&gt;Азбука&lt;/font&gt;&lt;/div&gt;
+&lt;/FONT&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;/TABLE&gt;
+&lt;/div&gt;
+&lt;/FONT&gt;
+</htmlcode><exportcode>&lt;div class="wpmd"&gt;
+&lt;div&gt;&lt;TABLE bgcolor="#FFFFFF" border=1 bordercolorlight="#C0C0C0" bordercolordark="#808080"&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=175&gt;&lt;div class="wpmd"&gt;
+&lt;div align=center&gt;&lt;font class="ws20"&gt;&lt;B&gt;Продукт&lt;/B&gt;&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;TR valign=top&gt;
+&lt;TD width=175&gt;&lt;div class="wpmd"&gt;
+&lt;div align=center&gt;&lt;font class="ws20"&gt;Азбука&lt;/font&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;/TABLE&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</exportcode><rvf>LTggMSAzDQotOSAyIDAgMCAyIDAgMQ0KcnZzDQorAQAADgEJU3R5bGVOYW1lBgtOb3JtYWwgdGV4
+dAhGb250TmFtZQYFQXJpYWwAAQlTdHlsZU5hbWUGBkp1bXAgMQhGb250TmFtZQYFQXJpYWwFU3R5
+bGULC2ZzVW5kZXJsaW5lAAVDb2xvcgcGY2xCbHVlBEp1bXAJAAEJU3R5bGVOYW1lBgdVbmljb2Rl
+CEZvbnROYW1lBghTZWdvZSBVSQdVbmljb2RlCQABCVN0eWxlTmFtZQYLTm9ybWFsIHRleHQIU3Rh
+bmRhcmQICEZvbnROYW1lBgVBcmlhbARTaXplAhQAAQlTdHlsZU5hbWUGC05vcm1hbCB0ZXh0CFN0
+YW5kYXJkCAhGb250TmFtZQYFQXJpYWwEU2l6ZQIUBVN0eWxlCwZmc0JvbGQAAAAtOSAyIDAgMCAy
+IDAgMg0KcnZzDQoHAQAADgEJU3R5bGVOYW1lBgpMZWZ0IEFsaWduB09wdGlvbnMLAARUYWJzDgAA
+AQlTdHlsZU5hbWUGCENlbnRlcmVkCUFsaWdubWVudAcJcnZhQ2VudGVyB09wdGlvbnMLAARUYWJz
+DgAAAQlTdHlsZU5hbWUGC1JpZ2h0IEFsaWduCUFsaWdubWVudAcIcnZhUmlnaHQHT3B0aW9ucwsA
+BFRhYnMOAAABCVN0eWxlTmFtZQYNUHJvdGVjdCBUYWJsZQdPcHRpb25zCw1ydnBhb1JlYWRPbmx5
+EXJ2cGFvU3R5bGVQcm90ZWN0FXJ2cGFvRG9Ob3RXYW50UmV0dXJucwAEVGFicw4AAAAtOSAyIDAg
+MCAyIDAgNA0KcnZzDQoCAAAADgAtNjAgMyAzIDAgMiAwIA0KZWRpdHRhYmxlDQoxDQqqAQAAVFBG
+MApUUlZUYWJsZVNXABJULlRleHRSb3dTZXBhcmF0b3IGAg0KElQuVGV4dENvbFNlcGFyYXRvcgYC
+DQoNVC5Cb3JkZXJXaWR0aAIBDVQuQm9yZGVyQ29sb3IHBmNsR3JheRJULkJvcmRlckxpZ2h0Q29s
+b3IHCGNsU2lsdmVyDVQuQm9yZGVyU3R5bGUHD3J2dGJSYWlzZWRDb2xvchFULkNlbGxCb3JkZXJX
+aWR0aAIBEVQuQ2VsbEJvcmRlckNvbG9yBwZjbEdyYXkWVC5DZWxsQm9yZGVyTGlnaHRDb2xvcgcI
+Y2xTaWx2ZXIRVC5DZWxsQm9yZGVyU3R5bGUHEHJ2dGJMb3dlcmVkQ29sb3IBQwICAgEBAgECAQJU
+RAALQy5CZXN0V2lkdGgDrwAGQy5EYXRhCiIAAAAeAAAALTggMSAzDQo0IDEgMSAwIDAgMA0Kz/Du
+5PPq8g0KAAACAQIBAlREAAtDLkJlc3RXaWR0aAOvAAZDLkRhdGEKIQAAAB0AAAAtOCAxIDMNCjMg
+MSAxIDAgMCAwDQrA5+Hz6uANCgAAAAAA
+</rvf></Component><Component type="14" id="formbutton3" zorder="13" filename="form26281582" formtype="2" formname="formbutton3" buttontype="1" width="200" height="28" left="713" top="129" formvalue="редактировать запись"/></body></page></site>

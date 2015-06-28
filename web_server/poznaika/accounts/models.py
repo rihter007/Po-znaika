@@ -22,6 +22,7 @@ class License(models.Model):
     ForUser = models.ForeignKey(User)
     StartDate = models.DateField()
     EndDate = models.DateField()
+    Count = models.IntegerField()
 
     
 class StudyHead(models.Model):

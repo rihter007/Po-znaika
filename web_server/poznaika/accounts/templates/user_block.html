@@ -1,4 +1,51 @@
-Your diary:
+<table border=0 cellpadding=10>
+<TR>
+
+<TD>
+<table border=1 cellpadding=5>
+    <TR>
+        <TH align=left>Просматриваемый ученик</TH>
+        <TH> {{user}}</TH>
+    </TR>
+</table>
+</TD>
+<TH>
+[Изменения ученика...]
+</TH>
+</TR>
+
+<TR>
+<TD>
+<table border=1 cellpadding=5>
+    <THEAD>
+        <TR>
+            <TH>Дата выполнения</TH>
+            <TH>Упражнение</TH>
+            <TH>Балл</TH>
+        </TR>
+    </THEAD>
+    
+    {% for record in user_table %}
+    <TR>
+        <TD>{{record.date}}</TD>
+        <TD>{{record.exercise}}</TD>
+        <TD>{{record.score}}</TD>
+    </TR>
+    {%endfor%}
+</table>
+</TD>
+
+<TD valign=top>
+<table border=1 cellpadding=5>
+    <TR><TH>Общий балл</TH></TR>
+    <TR><TH>{{general_score}}</TH></TR>
+</table>
+</TD>
+
+</TR>
+</table>
+
+<!--
 <font size=+1>
 <pre>
 {{ diariesList }}
@@ -19,3 +66,5 @@ Your diary:
 {% for mark in marks %}
 {{ mark.Score}} ({{ mark.DateTime}})<BR>
 {%endfor%}
+
+-->

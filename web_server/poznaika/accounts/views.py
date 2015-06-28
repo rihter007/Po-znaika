@@ -1,5 +1,8 @@
 # coding=1251
 
+import datetime 
+from datetime import date, timedelta
+
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.contrib import auth
@@ -23,6 +26,7 @@ from models import StudyHead
 from models import Teacher
 from models import Class
 from models import Pupil
+from models import License
 
 # Create your views here.
 
@@ -65,6 +69,52 @@ def MakeDiary(user):
                         diariesList += "; "
             diariesList += "\r\n"
     return diariesList
+    
+def MakeUserTable(user):
+    general_score = 0
+    table = []
+    for mark in Mark.objects.filter(ForUser=user):
+        item = {}
+        item['date'] = str(mark.DateTime)[:16]
+        item['exercise'] = mark.ForExercise.Name
+        item['score'] = mark.Score
+        general_score += mark.Score
+        table.append(item)
+    return table, general_score
+
+def GetScoresByTime(pupil):
+    totalScore, yesterdayScore, weekScore = 0, 0, 0
+    yesterday = date.today() - timedelta(days=1)
+    weekAgo = date.today() - timedelta(days=7)
+    marks = Mark.objects.filter(ForUser=pupil)
+    for mark in marks:
+        markDate = mark.DateTime.date()
+        if markDate == yesterday:
+            yesterdayScore += mark.Score
+        if weekAgo < markDate and markDate <= date.today():
+            weekScore += mark.Score
+        totalScore += mark.Score
+    return totalScore, yesterdayScore, weekScore
+
+def MakeTeacherTable():
+    table = []
+    for pupil in Pupil.objects.all():
+        item = {}
+        item['name'] = pupil.User.username
+        item['cls'] = pupil.ForClass.Name
+        item['totalScore'], item['yesterdayScore'], item['weekScore'] = \
+            GetScoresByTime(pupil)
+        table.append(item)
+    return table
+
+def MakeHeadClassTable():
+    table = []
+    for cls in Class.objects.all():
+        item = {}
+        item['name'] = cls.Name
+        item['count'] = len(Pupil.objects.filter(ForClass=cls))
+        table.append(item)
+    return table
 
 def IsHead(user):
     heads = StudyHead.objects.filter(ForUser=user)
@@ -95,6 +145,7 @@ def UsersPage(request):
             teachers = Teacher.objects.all()
             classes = Class.objects.all()
             pupils = Pupil.objects.all()
+            head_class_table = MakeHeadClassTable()
             
             addTeacherForm = AddNameForm()
             addTeacherForm.fields['Name'].label = ToUtf("Имя учителя")
@@ -116,6 +167,8 @@ def UsersPage(request):
                 choices.append(pair)
             deleteClassForm = DeleteNameForm(choices, ToUtf("Список классов"))
             
+            licenses = License.objects.filter(ForUser=user)
+            
         is_teacher = IsTeacher(user)
         if is_teacher:
             teachers = Teacher.objects.all()
@@ -132,8 +185,11 @@ def UsersPage(request):
                 pair = (pupil.User.username, pupil.User.username)
                 choices.append(pair)
             deletePupilForm = DeletePupilForm()
+            
+            teacher_table = MakeTeacherTable()
 
-        diariesList = MakeDiary(user)
+        #diariesList = MakeDiary(user)
+        user_table, general_score = MakeUserTable(user)
         courses = Course.objects.all()
         exercises = Exercise.objects.all()
         marks = Mark.objects.all()
@@ -165,3 +221,29 @@ def Logout(request):
     auth.logout(request)
     # Redirect to a success page.
     return HttpResponseRedirect("/accounts/")
+
+    
+def WatchPupil(request, pupil):
+    is_logged = True
+    user = User.objects.get(username=pupil)
+    user_table, general_score = MakeUserTable(user)
+    return render(request, 'account_main.html', locals())
+
+def WatchClass(request):
+    is_logged = True
+    is_teacher = True
+    teacher_table = MakeTeacherTable()
+    
+    # Copy-paste!!
+    pupils = Pupil.objects.all()
+    addPupilForm = AddPupilForm()
+    addPupilForm.fields['Name'].label = ToUtf("Имя ученика")
+    addPupilForm.fields['Class'].label = ToUtf("Его класс")
+    choices = []
+    for pupil in pupils:
+        pair = (pupil.User.username, pupil.User.username)
+        choices.append(pair)
+    deletePupilForm = DeletePupilForm()
+    
+    return render(request, 'account_main.html', locals())
+    

@@ -38,8 +38,8 @@ def AddUser(name, pwd):
     u.save()
     return u
 
-def AddL(user, start, end):
-    l = License(ForUser=user, StartDate=start, EndDate=end)
+def AddL(user, start, end, count=1):
+    l = License(ForUser=user, StartDate=start, EndDate=end, Count=count)
     l.save()
     return l
 
@@ -96,7 +96,8 @@ def MakeInitialDb():
     AddM(u2, e1, 21)
     AddM(u2, e3, 23)
     
-    AddL(u1, date(2014, 1, 1), date(2015, 6, 1))
+    AddL(u1, date(2015, 1, 1), date(2016, 1, 1), 1)
+    AddL(uH, date(2015, 1, 1), date(2016, 1, 1), 100)
     
     c1 = AddC("C1")
     c2 = AddC("C2")
@@ -111,7 +112,3 @@ def MakeInitialDb():
 
     
 MakeInitialDb()
-
-License.objects.all().delete()
-u = User.objects.get(username="5")
-AddL(u, date(2014, 1, 1), date(2015, 1, 1))
