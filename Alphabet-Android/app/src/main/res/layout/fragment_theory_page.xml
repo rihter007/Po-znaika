@@ -1,84 +1,99 @@
 <LinearLayout
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="#ff95d3f6"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/small_margin">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_marginLeft="@dimen/small_margin"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginRight="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/small_margin"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/small_margin"
-            android:text="@string/caption_previous"
-            android:id="@+id/backButton"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/small_margin"
-            android:text="@string/caption_next"
-            android:id="@+id/forwardButton"/>
-    </RelativeLayout>
-
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_vertical|left">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1">
 
             <ImageView
-                android:layout_width="@dimen/extra_large_image_size"
-                android:layout_height="@dimen/extra_large_image_size"
-                android:id="@+id/theoryImageView"/>
+                android:layout_width="@dimen/help_icon_size"
+                android:layout_height="@dimen/help_icon_size"
+                android:id="@+id/characterImageView"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/arrow_back"/>
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+            <ImageView
+                android:layout_width="@dimen/help_icon_size"
+                android:layout_height="@dimen/help_icon_size"
+                android:id="@+id/soundImageView"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/sound_button"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:scrollbars="vertical"
-                    android:singleLine="false"
-                    android:layout_gravity="center_horizontal"
-                    android:text=""
-                    android:id="@+id/theoryTextView"/>
+        </RelativeLayout>
 
-                </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="3"
+            android:background="@drawable/theory_page_screen_image_square">
 
-            <LinearLayout
-                android:orientation="horizontal"
+            <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_vertical|left">
+                android:layout_height="match_parent"
+                android:id="@+id/imageInformationImageView"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
 
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/playSoundButton"
-                    android:focusableInTouchMode="false"
-                    android:src="@android:drawable/ic_media_play"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="2">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxHeight="@dimen/medium_image_size"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/play_title"
-                    android:id="@+id/playSoundTextView"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/textInformationTextView"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
 
-            </LinearLayout>
-        </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:layout_marginBottom="@dimen/small_margin">
+
+        <ImageView
+            android:layout_width="@dimen/help_icon_size"
+            android:layout_height="@dimen/help_icon_size"
+            android:id="@+id/backImageView"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/arrow_back"/>
+
+        <ImageView
+            android:layout_width="@dimen/help_icon_size"
+            android:layout_height="@dimen/help_icon_size"
+            android:id="@+id/forwardImageView"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/arrow_forward"/>
+
+    </RelativeLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -22,6 +22,9 @@
     <!--0 - vertical orientation, 1 - horizontal orientation-->
     <dimen name="orientation_flag">0dp</dimen>
 
+    <!-- Common elements sizes -->
+    <dimen name="help_icon_size">80dp</dimen>
+
     <!-- Start activity sizes -->
     <dimen name="start_activity_top_margin">20dp</dimen>
 

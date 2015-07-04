@@ -364,7 +364,10 @@ public final class AlphabetDatabase
                     "WHERE (img1._id = ce.not_passed_image_id) AND (img2._id = ce.passed_image_id) " +
                     "      AND (ce.alphabet_type = ?)";
     private static final String ExtractCharacterExerciseByIdSqlStatement =
-            "SELECT exercise_id, character, alphabet_id FROM character_exercise WHERE _id = ?";
+            "SELECT ce.alphabet_type, ce.character, img1.file_name, img2.file_name " +
+                    "FROM character_exercise ce, image img1, image img2 " +
+                    "WHERE (img1._id = ce.not_passed_image_id) AND (img2._id = ce.passed_image_id) " +
+                    "      AND (ce._id = ?)";
 
     private static final String ExtractCharacterItemByIdSqlStatement =
             "SELECT character_exercise_id, menu_position, name, display_name FROM character_exercise_item WHERE _id = ?";
@@ -452,7 +455,7 @@ public final class AlphabetDatabase
      * SQL-expressions for theory_page table
      */
     private static final String ExtractTheoryPageById =
-            "SELECT image_id, image_redirect_url, sound_id, message " +
+            "SELECT iamge_id, image_redirect_url, sound_id, message " +
             "FROM theory_page " +
             "WHERE _id = ?";
 
@@ -717,8 +720,7 @@ public final class AlphabetDatabase
 
     public CharacterExerciseInfo getCharacterExerciseById(int characterExerciseId)
     {
-        return  null;
-        /*CharacterExerciseInfo result = null;
+        CharacterExerciseInfo result = null;
         Cursor dataReader = null;
 
         try
@@ -731,9 +733,10 @@ public final class AlphabetDatabase
             {
                 result = new CharacterExerciseInfo();
                 result.id = characterExerciseId;
-                result.exerciseId = dataReader.getInt(0);
+                result.alphabetType = AlphabetType.getTypeByValue(dataReader.getInt(0));
                 result.character = dataReader.getString(1).charAt(0);
-                result.alphabetType = AlphabetType.getTypeByValue(dataReader.getInt(2));
+                result.notPassedImageName = dataReader.getString(2);
+                result.passedImageName = dataReader.getString(3);
             }
         }
         catch (Exception exp)
@@ -747,7 +750,6 @@ public final class AlphabetDatabase
         }
 
         return result;
-        */
     }
 
     public CharacterExerciseItemInfo getCharacterExerciseItemById(int characterExerciseItemId)

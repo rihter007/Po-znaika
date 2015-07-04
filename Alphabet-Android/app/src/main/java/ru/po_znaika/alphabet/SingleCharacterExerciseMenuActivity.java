@@ -6,13 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.annotation.NonNull;
-import android.util.Log;
-import android.view.View;
 import android.os.Bundle;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.util.Pair;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
@@ -21,9 +18,14 @@ import com.arz_x.android.product_tracer.FileTracerInstance;
 import com.arz_x.tracer.ProductTracer;
 import com.arz_x.tracer.TraceLevel;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
+import ru.po_znaika.alphabet.database.diary.DiaryDatabase;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 public class SingleCharacterExerciseMenuActivity extends Activity
@@ -37,6 +39,97 @@ public class SingleCharacterExerciseMenuActivity extends Activity
 
     private static final String CharacterExerciseIdTag = "character_exercise_id";
     private static final String LogTag = SingleCharacterExerciseMenuActivity.class.getName();
+
+    private class CharacterExerciseItem
+    {
+        public CharacterExerciseItem(int _id, @NonNull ExerciseScoreType _scoreType)
+        {
+            this.id = _id;
+            this.scoreType = _scoreType;
+        }
+
+        public int id;
+        public ExerciseScoreType scoreType;
+    }
+
+    private static int getExerciseImageId(@NonNull AlphabetDatabase.CharacterExerciseItemType exerciseItemType
+            ,@NonNull ExerciseScoreType scoreType)
+    {
+        switch (exerciseItemType)
+        {
+            case CharacterHandWrite:
+            {
+                switch (scoreType)
+                {
+                    case Initial:
+                        return R.drawable.cloud_handwrite_character_initial;
+                    case Started:
+                        return R.drawable.cloud_handwrite_character_started;
+                    case Completed:
+                        return R.drawable.cloud_handwrite_character_completed;
+                }
+            }
+            break;
+
+            case CharacterPrint:
+            {
+                switch (scoreType)
+                {
+                    case Initial:
+                        return R.drawable.cloud_print_character_initial;
+                    case Started:
+                        return R.drawable.cloud_print_character_started;
+                    case Completed:
+                        return R.drawable.cloud_print_character_completed;
+                }
+            }
+            break;
+
+            case CharacterSound:
+            {
+                switch (scoreType)
+                {
+                    case Initial:
+                        return R.drawable.cloud_character_sound_intial;
+                    case Started:
+                        return R.drawable.cloud_character_sound_started;
+                    case Completed:
+                        return R.drawable.cloud_character_sound_completed;
+                }
+            }
+            break;
+
+            case FindCharacter:
+            {
+                switch (scoreType)
+                {
+                    case Initial:
+                        return R.drawable.cloud_select_character_initial;
+                    case Started:
+                        return R.drawable.cloud_select_character_started;
+                    case Completed:
+                        return R.drawable.cloud_select_character_completed;
+                }
+            }
+            break;
+
+            case FindPictureWithCharacter:
+            {
+                switch (scoreType)
+                {
+                    case Initial:
+                        return R.drawable.cloud_select_image_initial;
+                    case Started:
+                        return R.drawable.cloud_select_image_started;
+                    case Completed:
+                        return R.drawable.cloud_select_image_completed;
+                }
+            }
+            break;
+        }
+
+        return 0;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -107,52 +200,78 @@ public class SingleCharacterExerciseMenuActivity extends Activity
     void restoreInternalState() throws CommonException
     {
         // Restore exercise id from Bundle
+        int characterExerciseId;
         {
-            Bundle intentInfo = getIntent().getExtras();
+            final Bundle intentInfo = getIntent().getExtras();
 
-            m_characterExerciseId = intentInfo.getInt(CharacterExerciseIdTag);
-            if (m_characterExerciseId == DatabaseConstant.InvalidDatabaseIndex)
+            characterExerciseId = intentInfo.getInt(CharacterExerciseIdTag);
+            if (characterExerciseId == DatabaseConstant.InvalidDatabaseIndex)
             {
-                Log.e(LogTag, "Invalid character exercise id");
+                ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "Failed to get character exercise id");
                 throw new CommonException(CommonResultCode.InvalidInternalState);
             }
-
-            /*m_character = intentInfo.getChar(ExerciseCharacterTag);
-            if (m_character == '\0')
-            {
-                Log.e(LogTag, "Invalid exercise character");
-                throw new CommonException(CommonResultCode.InvalidInternalState);
-            }*/
         }
 
-        // Prepare database
+        // Prepare databases
+        AlphabetDatabase alphabetDatabase = new AlphabetDatabase(this, false);
+        DiaryDatabase diaryDatabase = new DiaryDatabase(this);
+
+        // get character icon
+        final AlphabetDatabase.CharacterExerciseInfo characterExerciseInfo =
+                alphabetDatabase.getCharacterExerciseById(characterExerciseId);
+        if (characterExerciseInfo == null)
         {
-            m_alphabetDatabase = new AlphabetDatabase(this, false);
+            ProductTracer.traceMessage(m_tracer
+                    , TraceLevel.Error
+                    , LogTag
+                    , String.format("Failed to get character exercise info for id: '%d'", characterExerciseId));
+            throw new CommonException(CommonResultCode.InvalidExternalSource);
+        }
+
+        m_characterIconId = DatabaseHelpers.getDrawableIdByName(getResources(), characterExerciseInfo.passedImageName);
+        if (m_characterIconId == 0)
+        {
+            ProductTracer.traceMessage(m_tracer
+                    , TraceLevel.Error
+                    , LogTag
+                    , String.format("Failed to get character icon image id for '%s'", characterExerciseInfo.passedImageName));
+            throw new CommonException(CommonResultCode.InvalidExternalSource);
         }
 
         // Prepare menu exercises
+        final AlphabetDatabase.CharacterExerciseItemInfo[] exercises =
+                alphabetDatabase.getAllCharacterExerciseItemsByCharacterExerciseId(characterExerciseId);
+        if (exercises == null)
         {
-            AlphabetDatabase.CharacterExerciseItemInfo[] exercises = m_alphabetDatabase.getAllCharacterExerciseItemsByCharacterExerciseId(m_characterExerciseId);
-            if (exercises == null)
+            ProductTracer.traceMessage(m_tracer
+                    , TraceLevel.Error
+                    , LogTag
+                    , String.format("Failed to get character exercise items for '%d'", characterExerciseId));
+            throw new CommonException(CommonResultCode.InvalidExternalSource);
+        }
+
+        m_characterExerciseItems = new HashMap<>();
+        for (AlphabetDatabase.CharacterExerciseItemInfo exerciseItemInfo : exercises)
+        {
+            ExerciseScoreType scoreType = ExerciseScoreType.Completed;
+
+            final int currentExerciseScore = diaryDatabase.getExerciseScore(exerciseItemInfo.exerciseInfo.name);
+            if (diaryDatabase.getExerciseScore(exerciseItemInfo.exerciseInfo.name) <
+                    exerciseItemInfo.exerciseInfo.maxScore)
             {
-                Log.e(LogTag, "Failed to get character exercises from database");
-                throw new CommonException(CommonResultCode.InvalidExternalSource);
+                scoreType = currentExerciseScore == 0 ? ExerciseScoreType.Initial : ExerciseScoreType.Started;
             }
 
-           /* m_characterExerciseItems = new AlphabetDatabase.CharacterExerciseItemInfo[exercises.length];
-
-            // Sort exercises in m_characterExerciseItems according to menu_position
+            if (m_characterExerciseItems.containsKey(exerciseItemInfo.menuElementType))
             {
-                Map<Integer, AlphabetDatabase.CharacterExerciseItemInfo> sortedExercises = new TreeMap<>();
-
-                //for (AlphabetDatabase.CharacterExerciseItemInfo exerciseInfo : exercises)
-                //    sortedExercises.put(exerciseInfo.menuPosition, exerciseInfo);
-
-                int exerciseIndex = 0;
-                for (Map.Entry<Integer, AlphabetDatabase.CharacterExerciseItemInfo> exerciseInfo : sortedExercises.entrySet())
-                    m_characterExerciseItems[exerciseIndex++] = exerciseInfo.getValue();
+                ProductTracer.traceMessage(m_tracer
+                        , TraceLevel.Error
+                        , LogTag
+                        , String.format("Menu element '%s' already exists", exerciseItemInfo.menuElementType.toString()));
             }
-            */
+
+            m_characterExerciseItems.put(exerciseItemInfo.menuElementType
+                    , new CharacterExerciseItem(exerciseItemInfo.id, scoreType));
         }
     }
 
@@ -161,39 +280,60 @@ public class SingleCharacterExerciseMenuActivity extends Activity
      */
     void constructUserInterface()
     {
-        // process caption
         {
-            TextView textView = (TextView) findViewById(R.id.charcterTextView);
-            //final String CharacterCaption = "[" + m_character + "]";
-           // textView.setText(CharacterCaption);
+            ImageView characterIconImageView = (ImageView)findViewById(R.id.exerciseIconImageView);
+            characterIconImageView.setImageDrawable(getResources().getDrawable(m_characterIconId));
         }
-        // process menu items list view
+
         {
-            ArrayAdapter<String> menuItems = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+            final List<Pair<AlphabetDatabase.CharacterExerciseItemType, Integer>> exercisesInfo =
+                    new ArrayList<Pair<AlphabetDatabase.CharacterExerciseItemType, Integer>>()
+                    {
+                        {
+                            add(new Pair<>(AlphabetDatabase.CharacterExerciseItemType.CharacterSound
+                                    , R.id.characterSoundImageView));
+                            add(new Pair<>(AlphabetDatabase.CharacterExerciseItemType.CharacterPrint
+                                    , R.id.characterPrintImageView));
+                            add(new Pair<>(AlphabetDatabase.CharacterExerciseItemType.CharacterHandWrite
+                                    , R.id.characterHandwriteImageView));
+                            add(new Pair<>(AlphabetDatabase.CharacterExerciseItemType.FindCharacter
+                                    , R.id.selectCharacterImageView));
+                            add(new Pair<>(AlphabetDatabase.CharacterExerciseItemType.FindPictureWithCharacter
+                                    , R.id.selectImageImageView));
+                        }
+                    };
 
-            //for (AlphabetDatabase.CharacterExerciseItemInfo characterExerciseInfo : m_characterExerciseItems)
-            //    menuItems.add(characterExerciseInfo.displayName);
-
-            ListView menuListView = (ListView) findViewById(R.id.menuListView);
-            menuListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+            for (Pair<AlphabetDatabase.CharacterExerciseItemType, Integer> exerciseUI : exercisesInfo)
             {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+                ImageView characterExerciseImageView = (ImageView)findViewById(exerciseUI.second);
+                final CharacterExerciseItem exerciseItem =
+                        m_characterExerciseItems.get(AlphabetDatabase.CharacterExerciseItemType.CharacterSound);
+                if (exerciseItem != null)
                 {
-                    onListViewItemSelected((int) l);
+                    characterExerciseImageView.setVisibility(View.VISIBLE);
+                    characterExerciseImageView.setImageDrawable(getResources().getDrawable(
+                            getExerciseImageId(AlphabetDatabase.CharacterExerciseItemType.CharacterSound
+                                    , exerciseItem.scoreType)));
+                    final int characterExerciseItemId = exerciseItem.id;
+                    characterExerciseImageView.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            CharacterExerciseItemActivity.startActivity(SingleCharacterExerciseMenuActivity.this
+                                    , characterExerciseItemId);
+                        }
+                    });
                 }
-            });
-            menuListView.setAdapter(menuItems);
+                else
+                {
+                    characterExerciseImageView.setVisibility(View.INVISIBLE);
+                }
+            }
         }
-    }
-
-    private void onListViewItemSelected(int itemSelectedIndex)
-    {
-        //CharacterExerciseItemActivity.startActivity(this, m_characterExerciseItems[itemSelectedIndex].id);
     }
 
     private FileTracerInstance m_tracer;
-    private Map<AlphabetDatabase.CharacterExerciseItemType, Integer> m_characterExerciseItems;
-    private AlphabetDatabase m_alphabetDatabase;
-    private int m_characterExerciseId;
+    private int m_characterIconId;
+    private Map<AlphabetDatabase.CharacterExerciseItemType, CharacterExerciseItem> m_characterExerciseItems;
 }

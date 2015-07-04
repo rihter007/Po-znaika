@@ -397,7 +397,7 @@ alphabet_id is column of hardocded alphabet identifier
 CREATE TABLE character_exercise (
     _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
     character TEXT NOT NULL,
-    alphabet_id INTEGER NOT NULL,
+    alphabet_type INTEGER NOT NULL,
 	not_passed_image_id INTEGER NOT NULL,
 	passed_image_id INTEGER NOT NULL,
 		
