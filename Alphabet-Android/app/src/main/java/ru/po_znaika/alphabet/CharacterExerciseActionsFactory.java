@@ -84,7 +84,16 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
     public CharacterExerciseActionsFactory(int _characterExerciseId, @NonNull Context _context,
                                            @NonNull AlphabetDatabase _alphabetDatabase)
     {
+        this(_characterExerciseId, 0, _context, _alphabetDatabase);
+    }
+
+    public CharacterExerciseActionsFactory(int _characterExerciseId
+            , int exerciseLogoId
+            , @NonNull Context _context
+            , @NonNull AlphabetDatabase _alphabetDatabase)
+    {
         m_characterExerciseId = _characterExerciseId;
+        m_exerciseLogoId = exerciseLogoId;
         m_context = _context;
         m_alphabetDatabase = _alphabetDatabase;
     }
@@ -104,7 +113,7 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                 break;
 
             case TheoryPage:
-                resultFragment = TheoryPageFragment.createFragment(value);
+                resultFragment = TheoryPageFragment.createFragment(value, m_exerciseLogoId);
                 break;
         }
 
@@ -215,6 +224,7 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
     }
 
     private int m_characterExerciseId;
+    private int m_exerciseLogoId;
     private Context m_context;
     private AlphabetDatabase m_alphabetDatabase;
 }

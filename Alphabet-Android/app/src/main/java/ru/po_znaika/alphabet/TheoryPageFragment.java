@@ -24,13 +24,13 @@ import android.widget.TextView;
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.product_tracer.ITracerGetter;
 import com.arz_x.tracer.ITracer;
 import com.arz_x.tracer.ProductTracer;
 import com.arz_x.tracer.TraceLevel;
 
 import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.IExerciseStepCallback;
-import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.ProcessUrl;
 import ru.po_znaika.common.ru.po_znaika.common.helpers.TextFormatBlock;
@@ -113,6 +113,8 @@ public class TheoryPageFragment extends Fragment
         super.onAttach(activity);
 
         m_stepsCallback = (IExerciseStepCallback) activity;
+        if (activity instanceof ITracerGetter)
+            m_tracer = ((ITracerGetter)activity).getTracer();
     }
 
     @Override
@@ -120,6 +122,8 @@ public class TheoryPageFragment extends Fragment
     {
         super.onDetach();
         m_stepsCallback = null;
+        m_tracer = null;
+        m_theorySoundPlayer.stop();
     }
 
     @Override
@@ -183,7 +187,6 @@ public class TheoryPageFragment extends Fragment
     void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         AlphabetDatabase alphabetDatabase = new AlphabetDatabase(getActivity(), false);
-
         m_theorySoundPlayer = new MediaPlayerManager(getActivity(), alphabetDatabase);
 
         Bundle fragmentArguments = getArguments();
@@ -205,7 +208,7 @@ public class TheoryPageFragment extends Fragment
                 throw new CommonException(CommonResultCode.InvalidExternalSource);
             }
 
-            if ((theoryPageInfo.imageId == DatabaseConstant.InvalidDatabaseIndex)
+            if ((TextUtils.isEmpty(theoryPageInfo.imageName))
                     && (TextUtils.isEmpty(theoryPageInfo.message)))
             {
                 ProductTracer.traceMessage(m_tracer
@@ -216,33 +219,31 @@ public class TheoryPageFragment extends Fragment
             }
 
             m_state = new TheoryPageState();
-            if (theoryPageInfo.imageId != DatabaseConstant.InvalidDatabaseIndex)
+            if (!TextUtils.isEmpty(theoryPageInfo.imageName))
             {
-                m_state.theoryImageResourceId = DatabaseHelpers.getDrawableIdByDatabaseId(alphabetDatabase
-                        , getResources()
-                        , theoryPageInfo.imageId);
+                m_state.theoryImageResourceId = DatabaseHelpers.getDrawableIdByName(getResources()
+                        , theoryPageInfo.imageName);
                 if (m_state.theoryImageResourceId == 0)
                 {
                     ProductTracer.traceMessage(m_tracer
                             , TraceLevel.Error
                             , LogTag
-                            , String.format("Failed to get image resource id for '%s'", theoryPageInfo.imageId));
+                            , String.format("Failed to get image resource id for '%s'", theoryPageInfo.imageName));
                     throw new CommonException(CommonResultCode.InvalidExternalSource);
                 }
             }
 
-            if (theoryPageInfo.soundId != 0)
+            if (!TextUtils.isEmpty(theoryPageInfo.soundName))
             {
-                m_state.theorySoundResourceId = DatabaseHelpers.getDrawableIdByDatabaseId(alphabetDatabase
-                        , getResources()
-                        , theoryPageInfo.imageId);
+                m_state.theorySoundResourceId = DatabaseHelpers.getSoundIdByName(getResources()
+                        , theoryPageInfo.soundName);
 
                 if (m_state.theorySoundResourceId == 0)
                 {
                     ProductTracer.traceMessage(m_tracer
                             , TraceLevel.Error
                             , LogTag
-                            , String.format("Failed to get sound resource id for '%s'", theoryPageInfo.soundId));
+                            , String.format("Failed to get sound resource id for '%s'", theoryPageInfo.soundName));
                     throw new CommonException(CommonResultCode.InvalidExternalSource);
                 }
             }
@@ -275,7 +276,7 @@ public class TheoryPageFragment extends Fragment
         // process image
         if (m_state.theoryImageResourceId != 0)
         {
-            ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.theoryImageView);
+            ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.imageInformationImageView);
             theoryImageView.setImageDrawable(getResources().getDrawable(m_state.theoryImageResourceId));
 
             if (!TextUtils.isEmpty(m_state.theoryImageRedirectUrl))
@@ -305,7 +306,7 @@ public class TheoryPageFragment extends Fragment
         }
         else
         {
-            ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.theoryImageView);
+            ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.imageInformationImageView);
             theoryImageView.setVisibility(View.INVISIBLE);
 
             ViewGroup.LayoutParams layoutParams = theoryImageView.getLayoutParams();
@@ -335,7 +336,7 @@ public class TheoryPageFragment extends Fragment
         // process text
         if (!TextUtils.isEmpty(m_state.theoryMessage))
         {
-            TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.theoryTextView);
+            TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.textInformationTextView);
             theoryTextView.setText(null);
             final List<TextFormatBlock> formatBlocks = TextFormatter.processText(m_state.theoryMessage);
 
@@ -354,7 +355,7 @@ public class TheoryPageFragment extends Fragment
         }
         else
         {
-            TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.theoryTextView);
+            TextView theoryTextView = (TextView) fragmentView.findViewById(R.id.textInformationTextView);
             theoryTextView.setVisibility(View.INVISIBLE);
         }
 

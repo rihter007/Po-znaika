@@ -1,9 +1,7 @@
 package ru.po_znaika.alphabet;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Parcel;
@@ -16,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -25,6 +24,10 @@ import java.util.List;
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.product_tracer.ITracerGetter;
+import com.arz_x.tracer.ITracer;
+import com.arz_x.tracer.ProductTracer;
+import com.arz_x.tracer.TraceLevel;
 
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.DatabaseHelpers;
@@ -33,7 +36,6 @@ import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
 /**
  * Fragment of correct image selection exercise
- *
  */
 public class ImageSelectionFragment extends Fragment
 {
@@ -126,14 +128,6 @@ public class ImageSelectionFragment extends Fragment
                     R.id.bottomLeftImageView,
                     R.id.bottomRightImageView
             };
-    private static final int HintTextViewIds[] = new int[]
-            {
-                    R.id.topLeftTextView,
-                    R.id.topRightTextView,
-                    R.id.bottomLeftTextView,
-                    R.id.bottomRightTextView
-            };
-
 
     private static final String ExercisesTag = "image_selection_exercises";
     private static final String StateTag = "state";
@@ -171,14 +165,50 @@ public class ImageSelectionFragment extends Fragment
         // Required empty public constructor
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState)
+    {
+        // Inflate the layout for this fragment
+        View fragmentView = inflater.inflate(R.layout.fragment_image_selection, container, false);
+
+        try
+        {
+            restoreInternalState(savedInstanceState);
+            constructUserInterface(fragmentView, true);
+        }
+        catch (Exception exp)
+        {
+            ProductTracer.traceException(m_tracer
+                    , TraceLevel.Error
+                    , LogTag
+                    , exp);
+
+            AlertDialogHelper.showMessageBox(getActivity(),
+                    getResources().getString(R.string.alert_title),
+                    getResources().getString(R.string.failed_action),
+                    false,
+                    new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            getActivity().finish();
+                        }
+                    });
+        }
+
+        return fragmentView;
+    }
+
     /**
      * Restores all internal selectionVariants
      * @param savedInstanceState activity saved state
      */
     void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
-        m_serviceLocator = new CoreServiceLocator(getActivity());
-        m_mediaPlayerManager = m_serviceLocator.getMediaPlayerManager();
+        CoreServiceLocator serviceLocator = new CoreServiceLocator(getActivity());
+        m_mediaPlayerManager = serviceLocator.getMediaPlayerManager();
 
         m_exerciseStates = getArguments().getParcelableArrayList(ExercisesTag);
         if (savedInstanceState == null)
@@ -198,7 +228,7 @@ public class ImageSelectionFragment extends Fragment
     {
         final ImageSelectionSingleExerciseState currentExerciseInfo = m_exerciseStates.get(m_state.currentStepNumber);
 
-        // place exercise title
+        // place exercise caption
         {
             String newExerciseCaption = "";
             if (!TextUtils.isEmpty(currentExerciseInfo.exerciseTitle))
@@ -208,26 +238,35 @@ public class ImageSelectionFragment extends Fragment
             exerciseCaption.setText(newExerciseCaption);
         }
 
-        // set images + hints + selection
+        final float selectionImageSize = calculateSelectionImageSize(fragmentView);
+
+        // set images
         for (int imageIndex = 0; imageIndex < LayoutViewIds.length; ++imageIndex)
         {
-            ImageView uiImage = (ImageView)fragmentView.findViewById(ImageViewIds[imageIndex]);
             View selectionView = fragmentView.findViewById(LayoutViewIds[imageIndex]);
-            TextView hintTextView = (TextView)fragmentView.findViewById(HintTextViewIds[imageIndex]);
+            {
+                ViewGroup.LayoutParams layoutParams = selectionView.getLayoutParams();
+                layoutParams.height = layoutParams.width = (int) selectionImageSize;
+                selectionView.setLayoutParams(layoutParams);
+            }
+            ImageView uiImage = (ImageView)fragmentView.findViewById(ImageViewIds[imageIndex]);
 
             final int imageResourceId = DatabaseHelpers.getDrawableIdByName(getResources()
                     , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath);
             if (imageResourceId == DatabaseConstant.InvalidDatabaseIndex)
             {
-                Log.e(LogTag, "Failed to get resources id for : "
-                        + currentExerciseInfo.selectionVariants[imageIndex].imageFilePath);
+                ProductTracer.traceMessage(m_tracer
+                        , TraceLevel.Error
+                        , LogTag
+                        , String.format("Failed to get resources id for '%s'"
+                            , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath));
                 throw new CommonException(CommonResultCode.InvalidExternalSource);
             }
 
             uiImage.setImageDrawable(getResources().getDrawable(imageResourceId));
             if (doSetUserInteraction)
             {
-                final int ImageViewId = imageIndex;
+                final int imageViewId = imageIndex;
                 uiImage.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
@@ -235,11 +274,14 @@ public class ImageSelectionFragment extends Fragment
                     {
                         try
                         {
-                            onImageSelected(ImageViewId);
+                            onImageSelected(imageViewId);
                         }
                         catch (CommonException exp)
                         {
-                            Log.e(LogTag, "onImageSelected failed: " + exp.getMessage());
+                            ProductTracer.traceException(m_tracer
+                                    , TraceLevel.Error
+                                    , LogTag
+                                    , exp);
                             getActivity().finish();
                         }
                     }
@@ -250,23 +292,13 @@ public class ImageSelectionFragment extends Fragment
             if (isVariantProcessed)
             {
                 if (currentExerciseInfo.answerIndex == imageIndex)
-                {
                     selectionView.setBackgroundColor(CorrectSelectionColor);
-                }
                 else
-                {
                     selectionView.setBackgroundColor(IncorrectSelectionColor);
-
-                    String objectName = currentExerciseInfo.selectionVariants[imageIndex].name;
-                    if (objectName == null)
-                        objectName = "";
-                    hintTextView.setText(objectName);
-                }
             }
             else
             {
                 selectionView.setBackgroundColor(NoSelectionColor);
-                hintTextView.setText("");
             }
         }
 
@@ -280,7 +312,18 @@ public class ImageSelectionFragment extends Fragment
                     @Override
                     public void onClick(View view)
                     {
-                        onForwardButtonClick();
+                        try
+                        {
+                            processNextStep();
+                        }
+                        catch (CommonException exp)
+                        {
+                            ProductTracer.traceException(m_tracer
+                                    , TraceLevel.Error
+                                    , LogTag
+                                    , exp);
+                            getActivity().finish();
+                        }
                     }
                 });
             }
@@ -292,11 +335,23 @@ public class ImageSelectionFragment extends Fragment
                     @Override
                     public void onClick(View view)
                     {
-                        onBackButtonClick();
+                        m_stepsCallback.processPreviousStep();
                     }
                 });
             }
         }
+    }
+
+    float calculateSelectionImageSize(@NonNull View fragmentView)
+    {
+        final RelativeLayout layout = (RelativeLayout)fragmentView.findViewById(R.id.leftLayout);
+        final ViewGroup.LayoutParams layoutParams = layout.getLayoutParams();
+
+        final float imageMargin = getResources().getDimension(R.dimen.small_margin);
+        if (layoutParams.height >= imageMargin + 2*layoutParams.width)
+            return layoutParams.width;
+
+        return (layoutParams.height - imageMargin) / 2;
     }
 
     @Override
@@ -322,6 +377,9 @@ public class ImageSelectionFragment extends Fragment
 
         m_stepsCallback = (IExerciseStepCallback) activity;
         m_scoreNotification = (IScoreNotification) activity;
+
+        if (activity instanceof ITracerGetter)
+            m_tracer = ((ITracerGetter)activity).getTracer();
     }
 
     @Override
@@ -329,40 +387,10 @@ public class ImageSelectionFragment extends Fragment
     {
         super.onDetach();
         m_stepsCallback = null;
+        m_scoreNotification = null;
+        m_tracer = null;
 
         m_mediaPlayerManager.stop();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
-    {
-        // Inflate the layout for this fragment
-        View fragmentView = inflater.inflate(R.layout.fragment_image_selection, container, false);
-
-        try
-        {
-            restoreInternalState(savedInstanceState);
-            constructUserInterface(fragmentView, true);
-        }
-        catch (Exception exp)
-        {
-            Resources resources = getResources();
-            AlertDialogHelper.showMessageBox(getActivity(),
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.failed_action),
-                    false,
-                    new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i)
-                        {
-                            getActivity().finish();
-                        }
-                    });
-        }
-
-        return fragmentView;
     }
 
     @Override
@@ -371,24 +399,6 @@ public class ImageSelectionFragment extends Fragment
         super.onSaveInstanceState(savedInstanceState);
 
         savedInstanceState.putParcelable(StateTag, m_state);
-    }
-
-    private void onForwardButtonClick()
-    {
-        try
-        {
-            processNextStep();
-        }
-        catch (CommonException exp)
-        {
-            Log.e(LogTag, "process next step failed with: " + exp.getMessage());
-            getActivity().finish();
-        }
-    }
-
-    private void onBackButtonClick()
-    {
-        m_stepsCallback.processPreviousStep();
     }
 
     private void onImageSelected(int selectedImageId) throws CommonException
@@ -449,13 +459,6 @@ public class ImageSelectionFragment extends Fragment
                     Log.e(LogTag, "Failed to play sound hint " + exp.getMessage());
                 }
             }
-
-            // text hint
-            if (!TextUtils.isEmpty(currentExercise.selectionVariants[selectedImageId].name))
-            {
-                TextView hintTextView = (TextView)getView().findViewById(HintTextViewIds[selectedImageId]);
-                hintTextView.setText(currentExercise.selectionVariants[selectedImageId].name);
-            }
         }
     }
 
@@ -504,7 +507,7 @@ public class ImageSelectionFragment extends Fragment
         }
     }
 
-    private CoreServiceLocator m_serviceLocator;
+    private ITracer m_tracer;
     private IMediaPlayerManager m_mediaPlayerManager;
 
     private IExerciseStepCallback m_stepsCallback;

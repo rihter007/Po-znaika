@@ -197,9 +197,10 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     }
 
     @Override
-    public void setScore(int score)
+    public void setScore(double completeness)
     {
-        m_state.totalScore = score;
+        // TODO: refactor
+        m_state.totalScore = (int)completeness;
     }
 
     @Override

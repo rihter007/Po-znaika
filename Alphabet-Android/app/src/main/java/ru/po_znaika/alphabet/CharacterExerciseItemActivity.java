@@ -1,6 +1,10 @@
 package ru.po_znaika.alphabet;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -22,56 +26,48 @@ import android.util.Log;
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.product_tracer.FileTracerInstance;
+import com.arz_x.android.product_tracer.ITracerGetter;
+import com.arz_x.tracer.ITracer;
+import com.arz_x.tracer.ProductTracer;
+import com.arz_x.tracer.TraceLevel;
 
+import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.DatabaseConstant;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
-public class CharacterExerciseItemActivity extends Activity implements IExerciseStepCallback, IScoreNotification
+public class CharacterExerciseItemActivity extends Activity implements IExerciseStepCallback
+        , ITracerGetter
+        , IScoreNotification
 {
     /**
      * Describes CharacterExerciseItem activity state
      */
     private static final class CharacterExerciseItemState implements Parcelable
     {
-        /**
-         * Current exercise step (starts from 0)
-         */
+        public String exerciseName;
+        public int exerciseIconId;
+        public int exerciseMaxScore;
+
+        /* Current exercise step (starts from 0) */
         public int currentStep;
-
-        public int characterExerciseId;
-        public char exerciseCharacter;
-
-        public int characterExerciseItemId;
-        public String characterExerciseItemName;
-        public String characterExerciseItemDisplayName;
-
+        /* Exercise item steps */
         public CharacterExerciseItemStep[] exerciseSteps;
-        public Map<Integer, Integer> exerciseStepsScore;
+        /* Scores achieved for processing steps */
+        public Map<Integer, Double> exerciseStepsScore;
 
-        public CharacterExerciseItemState(int _characterExerciseId,
-                                          char _exerciseCharacter,
-                                          int _characterExerciseItemId,
-                                          @NonNull String _characterExerciseItemName,
-                                          @NonNull String _characterExerciseItemDisplayName,
+        public CharacterExerciseItemState(@NonNull String _exerciseName,
+                                          int _exerciseIconId,
+                                          int _exerciseMaxScore,
                                           @NonNull Collection<CharacterExerciseItemStep> _exerciseSteps)
 
         {
-            if ((_characterExerciseId == DatabaseConstant.InvalidDatabaseIndex) ||
-                    (_characterExerciseItemId == DatabaseConstant.InvalidDatabaseIndex))
-            {
-                throw new IllegalArgumentException();
-            }
+            this.exerciseName = _exerciseName;
+            this.exerciseIconId = _exerciseIconId;
+            this.exerciseMaxScore = _exerciseMaxScore;
 
             this.currentStep = 0;
-
-            this.characterExerciseId = _characterExerciseId;
-            this.exerciseCharacter = _exerciseCharacter;
-
-            this.characterExerciseItemId = _characterExerciseItemId;
-            this.characterExerciseItemName = _characterExerciseItemName;
-            this.characterExerciseItemDisplayName = _characterExerciseItemDisplayName;
-
             this.exerciseSteps = new CharacterExerciseItemStep[_exerciseSteps.size()];
             _exerciseSteps.toArray(this.exerciseSteps);
 
@@ -80,26 +76,20 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
 
         public CharacterExerciseItemState(@NonNull Parcel _in)
         {
+            this.exerciseName = _in.readString();
+            this.exerciseIconId = _in.readInt();
+            this.exerciseMaxScore = _in.readInt();
+
             this.currentStep = _in.readInt();
-
-            this.characterExerciseId = _in.readInt();
-            this.exerciseCharacter = _in.readString().charAt(0);
-
-            this.characterExerciseItemId = _in.readInt();
-            this.characterExerciseItemName = _in.readString();
-            this.characterExerciseItemDisplayName = _in.readString();
 
             {
                 final int exerciseStepsNumber = _in.readInt();
-
                 if (exerciseStepsNumber > 0)
                 {
                     this.exerciseSteps = new CharacterExerciseItemStep[exerciseStepsNumber];
 
                     for (int exerciseStepIndex = 0; exerciseStepIndex < exerciseStepsNumber; ++exerciseStepIndex)
-                    {
                         this.exerciseSteps[exerciseStepIndex] = _in.readParcelable(CharacterExerciseItemStep.class.getClassLoader());
-                    }
                 }
             }
 
@@ -118,13 +108,11 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         @Override
         public void writeToParcel(@NonNull Parcel out, int flags)
         {
+            out.writeString(this.exerciseName);
+            out.writeInt(this.exerciseIconId);
+            out.writeInt(this.exerciseMaxScore);
+
             out.writeInt(this.currentStep);
-
-            out.writeInt(this.characterExerciseId);
-            out.writeString(((Character)this.exerciseCharacter).toString());
-
-            out.writeInt(this.characterExerciseItemId);
-            out.writeString(this.characterExerciseItemName);
 
             out.writeInt(this.exerciseSteps.length);
             for (CharacterExerciseItemStep exerciseItemStepState : this.exerciseSteps)
@@ -168,11 +156,14 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
 
         try
         {
+            m_tracer = TracerHelper.continueOrCreateFileTracer(this, savedInstanceState);
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onCreate");
             restoreInternalState(savedInstanceState);
             constructUserInterface();
         }
         catch (Exception exp)
         {
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
             Resources resources = getResources();
             AlertDialogHelper.showMessageBox(this,
                     resources.getString(R.string.alert_title),
@@ -190,10 +181,52 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
     }
 
     @Override
+    protected void onPause()
+    {
+        super.onPause();
+        m_tracer.pause();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        try
+        {
+            m_tracer.resume();
+        }
+        catch (CommonException exp)
+        {
+            throw new AssertionError();
+        }
+    }
+
+    @Override
     protected void onDestroy()
     {
         super.onDestroy();
         new CloseAsyncTask(m_serviceLocator).execute();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState)
+    {
+        super.onSaveInstanceState(savedInstanceState);
+
+        FileTracerInstance.saveInstance(m_tracer, savedInstanceState);
+
+        savedInstanceState.putParcelable(InternalStateTag, m_state);
+
+        final FragmentManager fragmentManager = getFragmentManager();
+        final Fragment currentFragment = fragmentManager.findFragmentByTag(FragmentTag);
+        fragmentManager.putFragment(savedInstanceState, FragmentTag, currentFragment);
+    }
+
+    @Override
+    public ITracer getTracer()
+    {
+        return m_tracer;
     }
 
     /**
@@ -205,6 +238,23 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
     {
         m_serviceLocator = new CoreServiceLocator(this);
 
+        Bundle intentParams = getIntent().getExtras();
+
+        // get initial parameters from intent
+
+        final int characterExerciseItemId = intentParams.getInt(CharacterExerciseItemIdTag
+                , DatabaseConstant.InvalidDatabaseIndex);
+        if (characterExerciseItemId == DatabaseConstant.InvalidDatabaseIndex)
+        {
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "Invalid character exercise id");
+            throw new CommonException(CommonResultCode.InvalidInternalState);
+        }
+
+        ProductTracer.traceMessage(m_tracer
+                , TraceLevel.Info
+                , LogTag
+                , String.format("Character exercise item id: '%d'", characterExerciseItemId));
+
         // Restore state
         {
             if (savedInstanceState != null)
@@ -212,7 +262,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
                 m_state = savedInstanceState.getParcelable(InternalStateTag);
                 if (m_state == null)
                 {
-                    Log.e(LogTag, "Failed to restore internal state");
+                    ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "Failed to restore internal state");
                     throw new CommonException(CommonResultCode.InvalidInternalState);
                 }
                 m_currentFragment = getFragmentManager().getFragment(savedInstanceState, FragmentTag);
@@ -220,59 +270,69 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
             else
             {
                 m_currentFragment = null;
-                Bundle intentParams = getIntent().getExtras();
-
-                // get initial parameters from intent
-
-                final int characterExerciseItemId = intentParams.getInt(CharacterExerciseItemIdTag);
-                if (characterExerciseItemId == DatabaseConstant.InvalidDatabaseIndex)
-                {
-                    Log.e(LogTag, "Invalid character exercise id");
-                    throw new CommonException(CommonResultCode.InvalidInternalState);
-                }
 
                 // get additional parameters about item steps from database
                 final AlphabetDatabase.CharacterExerciseItemInfo characterExerciseItemInfo =
                         m_serviceLocator.getAlphabetDatabase().getCharacterExerciseItemById(characterExerciseItemId);
                 if (characterExerciseItemInfo == null)
                 {
-                    Log.e(LogTag, String.format("Failed to obtain character item info from database, id: \"%d\"",
-                            characterExerciseItemId));
+                    ProductTracer.traceMessage(m_tracer
+                            , TraceLevel.Error
+                            , LogTag
+                            , "Failed to obtain character item info from database");
                     throw new CommonException(CommonResultCode.InvalidExternalSource);
                 }
 
-                final AlphabetDatabase.CharacterExerciseInfo characterExerciseInfo =
-                        m_serviceLocator.getAlphabetDatabase().getCharacterExerciseById(characterExerciseItemInfo.characterExerciseId);
-                if (characterExerciseInfo == null)
+                final int exerciseIconId = DatabaseHelpers.getDrawableIdByName(getResources()
+                        , characterExerciseItemInfo.iconImageName);
+                if (exerciseIconId == 0)
                 {
-                    Log.e(LogTag, String.format("Failed to obtain character exercise info from database, id: \"%d\"",
-                            characterExerciseItemInfo.characterExerciseId));
+                    ProductTracer.traceMessage(m_tracer
+                            , TraceLevel.Error
+                            , LogTag
+                            , String.format("Failed to exercise icon resource id by '%s'"
+                                , characterExerciseItemInfo.iconImageName));
                     throw new CommonException(CommonResultCode.InvalidExternalSource);
                 }
 
-                Map<Integer, CharacterExerciseItemStep> sortedExerciseSteps = new TreeMap<>();
+                final AlphabetDatabase.CharacterExerciseItemStepInfo[] exerciseSteps =
+                        m_serviceLocator.getAlphabetDatabase()
+                                .getAllCharacterExerciseStepsByCharacterExerciseItemId(characterExerciseItemId);
+                if (exerciseSteps == null)
                 {
-                    final AlphabetDatabase.CharacterExerciseItemStepInfo[] exerciseSteps =
-                            m_serviceLocator.getAlphabetDatabase().getAllCharacterExerciseStepsByCharacterExerciseItemId(characterExerciseItemId);
-                    for (AlphabetDatabase.CharacterExerciseItemStepInfo exerciseStepInfo : exerciseSteps)
+                    ProductTracer.traceMessage(m_tracer
+                            , TraceLevel.Error
+                            , LogTag
+                            , "Failed to obtain character item info from database");
+                    throw new CommonException(CommonResultCode.InvalidExternalSource);
+                }
+
+                Arrays.sort(exerciseSteps, new Comparator<AlphabetDatabase.CharacterExerciseItemStepInfo>()
+                {
+                    @Override
+                    public int compare(AlphabetDatabase.CharacterExerciseItemStepInfo lhs, AlphabetDatabase.CharacterExerciseItemStepInfo rhs)
                     {
-                        //sortedExerciseSteps.put(exerciseStepInfo.stepNumber,
-                        //        new CharacterExerciseItemStep(exerciseStepInfo.action, exerciseStepInfo.value));
+                        if (lhs.stepNumber == rhs.stepNumber)
+                            return 0;
+                        return lhs.stepNumber < rhs.stepNumber ? -1 : 1;
                     }
-                }
+                });
 
-                /*m_state = new CharacterExerciseItemState(characterExerciseInfo.id,
-                        characterExerciseInfo.character,
-                        characterExerciseItemId,
-                        characterExerciseItemInfo.name,
-                        getResources().getString(R.string.title_activity_character_exercise_item) + " \"" + characterExerciseItemInfo.displayName + "\"",
-                        sortedExerciseSteps.values());
-                        */
+                List<CharacterExerciseItemStep> itemSteps = new ArrayList<>();
+                for (AlphabetDatabase.CharacterExerciseItemStepInfo stepInfo : exerciseSteps)
+                    itemSteps.add(new CharacterExerciseItemStep(stepInfo.action, stepInfo.value));
+
+                m_state = new CharacterExerciseItemState(characterExerciseItemInfo.exerciseInfo.name
+                        , characterExerciseItemInfo.exerciseInfo.maxScore
+                        , exerciseIconId
+                        , itemSteps);
             }
         }
 
-        final CharacterExerciseActionsFactory actionsFactory = new CharacterExerciseActionsFactory(m_state.characterExerciseId,
-                this, m_serviceLocator.getAlphabetDatabase());
+        final CharacterExerciseActionsFactory actionsFactory = new CharacterExerciseActionsFactory(characterExerciseItemId
+                , m_state.exerciseIconId
+                , this
+                , m_serviceLocator.getAlphabetDatabase());
         m_exerciseStepManager = new CharacterExerciseStepManager(m_state.currentStep, m_state.exerciseSteps, actionsFactory);
     }
 
@@ -281,23 +341,12 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
      */
     void constructUserInterface()
     {
-        setTitle(m_state.characterExerciseItemDisplayName);
         if (m_currentFragment == null)
             m_currentFragment = m_exerciseStepManager.getCurrentExerciseStep();
         ProcessFragment(m_currentFragment);
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle savedInstanceState)
-    {
-        super.onSaveInstanceState(savedInstanceState);
 
-        savedInstanceState.putParcelable(InternalStateTag, m_state);
-
-        final FragmentManager fragmentManager = getFragmentManager();
-        final Fragment currentFragment = fragmentManager.findFragmentByTag(FragmentTag);
-        fragmentManager.putFragment(savedInstanceState, FragmentTag, currentFragment);
-    }
 
     @Override
     public void processPreviousStep()
@@ -335,25 +384,29 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
             if (!m_state.exerciseStepsScore.isEmpty())
             {
                 // calculate score
-                int totalScore = 0;
+                double averageCompleteness = 0;
                 {
-                    Collection<Integer> values = m_state.exerciseStepsScore.values();
-                    for (Integer singleScore : values)
-                        totalScore += singleScore;
+                    Collection<Double> values = m_state.exerciseStepsScore.values();
+                    for (Double singleScore : values)
+                        averageCompleteness += singleScore;
+                    averageCompleteness /= m_state.exerciseStepsScore.size();
                 }
-                score = totalScore;
+                score = (int)(m_state.exerciseMaxScore * averageCompleteness);
+            }
+            else
+            {
+                score = m_state.exerciseMaxScore;
+            }
 
-                try
-                {
-                    m_serviceLocator.getExerciseScoreProcessor().reportExerciseScore(m_state.characterExerciseItemName, totalScore);
-                }
-                catch (CommonException exp)
-                {
-                    Log.e(LogTag, "Failed to report exercise score, exception message:" + exp.getMessage());
-                }
+            try
+            {
+                m_serviceLocator.getExerciseScoreProcessor().reportExerciseScore(m_state.exerciseName, score);
+            }
+            catch (Throwable exp)
+            {
+                ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
             }
             ++m_state.currentStep;
-
             m_currentFragment = ExerciseFinishedFragment.createFragment(score);
             ProcessFragment(m_currentFragment);
             return;
@@ -395,9 +448,10 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         }
     }
 
-    public void setScore(int score)
+    @Override
+    public void setScore(double completeness)
     {
-        m_state.exerciseStepsScore.put(m_state.currentStep, score);
+        m_state.exerciseStepsScore.put(m_state.currentStep, completeness);
     }
 
     /**
@@ -412,9 +466,10 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         fragmentTransaction.commit();
     }
 
-    private CharacterExerciseItemState m_state;
-    private Fragment m_currentFragment;
+    private FileTracerInstance m_tracer;
+    private CoreServiceLocator m_serviceLocator;
     private CharacterExerciseStepManager m_exerciseStepManager;
 
-    private CoreServiceLocator m_serviceLocator;
+    private CharacterExerciseItemState m_state;
+    private Fragment m_currentFragment;
 }

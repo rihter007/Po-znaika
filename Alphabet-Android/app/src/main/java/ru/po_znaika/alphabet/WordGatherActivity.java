@@ -259,9 +259,10 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
     }
 
     @Override
-    public void setScore(int score)
+    public void setScore(double score)
     {
-        m_state.totalScore = score;
+        // TODO: refactor
+        m_state.totalScore = (int)score;
     }
 
     /**

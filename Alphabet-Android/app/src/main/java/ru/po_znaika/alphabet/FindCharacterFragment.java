@@ -1,5 +1,8 @@
 package ru.po_znaika.alphabet;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Activity;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -14,9 +17,6 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import com.arz_x.android.AlertDialogHelper;
 

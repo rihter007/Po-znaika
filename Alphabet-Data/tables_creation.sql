@@ -116,10 +116,12 @@ CREATE TABLE character_exercise_item (
 	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
 	exercise_id INTEGER NOT NULL,
 	character_exercise_id INTEGER NOT NULL,
+	icon_id INTEGER,
 	menu_element_type INTEGER NOT NULL,
 	
 	FOREIGN KEY(exercise_id) REFERENCES exercise(_id),
 	FOREIGN KEY(character_exercise_id) REFERENCES character_exercise(_id),
+	FOREIGN KEY(icon_id) REFERENCES image(_id),
 	
 	UNIQUE (character_exercise_id, exercise_id) ON CONFLICT FAIL,
 	UNIQUE (character_exercise_id, menu_element_type) ON CONFLICT FAIL

@@ -235,9 +235,11 @@ public final class AlphabetDatabase
         /* Information about the base exercise */
         public ExerciseInfo exerciseInfo;
         /* Identifier of the parent character exercise */
-        public int characterExerciseId;
+        public CharacterExerciseInfo characterExercise;
         /* Unique type of the menu element */
         public CharacterExerciseItemType menuElementType;
+        /* Icon to show when this exercise steps are processed */
+        public String iconImageName;
     }
 
     /**
@@ -248,8 +250,9 @@ public final class AlphabetDatabase
         /* Database row identifier */
         public int id;
         /* Identifier of character exercise item to which step belongs to */
-        public int characterExerciseItemId;
-
+        public CharacterExerciseItemInfo characterExerciseItem;
+        /* Sequential number of step during the exercise */
+        public int stepNumber;
         /* Action which must be done */
         public CharacterExerciseActionType action;
         /* Specific value for action */
@@ -264,13 +267,13 @@ public final class AlphabetDatabase
         public int id;
 
         /* Optional: image id for theory material */
-        public int imageId;
+        public String imageName;
 
         /* Optional: url to wich redirection is processed when clicked on image */
         public String imageRedirectUrl;
 
         /* Optional: sound id which contains oral theory description */
-        public int soundId;
+        public String soundName;
 
         /* Optional: Text information theory description */
         public String message;
@@ -352,6 +355,8 @@ public final class AlphabetDatabase
     /**
      * SQL-expressions from exercise table
      */
+    private static final String ExtractExerciseInfoById =
+            "SELECT type, name, max_score FROM exercise WHERE _id = ?";
     private static final String ExtractExerciseInfoByTypeSqlStatement =
             "SELECT _id, name, max_score FROM exercise WHERE type = ?";
 
@@ -370,11 +375,11 @@ public final class AlphabetDatabase
                     "      AND (ce._id = ?)";
 
     private static final String ExtractCharacterItemByIdSqlStatement =
-            "SELECT character_exercise_id, menu_position, name, display_name FROM character_exercise_item WHERE _id = ?";
+            "SELECT exercise_id, character_exercise_id, icon_id, menu_element_type FROM character_exercise_item WHERE _id = ?";
     private static final String ExtractAllCharacterExerciseItemsByCharacterExerciseIdSqlStatement =
-            "SELECT chi._id, chi.menu_element_type, ex._id, ex.type, ex.name, ex.max_score " +
-                    "FROM character_exercise_item chi, exercise ex " +
-                    "WHERE (chi.exercise_id = ex._id) AND (character_exercise_id = ?)";
+            "SELECT _id, exercise_id, icon_id, menu_element_type " +
+                    "FROM character_exercise_item " +
+                    "WHERE character_exercise_id = ?";
     private static final String ExtractAllCharacterExerciseStepsByCharacterExerciseItemIdSqlStatement =
             "SELECT _id, step_number, action, value FROM character_exercise_item_step WHERE character_exercise_item_id = ?";
     private static final String ExtractCharacterItemDisplayNameByIdSqlStatement =
@@ -455,7 +460,7 @@ public final class AlphabetDatabase
      * SQL-expressions for theory_page table
      */
     private static final String ExtractTheoryPageById =
-            "SELECT iamge_id, image_redirect_url, sound_id, message " +
+            "SELECT image_id, image_redirect_url, sound_id, message " +
             "FROM theory_page " +
             "WHERE _id = ?";
 
@@ -642,6 +647,38 @@ public final class AlphabetDatabase
         return null;
     }
 
+    public ExerciseInfo getExerciseInfoById(int id)
+    {
+        ExerciseInfo result = null;
+        Cursor dataReader = null;
+
+        try
+        {
+            final Integer exerciseIdObject = id;
+            dataReader = m_databaseConnection.rawQuery(ExtractExerciseInfoById
+                    , new String[] { exerciseIdObject.toString() });
+
+            if (dataReader.moveToFirst())
+            {
+                ExerciseInfo exerciseInfo = new ExerciseInfo();
+                exerciseInfo.id = id;
+                exerciseInfo.type = ExerciseType.getTypeByValue(dataReader.getInt(0));
+                exerciseInfo.name = dataReader.getString(1);
+                exerciseInfo.maxScore = dataReader.getInt(2);
+            }
+        }
+        catch (Exception exp)
+        {
+            result = null;
+        }
+        finally
+        {
+            if (dataReader != null)
+                dataReader.close();
+        }
+        return result;
+    }
+
     public ExerciseInfo[] getExerciseInfoByType(@NonNull ExerciseType exerciseType)
     {
         ExerciseInfo[] result = null;
@@ -754,9 +791,9 @@ public final class AlphabetDatabase
 
     public CharacterExerciseItemInfo getCharacterExerciseItemById(int characterExerciseItemId)
     {
-        return null;
-        /*CharacterExerciseItemInfo result = null;
+        CharacterExerciseItemInfo result = null;
         Cursor dataReader = null;
+
         try
         {
             final Integer characterExerciseItemIdObject = characterExerciseItemId;
@@ -767,10 +804,10 @@ public final class AlphabetDatabase
             {
                 result = new CharacterExerciseItemInfo();
                 result.id = characterExerciseItemId;
-                result.characterExerciseId = dataReader.getInt(0);
-                result.menuPosition = dataReader.getInt(1);
-                result.name = dataReader.getString(2);
-                result.displayName = dataReader.getString(3);
+                result.exerciseInfo = getExerciseInfoById(dataReader.getInt(0));
+                result.characterExercise = getCharacterExerciseById(dataReader.getInt(1));
+                result.menuElementType = CharacterExerciseItemType.getTypeByValue(dataReader.getInt(2));
+                result.iconImageName = dataReader.getString(3);
             }
         }
         catch (Exception exp)
@@ -782,8 +819,7 @@ public final class AlphabetDatabase
             if (dataReader != null)
                 dataReader.close();
         }
-
-        return result;*/
+        return result;
     }
 
     public CharacterExerciseItemInfo[] getAllCharacterExerciseItemsByCharacterExerciseId(int characterExerciseId)
@@ -802,13 +838,10 @@ public final class AlphabetDatabase
             {
                 CharacterExerciseItemInfo characterItem = new CharacterExerciseItemInfo();
                 characterItem.id = dataReader.getInt(0);
-                characterItem.characterExerciseId = characterExerciseId;
+                characterItem.exerciseInfo = getExerciseInfoById(dataReader.getInt(1));
+                characterItem.characterExercise = getCharacterExerciseById(characterExerciseId);
+                characterItem.iconImageName = dataReader.getString(2);
                 characterItem.menuElementType = CharacterExerciseItemType.getTypeByValue(dataReader.getInt(1));
-                characterItem.exerciseInfo = new ExerciseInfo();
-                characterItem.exerciseInfo.id = dataReader.getInt(2);
-                characterItem.exerciseInfo.type = ExerciseType.getTypeByValue(dataReader.getInt(3));
-                characterItem.exerciseInfo.name = dataReader.getString(4);
-                characterItem.exerciseInfo.maxScore = dataReader.getInt(5);
 
                 resultList.add(characterItem);
             }
@@ -939,9 +972,9 @@ public final class AlphabetDatabase
                 result = new TheoryPageInfo();
 
                 result.id = theoryPageId;
-                result.imageId = dataReader.getInt(0);
+                result.imageName = getImageFileNameById(dataReader.getInt(0));
                 result.imageRedirectUrl = dataReader.getString(1);
-                result.soundId = dataReader.getInt(2);
+                result.soundName = getSoundFileNameById(dataReader.getInt(2));
                 result.message = dataReader.getString(3);
             }
         }
