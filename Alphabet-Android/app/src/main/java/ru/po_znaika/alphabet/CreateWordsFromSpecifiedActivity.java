@@ -197,7 +197,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     }
 
     @Override
-    public void setScore(double completeness)
+    public void setCompletionRate(double completeness)
     {
         // TODO: refactor
         m_state.totalScore = (int)completeness;

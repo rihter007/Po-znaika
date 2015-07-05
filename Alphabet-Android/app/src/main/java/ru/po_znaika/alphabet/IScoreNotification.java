@@ -6,5 +6,5 @@ package ru.po_znaika.alphabet;
  */
 public interface IScoreNotification
 {
-    void setScore(double completeness);
+    void setCompletionRate(double completeness);
 }

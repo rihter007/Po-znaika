@@ -1,7 +1,6 @@
 package ru.po_znaika.alphabet;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -602,7 +601,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
                                 totalScore += WordLiteral.length() * (m_state.usedHints.contains(wordId) ? SingleCharacterHintScore : SingleCharacterScore);
                             }
 
-                            m_scoreNotification.setScore(totalScore);
+                            m_scoreNotification.setCompletionRate(totalScore);
                             m_exerciseCallback.processNextStep();
                         }
                     }

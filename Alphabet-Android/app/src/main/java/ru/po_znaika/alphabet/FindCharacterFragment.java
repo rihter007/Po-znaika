@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -18,7 +19,13 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.product_tracer.ITracerGetter;
+import com.arz_x.tracer.ITracer;
+import com.arz_x.tracer.ProductTracer;
+import com.arz_x.tracer.TraceLevel;
 
 import ru.po_znaika.common.IExerciseStepCallback;
 
@@ -45,7 +52,7 @@ public class FindCharacterFragment extends Fragment
             return ValuesMap.get(value);
         }
 
-        private ExerciseStage(int _value)
+        ExerciseStage(int _value)
         {
             m_value = _value;
         }
@@ -84,6 +91,7 @@ public class FindCharacterFragment extends Fragment
             Boolean[] elements = new Boolean[_in.readInt()];
             for (int elemIndex = 0; elemIndex < elements.length; ++elemIndex)
                 elements[elemIndex] = _in.readByte() == 1;
+            this.elementsSelection = new MatrixAccessor<>(elements, this.columnsCount);
         }
 
         @Override
@@ -100,8 +108,8 @@ public class FindCharacterFragment extends Fragment
 
             final Boolean[] elements = this.elementsSelection.get();
             container.writeInt(elements.length);
-            for (int elemIndex = 0; elemIndex < elements.length; ++elemIndex)
-                container.writeByte((byte)(elements[elemIndex] ? 1 : 0));
+            for (Boolean elem : elements)
+                container.writeByte((byte)(elem ? 1 : 0));
         }
 
         public static final Creator CREATOR = new Creator()
@@ -118,16 +126,26 @@ public class FindCharacterFragment extends Fragment
         };
     }
 
+    private enum SelectionType
+    {
+        NoSelection,
+        Selected,
+        Correct,
+        InCorrect
+    }
+
+    private static final String LogTag = FindCharacterFragment.class.getName();
+
+    private static final int MaxMistakesCount = 5;
+
     private static final String InternalStateTag = "internal_state";
     private static final String TextTag = "text";
     private static final String SearchCharacterTag = "search_character";
 
-    private static final int ScoreDelta = 5;
-
-    private static final int NoSelectionColorId = android.R.color.transparent;
-    private static final int SelectionColorId = android.R.color.holo_blue_light;
-    private static final int CorrectSelectionColorId = android.R.color.holo_green_light;
-    private static final int IncorrectSelectionColorId = android.R.color.holo_red_light;
+    private static final int NoSelectionColor = Constant.Color.BackgroundBlue;
+    private static final int SelectionColor = Constant.Color.LightBlue;
+    private static final int CorrectSelectionColor = Constant.Color.LightGreen;
+    private static final int IncorrectSelectionColor = Constant.Color.LightRed;
 
     public static FindCharacterFragment createFragment(@NonNull String text, char searchChar)
     {
@@ -146,17 +164,61 @@ public class FindCharacterFragment extends Fragment
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+        final View fragmentView = inflater.inflate(R.layout.fragment_find_character, container, false);
+        try
+        {
+            restoreInternalState(savedInstanceState);
+            constructUserInterface(fragmentView, inflater);
+        }
+        catch (Exception exp)
+        {
+            ProductTracer.traceException(m_tracer
+                    , TraceLevel.Error
+                    , LogTag
+                    , exp);
+            AlertDialogHelper.showMessageBox(getActivity()
+                    , getResources().getString(R.string.error_unknown_error)
+                    , getResources().getString(R.string.alert_title)
+                    , false
+                    , new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    getActivity().finish();
+                }
+            });
+        }
+
+        return fragmentView;
     }
 
     @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public void onAttach(@NonNull Activity activity)
+    {
+        super.onAttach(activity);
+
+        m_stepCallback = (IExerciseStepCallback)activity;
+        m_exerciseScoreNotificator = (IScoreNotification)activity;
+
+        if (activity instanceof ITracerGetter)
+            m_tracer = ((ITracerGetter)activity).getTracer();
+    }
+
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+
+        m_stepCallback = null;
+        m_exerciseScoreNotificator = null;
+    }
+
+    void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         final Bundle arguments = getArguments();
-        if (arguments == null)
-            throw new NullPointerException();
 
         final String exerciseText = arguments.getString(TextTag);
         m_text = exerciseText.split(Constant.NewLineDelimiter);
@@ -168,6 +230,12 @@ public class FindCharacterFragment extends Fragment
             m_state = savedInstanceState.getParcelable(InternalStateTag);
         else
             m_state = new InternalState(ExerciseStage.Active, totalElementsCount, maxRowLength);
+    }
+
+    void constructUserInterface(@NonNull View fragmentView, @NonNull LayoutInflater inflater) throws CommonException
+    {
+        final int totalElementsCount = m_state.elementsSelection.getElementsCount();
+        final int maxRowLength = m_state.elementsSelection.getColumnsCount();
 
         LinearLayout[] elements = new LinearLayout[totalElementsCount];
         for (int elementIndex = 0; elementIndex < elements.length; ++elementIndex)
@@ -191,27 +259,29 @@ public class FindCharacterFragment extends Fragment
                         onItemSelected((LinearLayout) v, rowIndex, columnIndex);
                     }
                 });
+            }
+        }
 
+        m_uiElements = new MatrixAccessor<>(elements, maxRowLength);
+
+        // process selection
+        for (int columnIndex = 0; columnIndex < m_uiElements.getColumnsCount(); ++columnIndex)
+        {
+            for (int rowIndex = 0; rowIndex < m_uiElements.getRowsCount(); ++rowIndex)
+            {
                 if (m_state.stage == ExerciseStage.Active)
                 {
-                    elements[elementIndex].setBackgroundColor(getResources().getColor(NoSelectionColorId));
+                    markCharacterElement(rowIndex, columnIndex, SelectionType.NoSelection);
                 }
                 else
                 {
                     final boolean isCorrect = m_state.elementsSelection.get(rowIndex, columnIndex) ==
                             (m_text[rowIndex].charAt(columnIndex) == m_searchCharacter);
-                    final int colorId = isCorrect ? CorrectSelectionColorId : IncorrectSelectionColorId;
-                    elements[elementIndex].setBackgroundColor(colorId);
+                    markCharacterElement(rowIndex, columnIndex
+                            , isCorrect ? SelectionType.Correct : SelectionType.InCorrect);
                 }
             }
-            else
-            {
-                elements[elementIndex].setBackgroundColor(getResources().getColor(NoSelectionColorId));
-            }
         }
-        m_uiElements = new MatrixAccessor<>(elements, maxRowLength);
-
-        final View fragmentView = inflater.inflate(R.layout.fragment_find_character, container, false);
 
         // put characters
         {
@@ -256,29 +326,51 @@ public class FindCharacterFragment extends Fragment
 
         // exercise title
         {
-            TextView titleTextView = (TextView)fragmentView.findViewById(R.id.exerciseCaptionTextView);
+            TextView titleTextView = (TextView)fragmentView.findViewById(R.id.textInformationTextView);
             titleTextView.setText(String.format(getResources().getString(R.string.caption_find_character), m_searchCharacter));
         }
-
-        return fragmentView;
     }
 
-    @Override
-    public void onAttach(@NonNull Activity activity)
+    public void markCharacterElement(int rowIndex, int columnIndex
+            , @NonNull SelectionType selectionType) throws CommonException
     {
-        super.onAttach(activity);
+        LinearLayout layout = m_uiElements.get(rowIndex, columnIndex);
+        if (layout == null)
+        {
+            ProductTracer.traceMessage(m_tracer
+                    , TraceLevel.Error
+                    , LogTag
+                    , String.format("Invalid rowIndex, columnIndex: '%d', '%d'", rowIndex, columnIndex));
+            throw new CommonException(CommonResultCode.AssertError);
+        }
 
-        m_stepCallback = (IExerciseStepCallback)activity;
-        m_exerciseScoreNotificator = (IScoreNotification)activity;
-    }
+        int color;
+        switch (selectionType)
+        {
+            case NoSelection:
+                color = NoSelectionColor;
+                break;
+            case Selected:
+                color = SelectionColor;
+                break;
+            case Correct:
+                color = CorrectSelectionColor;
+                break;
+            case InCorrect:
+                color = IncorrectSelectionColor;
+                break;
+            default:
+            {
+                ProductTracer.traceMessage(m_tracer
+                        , TraceLevel.Error
+                        , LogTag
+                        , String.format("Unknown selection type: '%s'", selectionType));
+                throw new CommonException(CommonResultCode.AssertError);
+            }
+        }
 
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-
-        m_stepCallback = null;
-        m_exerciseScoreNotificator = null;
+        TextView textView = (TextView)layout.findViewById(R.id.textView);
+        textView.setTextColor(color);
     }
 
     public void onBackButtonPressed()
@@ -303,47 +395,46 @@ public class FindCharacterFragment extends Fragment
 
     public void onForwardButtonPressed()
     {
-        if (m_state.stage == ExerciseStage.Active)
+        try
         {
-            m_state.stage = ExerciseStage.Processed;
-
-            final String searchCharacter = ((Character)m_searchCharacter).toString();
-
-            int mistakesCount = 0;
-            int charactersCount = 0;
-
-            final int elementsCount = m_state.elementsSelection.get().length;
-            for (int elementIndex = 0; elementIndex < elementsCount; ++elementIndex)
+            if (m_state.stage == ExerciseStage.Active)
             {
-                final int rowIndex = elementIndex / m_state.columnsCount;
-                final int columnIndex = elementIndex % m_state.columnsCount;
+                m_state.stage = ExerciseStage.Processed;
 
-                if ((columnIndex < m_text[rowIndex].length()) &&
-                        (!Character.isWhitespace(m_text[rowIndex].charAt(columnIndex))))
+                final String searchCharacter = ((Character) m_searchCharacter).toString();
+
+                int mistakesCount = 0;
+                for (int columnIndex = 0; columnIndex < m_uiElements.getColumnsCount(); ++columnIndex)
                 {
-                    String currentCharacter = ((Character)m_text[rowIndex].charAt(columnIndex)).toString();
-                    final boolean isCorrect = m_state.elementsSelection.get(rowIndex, columnIndex) ==
-                            currentCharacter.equalsIgnoreCase(searchCharacter);
-                    final int colorId = isCorrect ? CorrectSelectionColorId : IncorrectSelectionColorId;
+                    for (int rowIndex = 0; rowIndex < m_uiElements.getRowsCount(); ++columnIndex)
+                    {
+                        if ((columnIndex < m_text[rowIndex].length()) &&
+                                (!Character.isWhitespace(m_text[rowIndex].charAt(columnIndex))))
+                        {
+                            String currentCharacter = ((Character) m_text[rowIndex].charAt(columnIndex)).toString();
+                            final boolean isCorrect = m_state.elementsSelection.get(rowIndex, columnIndex) ==
+                                    currentCharacter.equalsIgnoreCase(searchCharacter);
+                            markCharacterElement(rowIndex, columnIndex
+                                    , isCorrect ? SelectionType.Correct : SelectionType.InCorrect);
 
-                    ++charactersCount;
-
-                    if (!isCorrect)
-                        ++mistakesCount;
-
-                    m_uiElements.get(rowIndex, columnIndex).setBackgroundColor(getResources().getColor(colorId));
+                            if (!isCorrect)
+                                ++mistakesCount;
+                        }
+                    }
                 }
+
+                final double completionRate = mistakesCount > MaxMistakesCount
+                        ? 0 : 100 * ((MaxMistakesCount - mistakesCount) / (double)MaxMistakesCount);
+                m_exerciseScoreNotificator.setCompletionRate(completionRate);
             }
-
-            int score = (int)((double)(charactersCount - mistakesCount) / (double)charactersCount * ScoreDelta);
-            m_exerciseScoreNotificator.setScore(score);
-
-            Button forwardButton = (Button)getView().findViewById(R.id.forwardButton);
-            forwardButton.setText(getResources().getText(R.string.caption_next));
+            else
+            {
+                m_stepCallback.processNextStep();
+            }
         }
-        else
+        catch (Exception exp)
         {
-            m_stepCallback.processNextStep();
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
         }
     }
 
@@ -353,11 +444,12 @@ public class FindCharacterFragment extends Fragment
             return;
 
         final boolean isSelected = m_state.elementsSelection.get(rowId, columnId);
-        int colorId = isSelected ? NoSelectionColorId : SelectionColorId;
+        int colorId = isSelected ? NoSelectionColor : SelectionColor;
         view.setBackgroundColor(getResources().getColor(colorId));
         m_state.elementsSelection.set(rowId, columnId, !isSelected);
     }
 
+    private ITracer m_tracer;
     private IExerciseStepCallback m_stepCallback;
     private IScoreNotification m_exerciseScoreNotificator;
 

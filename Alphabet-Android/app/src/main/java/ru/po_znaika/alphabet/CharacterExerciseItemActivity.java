@@ -449,7 +449,7 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
     }
 
     @Override
-    public void setScore(double completeness)
+    public void setCompletionRate(double completeness)
     {
         m_state.exerciseStepsScore.put(m_state.currentStep, completeness);
     }

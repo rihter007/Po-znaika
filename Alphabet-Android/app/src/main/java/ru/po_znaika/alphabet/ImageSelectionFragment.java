@@ -134,7 +134,7 @@ public class ImageSelectionFragment extends Fragment
 
     private static final int ScoreStep = 10;
 
-    private static final int NoSelectionColor = Constant.Color.NoColor;
+    private static final int NoSelectionColor = Constant.Color.BackgroundBlue;
     private static final int CorrectSelectionColor = Constant.Color.LightGreen;
     private static final int IncorrectSelectionColor = Constant.Color.LightRed;
 
@@ -498,7 +498,7 @@ public class ImageSelectionFragment extends Fragment
             }
 
             // remember results
-            m_scoreNotification.setScore(resultScore);
+            m_scoreNotification.setCompletionRate(resultScore);
         }
         else
         {

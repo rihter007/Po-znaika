@@ -312,7 +312,7 @@ public final class WordGatherFragment extends Fragment
                 }
             }
 
-            m_gridElements[m_selectedItemIndex].setBackgroundColor(Constant.Color.NoColor);
+            m_gridElements[m_selectedItemIndex].setBackgroundColor(Constant.Color.BackgroundBlue);
             m_selectedItemIndex = InvalidIndexSelectionValue;
         }
         else
@@ -340,7 +340,7 @@ public final class WordGatherFragment extends Fragment
                     totalScore += SingleCharacterScore;
             }
 
-            m_scoreNotification.setScore(totalScore);
+            m_scoreNotification.setCompletionRate(totalScore);
             m_stepsCallback.processNextStep();
             return;
         }

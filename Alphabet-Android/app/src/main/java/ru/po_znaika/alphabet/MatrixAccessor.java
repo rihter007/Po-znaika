@@ -28,6 +28,21 @@ public class MatrixAccessor<T>
         return null;
     }
 
+    public int getRowsCount()
+    {
+        return(int) Math.floor((double)m_elements.length / m_columnsCount);
+    }
+
+    public int getColumnsCount()
+    {
+        return m_columnsCount;
+    }
+
+    public int getElementsCount()
+    {
+        return m_elements.length;
+    }
+
     public T[] get()
     {
         return m_elements;
