@@ -70,7 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:layout_marginBottom="@dimen/min_margin">
+            android:layout_marginBottom="@dimen/small_margin">
 
             <LinearLayout
                 android:id="@+id/resultTextLayout"

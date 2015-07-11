@@ -324,16 +324,7 @@ public final class WordGatherFragment extends Fragment
 
             for (int i = 0; i < m_state.selectionElements.length; ++i)
             {
-                final RelativeLayout elementLayout = (RelativeLayout)inflater.inflate(R.layout.framed_text_item, null);
-                FramedTextItem.setInternalColorWithNoBorder(elementLayout, internalSquareColor);
-                FramedTextItem.setTextSize(elementLayout, getResources().getDimension(R.dimen.word_gather_large_text_size));
-                FramedTextItem.setText(elementLayout, m_state.selectionElements[i]);
-
-                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
-                        m_displayHelper.getWidthInProportionDp(1.0 / CharactersPerRow
-                            , 2 * (int)getResources().getDimension(R.dimen.small_margin))
-                        , ViewGroup.LayoutParams.MATCH_PARENT);
-                elementLayout.setLayoutParams(layoutParams);
+                final RelativeLayout elementLayout = createSelectionFramedItem(m_state.selectionElements[i]);
 
                 final int selectionLayoutIndex = i < CharactersPerRow ? 0 : 1;
                 selectionLayouts[selectionLayoutIndex].addView(elementLayout);
@@ -351,15 +342,12 @@ public final class WordGatherFragment extends Fragment
                     });
 
                     // set color
-
                     if (m_state.currentSelection.indexOf(i) >= 0)
-                        elementLayout.setBackgroundColor(selectionColor);
-                    else
-                        elementLayout.setBackgroundColor(borderColor);
+                        FramedTextItem.setInternalColorWithNoBorder(elementLayout, selectionColor);
                 }
                 else
                 {
-                    elementLayout.setBackgroundColor(selectionColor);
+                    FramedTextItem.setInternalColorWithNoBorder(elementLayout, selectionColor);
                 }
 
                 m_selectionElements[i] = elementLayout;
@@ -439,16 +427,17 @@ public final class WordGatherFragment extends Fragment
 
             m_state.isExerciseChecked = true;
 
-            double totalScore = 100.0;
+            double completionRate = 1.0;
             for (int characterIndex = 0; characterIndex < m_state.selectionElements.length; ++characterIndex)
             {
-                if (m_state.selectionElements[characterIndex] != m_state.word.charAt(characterIndex))
+                if (m_state.selectionElements[m_state.currentSelection.get(characterIndex)]
+                        != m_state.word.charAt(characterIndex))
                 {
-                    totalScore -= 10.0;
+                    completionRate -= 0.1;
                 }
             }
 
-            m_scoreNotification.setCompletionRate(totalScore);
+            m_scoreNotification.setCompletionRate(completionRate);
         }
         else
         {
@@ -475,6 +464,15 @@ public final class WordGatherFragment extends Fragment
             , ch);
     }
 
+    private RelativeLayout createSelectionFramedItem(char ch)
+    {
+        return  createInitialFramedItem(
+                m_displayHelper.getWidthInProportionDp(1.0 / CharactersPerRow
+                        , 2 * (int)getResources().getDimension(R.dimen.small_margin))
+                , (int)getResources().getDimension(R.dimen.word_gather_small_text_size)
+                , ch);
+    }
+
     private RelativeLayout createInitialFramedItem(int width, int textSize, char ch)
     {
         RelativeLayout elementLayout = (RelativeLayout)getActivity()
@@ -482,7 +480,8 @@ public final class WordGatherFragment extends Fragment
 
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT);
         elementLayout.setLayoutParams(layoutParams);
-        FramedTextItem.setInternalColorWithNoBorder(elementLayout, internalSquareColor);
+        FramedTextItem.setInternalColor(elementLayout, internalSquareColor);
+        FramedTextItem.setBorderColor(elementLayout, borderColor);
         FramedTextItem.setTextSize(elementLayout, textSize);
         FramedTextItem.setText(elementLayout, ch);
         return elementLayout;
