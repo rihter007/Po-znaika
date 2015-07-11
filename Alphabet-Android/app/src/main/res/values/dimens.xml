@@ -68,4 +68,9 @@
     <dimen name="single_character_exercise_menu_cloud_image_width">180dp</dimen>
     <dimen name="single_character_exercise_menu_elements_padding">20dp</dimen>
 
+    <!-- Word gather fragment-->
+    <dimen name="word_gather_hint_image_size">120dp</dimen>
+    <dimen name="word_gather_small_text_size">18sp</dimen>
+    <dimen name="word_gather_large_text_size">24sp</dimen>
+
 </resources>

@@ -50,6 +50,7 @@
     <string name="caption_cancel">Отмена</string>
     <string name="caption_license_scroll_title">Выберите период дневника</string>
     <string name="caption_days_selected">Выбрано %d дней</string>
+    <string name="caption_word_gather_task">Переставь буквы местами</string>
     <string name="alert_title">Внимание</string>
     <string name="error_unknown_error">Произошла неизвестная ошибка</string>
     <string name="alert_bad_credentials">Некорректный логин и/или пароль</string>
@@ -74,6 +75,7 @@
     <string name="title_activity_create_words_from_specified">По-знайка: Создай слова</string>
     <string name="hello_world">Hello world!</string>
 
+    <string name="not_all_characters_are_used">Использованы не все буквы</string>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_start">StartActivity</string>

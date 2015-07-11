@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -17,13 +18,31 @@ import android.util.Log;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.arz_x.CommonException;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.product_tracer.FileTracerInstance;
+import com.arz_x.android.product_tracer.ITracerGetter;
+import com.arz_x.tracer.ITracer;
+import com.arz_x.tracer.ProductTracer;
+import com.arz_x.tracer.TraceLevel;
 
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
-public final class WordGatherActivity extends Activity implements IExerciseStepCallback, IScoreNotification
+public final class WordGatherActivity extends Activity implements IExerciseStepCallback
+        , IScoreNotification, ITracerGetter
 {
+    public static void startActivity(@NonNull Context context
+            , int exerciseId
+            , @NonNull AlphabetDatabase.AlphabetType alphabetType)
+    {
+        Intent intent = new Intent(context, WordGatherActivity.class);
+        intent.putExtra(ExerciseIdTag, exerciseId);
+        intent.putExtra(AlphabetTypeTag, alphabetType.getValue());
+
+        context.startActivity(intent);
+    }
+
     private static final class WordGatherActivityState implements Parcelable
     {
         public enum GameStage
@@ -57,19 +76,23 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
             private int m_value;
         }
 
-        public int totalScore;
+        public int maxExerciseScore;
         public GameStage stage;
+        public double completionRate;
 
-        public WordGatherActivityState()
+        public WordGatherActivityState(int _maxExerciseScore
+                , GameStage _stage)
         {
-            this.totalScore = 0;
-            this.stage = GameStage.GameIsActive;
+            this.maxExerciseScore = _maxExerciseScore;
+            this.stage = _stage;
+            this.completionRate = 0.0;
         }
 
         public WordGatherActivityState(@NonNull Parcel _in)
         {
-            this.totalScore = _in.readInt();
+            this.maxExerciseScore = _in.readInt();
             this.stage = GameStage.getTypeByValue(_in.readInt());
+            this.completionRate = _in.readDouble();
         }
 
         @Override
@@ -81,8 +104,9 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
         @Override
         public void writeToParcel(Parcel container, int flags)
         {
-            container.writeInt(this.totalScore);
+            container.writeInt(this.maxExerciseScore);
             container.writeInt(this.stage.getValue());
+            container.writeDouble(this.completionRate);
         }
 
         public static final Creator CREATOR = new Creator()
@@ -101,38 +125,33 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
 
     private static final String LogTag = WordGatherActivity.class.getName();
 
-    private static final String ExerciseNameTag = "exercise_name";
+    private static final String ExerciseIdTag = "exercise_name";
     private static final String AlphabetTypeTag = "alphabet_type";
     private static final String InternalStateTag = "internal_state";
     private static final String FragmentTag = "main_window_fragment";
-
-    public static void startActivity(@NonNull Context context, @NonNull String exerciseName, @NonNull AlphabetDatabase.AlphabetType alphabetType)
-    {
-        Intent intent = new Intent(context, WordGatherActivity.class);
-        intent.putExtra(ExerciseNameTag, exerciseName);
-        intent.putExtra(AlphabetTypeTag, alphabetType.getValue());
-
-        context.startActivity(intent);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_word_gather);
+        setRequestedOrientation(getResources().getDimension(R.dimen.orientation_flag) == 0 ?
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         try
         {
+            m_tracer = TracerHelper.continueOrCreateFileTracer(this, savedInstanceState);
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "onCreate()");
+
             m_serviceLocator = new CoreServiceLocator(this);
             restoreInternalState(savedInstanceState);
             constructUserInterface(savedInstanceState);
         }
         catch (Exception exp)
         {
-            final Resources resources = getResources();
             AlertDialogHelper.showMessageBox(this,
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.failed_exercise_start),
+                    getResources().getString(R.string.alert_title),
+                    getResources().getString(R.string.failed_exercise_start),
                     false,
                     new DialogInterface.OnClickListener()
                     {
@@ -145,13 +164,53 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
         }
     }
 
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        m_tracer.pause();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        try
+        {
+            m_tracer.resume();
+        }
+        catch (CommonException exp)
+        {
+            // this should never happen
+            throw new AssertionError();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle savedInstanceState)
+    {
+        super.onSaveInstanceState(savedInstanceState);
+
+        FileTracerInstance.saveInstance(m_tracer, savedInstanceState);
+
+        savedInstanceState.putParcelable(InternalStateTag, m_state);
+
+        final FragmentManager fragmentManager = getFragmentManager();
+        final Fragment currentFragment = fragmentManager.findFragmentByTag(FragmentTag);
+        fragmentManager.putFragment(savedInstanceState, FragmentTag, currentFragment);
+    }
+
     private void restoreInternalState(Bundle savedInstanceState)
     {
         final Bundle arguments = getIntent().getExtras();
-        m_exerciseName = arguments.getString(ExerciseNameTag);
+        final int exerciseId = arguments.getInt(ExerciseIdTag);
         m_alphabetType = AlphabetDatabase.AlphabetType.getTypeByValue(arguments.getInt(AlphabetTypeTag));
 
-        m_state = (savedInstanceState == null) ? new WordGatherActivityState() :
+        AlphabetDatabase.ExerciseInfo exerciseInfo = m_serviceLocator.getAlphabetDatabase().getExerciseInfoById(exerciseId);
+        m_exerciseName = exerciseInfo.name;
+
+        m_state = (savedInstanceState == null) ? new WordGatherActivityState(exerciseInfo.maxScore
+                , WordGatherActivityState.GameStage.GameIsActive) :
                 (WordGatherActivityState)savedInstanceState.getParcelable(InternalStateTag);
     }
 
@@ -170,7 +229,7 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
 
                 case GameIsFinished:
                 {
-                    currentFragment = ScoreFragment.createFragment(m_state.totalScore);
+                    currentFragment = ScoreFragment.createFragment((int)(m_state.maxExerciseScore * m_state.completionRate));
                 }
                 break;
 
@@ -187,18 +246,6 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
         }
 
         ProcessFragment(currentFragment);
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle savedInstanceState)
-    {
-        super.onSaveInstanceState(savedInstanceState);
-
-        savedInstanceState.putParcelable(InternalStateTag, m_state);
-
-        final FragmentManager fragmentManager = getFragmentManager();
-        final Fragment currentFragment = fragmentManager.findFragmentByTag(FragmentTag);
-        fragmentManager.putFragment(savedInstanceState, FragmentTag, currentFragment);
     }
 
     @Override
@@ -229,20 +276,21 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
             // exercise has just finished
             m_state.stage = WordGatherActivityState.GameStage.GameIsFinished;
 
+            final int totalScore = (int)(m_state.maxExerciseScore * m_state.completionRate);
+
             // Save score
             try
             {
-               m_serviceLocator.getExerciseScoreProcessor().reportExerciseScore(m_exerciseName, m_state.totalScore);
+               m_serviceLocator.getExerciseScoreProcessor().reportExerciseScore(m_exerciseName, totalScore);
             }
             catch (Exception exp)
             {
-                Log.e(LogTag, String.format("Failed to save exercise score," +
-                        " exercise name: \"%s\", score: \"%d\"", m_exerciseName, m_state.totalScore));
+                ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
             }
 
             // process score fragment
             {
-                final Fragment finishFragment = ExerciseFinishedFragment.createFragment(m_state.totalScore);
+                final Fragment finishFragment = ExerciseFinishedFragment.createFragment(totalScore);
                 ProcessFragment(finishFragment);
             }
         }
@@ -253,16 +301,21 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
     }
 
     @Override
+    public ITracer getTracer()
+    {
+        return m_tracer;
+    }
+
+    @Override
     public void processPreviousStep()
     {
         finish();
     }
 
     @Override
-    public void setCompletionRate(double score)
+    public void setCompletionRate(double completionRate)
     {
-        // TODO: refactor
-        m_state.totalScore = (int)score;
+        m_state.completionRate = completionRate;
     }
 
     /**
@@ -276,6 +329,8 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
         fragmentTransaction.replace(R.id.container, fragment, FragmentTag);
         fragmentTransaction.commit();
     }
+
+    private FileTracerInstance m_tracer;
 
     private String m_exerciseName;
     private AlphabetDatabase.AlphabetType m_alphabetType;

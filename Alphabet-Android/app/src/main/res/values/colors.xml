@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="standard_background">#ff95d3f6</color>
+    <color name="internal_elements_background">#bde8eb</color>
+    <color name="border">#0F0D18</color>
+    <color name="selection">#2E275A</color>
+    <color name="correct">#8ed63a</color>
+    <color name="incorrect">#e57070</color>
+</resources>

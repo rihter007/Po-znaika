@@ -1,6 +1,8 @@
 package ru.po_znaika.alphabet;
 
 import android.support.annotation.NonNull;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.Random;
 
@@ -54,5 +56,17 @@ public class Helpers
                 arr[ExchangeIndex] = destinationElement;
             }
         }
+    }
+
+    public static boolean isAscSequentialOrder(int[] arr)
+    {
+        if (arr.length == 0)
+            return true;
+        for (int i = 0; i < arr.length - 1; ++i)
+        {
+            if (arr[i] > arr[i + 1])
+                return false;
+        }
+        return true;
     }
 }

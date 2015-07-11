@@ -436,9 +436,11 @@ public final class AlphabetDatabase
                     "FROM word_creation_exercise wce, word w " +
                     "WHERE (wce.word_id = w._id) AND (w.alphabet_id = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomWordAndImageByAlphabetAndLength =
-            "SELECT w._id, w.word, w.complexity, wid.image_id " +
-                    "FROM word w, word_image_description wid " +
-                    "WHERE (w.alphabet_id = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) AND (w._id = wid.word_id) ORDER BY RANDOM() LIMIT 1";
+            "SELECT w._id, w.word, w.complexity, img.file_name " +
+                    "FROM word w, word_image_description wid, image img " +
+                    "WHERE (w.alphabet_id = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) " +
+                    "AND (w._id = wid.word_id) AND (wid.image_id = img._id) " +
+                    "ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomImageIdByWordId = "SELECT image_id FROM word_image_description wid " +
             "WHERE wid.word_id = ? ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomSoundIdByWordId = "SELECT sound_id FROM word_sound_description wsd " +
@@ -660,11 +662,11 @@ public final class AlphabetDatabase
 
             if (dataReader.moveToFirst())
             {
-                ExerciseInfo exerciseInfo = new ExerciseInfo();
-                exerciseInfo.id = id;
-                exerciseInfo.type = ExerciseType.getTypeByValue(dataReader.getInt(0));
-                exerciseInfo.name = dataReader.getString(1);
-                exerciseInfo.maxScore = dataReader.getInt(2);
+                result = new ExerciseInfo();
+                result.id = id;
+                result.type = ExerciseType.getTypeByValue(dataReader.getInt(0));
+                result.name = dataReader.getString(1);
+                result.maxScore = dataReader.getInt(2);
             }
         }
         catch (Exception exp)
@@ -1143,9 +1145,9 @@ public final class AlphabetDatabase
         return result;
     }
 
-    public Pair<WordInfo, Integer> getRandomWordAndImageByAlphabetAndLength(final AlphabetType alphabetId, int minWordLength, int maxWordLength)
+    public Pair<WordInfo, String> getRandomWordAndImageByAlphabetAndLength(final AlphabetType alphabetId, int minWordLength, int maxWordLength)
     {
-        Pair<WordInfo, Integer> result = null;
+        Pair<WordInfo, String> result = null;
         Cursor dataReader = null;
 
         try
@@ -1166,7 +1168,7 @@ public final class AlphabetDatabase
                 word.word = dataReader.getString(1);
                 word.complexity = dataReader.getInt(2);
 
-                result = new Pair<>(word, dataReader.getInt(3));
+                result = new Pair<>(word, dataReader.getString(3));
             }
         }
         catch (Exception exp)

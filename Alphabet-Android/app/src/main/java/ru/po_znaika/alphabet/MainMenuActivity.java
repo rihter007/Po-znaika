@@ -336,7 +336,7 @@ public class MainMenuActivity extends Activity
             switch (exerciseType)
             {
                 case WordGather:
-                    WordGatherActivity.startActivity(this, exercises[0].name, AlphabetDatabase.AlphabetType.Russian);
+                    WordGatherActivity.startActivity(this, exercises[0].id, AlphabetDatabase.AlphabetType.Russian);
                     break;
                 case CreateWordsFromSpecified:
                     CreateWordsFromSpecifiedActivity.startActivity(this, exercises[0].name, AlphabetDatabase.AlphabetType.Russian);
