@@ -339,7 +339,7 @@ public class MainMenuActivity extends Activity
                     WordGatherActivity.startActivity(this, exercises[0].id, AlphabetDatabase.AlphabetType.Russian);
                     break;
                 case CreateWordsFromSpecified:
-                    CreateWordsFromSpecifiedActivity.startActivity(this, exercises[0].name, AlphabetDatabase.AlphabetType.Russian);
+                    CreateWordsFromSpecifiedActivity.startActivity(this, exercises[0].id, AlphabetDatabase.AlphabetType.Russian);
                     break;
                 default:
                     throw new CommonException(CommonResultCode.AssertError);

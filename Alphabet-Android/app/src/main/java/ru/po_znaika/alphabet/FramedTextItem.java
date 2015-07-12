@@ -36,12 +36,18 @@ public class FramedTextItem
     public static void setText(@NonNull RelativeLayout framedItemLayout, char ch)
     {
         TextView textView = (TextView)framedItemLayout.findViewById(R.id.textView);
-        textView.setText(((Character)ch).toString());
+        textView.setText(((Character) ch).toString());
     }
 
     public static void setText(@NonNull RelativeLayout framedItemLayout, @NonNull String text)
     {
         TextView textView = (TextView)framedItemLayout.findViewById(R.id.textView);
         textView.setText(text);
+    }
+
+    public static String getText(@NonNull RelativeLayout framedItemLayout)
+    {
+        TextView textView = (TextView)framedItemLayout.findViewById(R.id.textView);
+        return textView.getText().toString();
     }
 }

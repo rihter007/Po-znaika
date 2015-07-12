@@ -72,7 +72,7 @@ public final class DiaryActivity extends ActionBarActivity
         {
             final Resources resources = getResources();
 
-            textAdapter = new TextAdapter(this, resources.getDimension(R.dimen.small_text_size));
+            textAdapter = new TextAdapter(this, resources.getDimension(R.dimen.small_text_size), TextAdapter.TextAlign.Center);
             textAdapter.add(resources.getString(R.string.caption_date));
             textAdapter.add(resources.getString(R.string.caption_exercise_name));
             textAdapter.add(resources.getString(R.string.caption_exercise_score));

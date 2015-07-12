@@ -3,154 +3,158 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/standard_background"
     tools:context="ru.po_znaika.alphabet.CreateWordsFromSpecifiedFragment">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:textSize="@dimen/medium_text_size"
-        android:text="@string/caption_create_words_from_specified" />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/small_margin"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginRight="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/small_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginBottom="@dimen/small_margin">
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <GridView
-                android:layout_marginTop="@dimen/small_margin"
-                android:layout_width="200dp"
-                android:layout_height="@dimen/large_grid_character_height"
-                android:horizontalSpacing="1dp"
-                android:verticalSpacing="1dp"
-                android:id="@+id/sourceGridView"
-                android:background="#ff000000"/>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
-
-                <Button
-                    android:layout_gravity="center_vertical|right"
-                    android:layout_marginRight="@dimen/medium_margin"
-                    android:layout_width="@dimen/small_button_size"
-                    android:layout_height="wrap_content"
-                    android:text="@string/button_create"
-                    android:id="@+id/createWordButton"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="fill_parent">
-
-            <GridView
-                android:layout_marginTop="@dimen/small_margin"
-                android:layout_width="200dp"
-                android:layout_height="@dimen/large_grid_character_height"
-                android:id="@+id/destinationGridView"
-                android:horizontalSpacing="1dp"
-                android:verticalSpacing="1dp"
-                android:background="#ff000000"/>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
-
-                <Button
-                    android:layout_gravity="center_vertical|right"
-                    android:layout_marginRight="@dimen/medium_margin"
-                    android:layout_width="@dimen/small_button_size"
-                    android:layout_height="wrap_content"
-                    android:text="@string/caption_finish"
-                    android:id="@+id/finishButton"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_gravity="center_horizontal">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
-
-            <ImageButton
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/backImageButton"
-                android:src="@drawable/arrow_back"/>
+            android:layout_height="0dp"
+            android:layout_weight="10">
 
             <TextView
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/caption_back"
-                android:id="@+id/backCaptionTextView"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text=""
-                android:id="@+id/charactersCountTextView"/>
+                android:text="@string/caption_create_words_from_specified"
+                android:background="@color/internal_elements_background"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
 
-            <ListView
-                android:layout_width="@dimen/medium_list_view_width"
-                android:layout_height="wrap_content"
-                android:id="@+id/wordsListView"/>
-
-        </LinearLayout>
+            <ImageView
+                android:layout_width="@dimen/help_icon_size"
+                android:layout_height="@dimen/help_icon_size"
+                android:id="@+id/soundImageView"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/sound_button"/>
+        </RelativeLayout>
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="20">
 
-            <ImageButton
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/skipImageButton"
-                android:src="@drawable/arrow_forward"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/resultTextLayout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="50">
+            </LinearLayout>
 
-            <TextView
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/caption_skip"
-                android:id="@+id/skipCaptionTextView"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="50"
+                android:layout_marginBottom="@dimen/small_margin">
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="60">
+
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="45">
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/resultWordsListView"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:background="@color/internal_elements_background"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="10">
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="45">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/caption_create_word"
+                    android:id="@+id/createWordButton"
+                    android:background="@color/internal_elements_background"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/caption_current_words_count"
+                    android:id="@+id/wordsFoundNumberTextView"
+                    android:background="@color/internal_elements_background"
+                    android:layout_below="@+id/createWordButton"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginTop="@dimen/small_margin"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/caption_skip"
+                    android:id="@+id/skipButton"
+                    android:background="@color/internal_elements_background"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10">
+
+            <ImageView
+                android:layout_width="@dimen/help_icon_size"
+                android:layout_height="@dimen/help_icon_size"
+                android:id="@+id/backImageView"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/arrow_back"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/caption_check"
+                android:id="@+id/finishButton"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
+
+    </LinearLayout>
 </LinearLayout>

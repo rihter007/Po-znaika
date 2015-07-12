@@ -18,12 +18,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.product_tracer.FileTracerInstance;
+import com.arz_x.android.product_tracer.ITracerGetter;
+import com.arz_x.tracer.ITracer;
+import com.arz_x.tracer.ProductTracer;
+import com.arz_x.tracer.TraceLevel;
 
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
-public class CreateWordsFromSpecifiedActivity extends Activity implements IExerciseStepCallback, IScoreNotification
+public class CreateWordsFromSpecifiedActivity extends Activity
+        implements IExerciseStepCallback, IScoreNotification, ITracerGetter
 {
     private static class ActivityInternalState implements Parcelable
     {
@@ -58,18 +65,24 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
             private int m_value;
         }
 
-        public int totalScore;
+        private String exerciseName;
+        public int exerciseMaxScore;
+
+        public double completeRate;
         public GameStage stage;
 
-        public ActivityInternalState()
+        public ActivityInternalState(@NonNull String exerciseName, int exerciseMaxScore)
         {
-            this.totalScore = 0;
+            this.exerciseName = exerciseName;
+            this.exerciseMaxScore = exerciseMaxScore;
             this.stage = GameStage.GameIsActive;
         }
 
         public ActivityInternalState(Parcel _in)
         {
-            this.totalScore = _in.readInt();
+            this.exerciseName = _in.readString();
+            this.exerciseMaxScore = _in.readInt();
+            this.completeRate = _in.readDouble();
             this.stage = GameStage.getTypeByValue(_in.readInt());
         }
 
@@ -82,7 +95,9 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
         @Override
         public void writeToParcel(Parcel container, int flags)
         {
-            container.writeInt(this.totalScore);
+            container.writeString(this.exerciseName);
+            container.writeInt(this.exerciseMaxScore);
+            container.writeDouble(this.completeRate);
             container.writeInt(this.stage.getValue());
         }
 
@@ -102,15 +117,15 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
 
     private static final String LogTag = CreateWordsFromSpecifiedActivity.class.getName();
 
-    private static final String ExerciseNameTag = "exercise_name";
+    private static final String ExerciseIdTag = "exercise_id";
     private static final String AlphabetTypeTag = "alphabet_type";
     private static final String InternalStateTag = "internal_state";
     private static final String FragmentTag = "fragment";
 
-    public static void startActivity(@NonNull Context context, @NonNull String exerciseName, @NonNull AlphabetDatabase.AlphabetType alphabetType)
+    public static void startActivity(@NonNull Context context, @NonNull int exerciseId, @NonNull AlphabetDatabase.AlphabetType alphabetType)
     {
         Intent intent = new Intent(context, CreateWordsFromSpecifiedActivity.class);
-        intent.putExtra(ExerciseNameTag, exerciseName);
+        intent.putExtra(ExerciseIdTag, exerciseId);
         intent.putExtra(AlphabetTypeTag, alphabetType.getValue());
 
         context.startActivity(intent);
@@ -124,16 +139,19 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
 
         try
         {
+            m_tracer = TracerHelper.continueOrCreateFileTracer(this, savedInstanceState);
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "onCreate()");
+
             m_serviceLocator = new CoreServiceLocator(this);
             restoreInternalState(savedInstanceState);
             constructUserInterface(savedInstanceState);
         }
         catch (Exception exp)
         {
-            Resources resources = getResources();
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
             AlertDialogHelper.showMessageBox(this,
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.failed_exercise_start),
+                    getResources().getString(R.string.alert_title),
+                    getResources().getString(R.string.failed_exercise_start),
                     false, new DialogInterface.OnClickListener()
                 {
                     @Override
@@ -150,6 +168,8 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     {
         super.onSaveInstanceState(savedInstanceState);
 
+        FileTracerInstance.saveInstance(m_tracer, savedInstanceState);
+
         savedInstanceState.putParcelable(InternalStateTag, m_state);
 
         final FragmentManager fragmentManager = getFragmentManager();
@@ -157,16 +177,53 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
         fragmentManager.putFragment(savedInstanceState, FragmentTag, currentFragment);
     }
 
-    private void restoreInternalState(Bundle savedInstanceState)
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        m_tracer.pause();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        try
+        {
+            m_tracer.resume();
+        }
+        catch (CommonException exp)
+        {
+            // this should never happen
+            throw new AssertionError();
+        }
+    }
+
+    private void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         final Bundle arguments = getIntent().getExtras();
-        m_exerciseName = arguments.getString(ExerciseNameTag);
+        final int exerciseId = arguments.getInt(ExerciseIdTag);
         m_alphabetType = AlphabetDatabase.AlphabetType.getTypeByValue(arguments.getInt(AlphabetTypeTag));
 
         if (savedInstanceState == null)
-            m_state = new ActivityInternalState();
+        {
+            final AlphabetDatabase.ExerciseInfo exerciseInfo =  m_serviceLocator.getAlphabetDatabase()
+                    .getExerciseInfoById(exerciseId);
+            if (exerciseInfo == null)
+            {
+                ProductTracer.traceMessage(m_tracer
+                        , TraceLevel.Error
+                        , LogTag
+                        , String.format("Failed to get exercise info by id '%d'", exerciseId));
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
+
+            m_state = new ActivityInternalState(exerciseInfo.name, exerciseInfo.maxScore);
+        }
         else
+        {
             m_state = savedInstanceState.getParcelable(InternalStateTag);
+        }
     }
 
     private void constructUserInterface(Bundle savedInstanceState)
@@ -178,7 +235,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
             if (m_state.stage == ActivityInternalState.GameStage.GameIsActive)
                 currentFragment = CreateWordsFromSpecifiedFragment.createFragment(m_alphabetType);
             else
-                currentFragment = ScoreFragment.createFragment(m_state.totalScore);
+                currentFragment = ScoreFragment.createFragment((int)(m_state.exerciseMaxScore * m_state.completeRate));
         }
         else
         {
@@ -199,8 +256,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
     @Override
     public void setCompletionRate(double completeness)
     {
-        // TODO: refactor
-        m_state.totalScore = (int)completeness;
+        m_state.completeRate = completeness;
     }
 
     @Override
@@ -229,16 +285,19 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
         {
             m_state.stage = ActivityInternalState.GameStage.GameIsFinished;
 
+            final int exerciseScore = (int)(m_state.exerciseMaxScore * m_state.completeRate);
+
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, String.format("Exercise score: '%d'", exerciseScore));
             try
             {
-                m_serviceLocator.getExerciseScoreProcessor().reportExerciseScore(m_exerciseName, m_state.totalScore);
+                m_serviceLocator.getExerciseScoreProcessor().reportExerciseScore(m_state.exerciseName, exerciseScore);
             }
-            catch (CommonException exp)
+            catch (Exception exp)
             {
-                Log.e(LogTag, String.format("An exception while saving exercise score occurred, exp: \"%s\"", exp.getMessage()));
+                ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
             }
 
-            final Fragment finishFragment = ExerciseFinishedFragment.createFragment(m_state.totalScore);
+            final Fragment finishFragment = ExerciseFinishedFragment.createFragment(exerciseScore);
             ProcessFragment(finishFragment);
         }
         else
@@ -253,9 +312,15 @@ public class CreateWordsFromSpecifiedActivity extends Activity implements IExerc
         finish();
     }
 
-    private String m_exerciseName;
+    @Override
+    public ITracer getTracer()
+    {
+        return m_tracer;
+    }
+
     private AlphabetDatabase.AlphabetType m_alphabetType;
     private ActivityInternalState m_state;
 
+    private FileTracerInstance m_tracer;
     private CoreServiceLocator m_serviceLocator;
 }

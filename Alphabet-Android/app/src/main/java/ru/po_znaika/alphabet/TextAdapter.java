@@ -1,10 +1,12 @@
 package ru.po_znaika.alphabet;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -15,10 +17,18 @@ import java.util.List;
  */
 public class TextAdapter extends BaseAdapter
 {
-    public TextAdapter(Context _context, float _textSize)
+    public enum TextAlign
+    {
+        Center,
+        Right,
+        Left
+    }
+
+    public TextAdapter(Context _context, float _textSize, @NonNull TextAlign _textAlign)
     {
         m_context = _context;
         m_textSize = _textSize;
+        m_textAlign = _textAlign;
         m_textElements = new ArrayList<>();
     }
 
@@ -68,6 +78,21 @@ public class TextAdapter extends BaseAdapter
         }
 
         TextView textView = (TextView) elementView.findViewById(R.id.textView);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)elementView.getLayoutParams();
+
+        switch (m_textAlign)
+        {
+            case Right:
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+                break;
+            case Left:
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
+                break;
+        }
+
+        elementView.setLayoutParams(layoutParams);
         textView.setTextSize(m_textSize);
         textView.setText(m_textElements.get(position));
 
@@ -76,5 +101,6 @@ public class TextAdapter extends BaseAdapter
 
     private Context m_context;
     private float m_textSize;
+    private TextAlign m_textAlign;
     private List<String> m_textElements;
 }

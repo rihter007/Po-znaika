@@ -13,16 +13,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.DisplayMetricsHelper;
+import com.arz_x.android.product_tracer.ITracerGetter;
+import com.arz_x.tracer.ITracer;
+import com.arz_x.tracer.ProductTracer;
+import com.arz_x.tracer.TraceLevel;
 
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
@@ -30,7 +36,7 @@ import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 /**
  * A fragment for the Game: Create sub words from the given
  */
-public class CreateWordsFromSpecifiedFragment extends Fragment
+public class  CreateWordsFromSpecifiedFragment extends Fragment
 {
     /**
      * Represents the game state
@@ -153,6 +159,8 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         private int m_gridElementSelectionIndex;
     }
 
+    private static final String LogTag = CreateWordsFromSpecifiedFragment.class.getName();
+
     private static final String AlphabetTypeTag = "alphabet_type";
     private static final String InternalStateTag = "state";
 
@@ -187,15 +195,17 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
         try
         {
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "onCreateView()");
+
             restoreInternalState(savedInstanceState);
             constructUserInterface(fragmentView);
         }
         catch (Exception exp)
         {
-            Resources resources = getResources();
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
             AlertDialogHelper.showMessageBox(getActivity(),
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.failed_exercise_start),
+                    getResources().getString(R.string.alert_title),
+                    getResources().getString(R.string.failed_exercise_start),
                     false, new DialogInterface.OnClickListener()
                     {
                         @Override
@@ -210,12 +220,16 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
     }
 
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(@NonNull Activity activity)
     {
         super.onAttach(activity);
 
         m_exerciseCallback = (IExerciseStepCallback) activity;
         m_scoreNotification = (IScoreNotification) activity;
+        m_displayMetrics = new DisplayMetricsHelper(activity);
+
+        if (activity instanceof ITracerGetter)
+            m_tracer = ((ITracerGetter)activity).getTracer();
     }
 
     @Override
@@ -225,6 +239,7 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
         m_exerciseCallback = null;
         m_scoreNotification = null;
+        m_tracer = null;
     }
 
     @Override
@@ -237,13 +252,10 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
     private void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
-        NoSelectionColor = getResources().getColor(android.R.color.holo_blue_light);
-        SelectionColor = getResources().getColor(android.R.color.holo_green_light);
+        NoSelectionColor = getResources().getColor(R.color.internal_elements_background);
+        SelectionColor = getResources().getColor(R.color.selection);
 
-        if (savedInstanceState != null)
-            m_state = savedInstanceState.getParcelable(InternalStateTag);
-
-        if (m_state == null)
+        if (savedInstanceState == null)
         {
             final Bundle arguments = getArguments();
             final int AlphabetTypeValue = arguments.getInt(AlphabetTypeTag);
@@ -254,11 +266,17 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
             m_state.mainWord = alphabetDatabase.getRandomCreationWordExerciseByAlphabetAndLength(
                     AlphabetDatabase.AlphabetType.getTypeByValue(AlphabetTypeValue), MinWordLength, MaxWordLength);
             if (m_state.mainWord == null)
-                throw new IllegalArgumentException();
+            {
+                ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "Failed to extract main word");
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
             final AlphabetDatabase.WordInfo[] allSubWords = alphabetDatabase.getSubWords(m_state.mainWord);
             if (allSubWords == null)
-                throw new IllegalArgumentException();
+            {
+                ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "Failed to extract subwords");
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
 
             m_state.allSubWords = new ArrayList<>();
             for (AlphabetDatabase.WordInfo wordInfo : allSubWords)
@@ -269,12 +287,9 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
             m_state.foundSubWords = new ArrayList<>();
             m_state.usedHints = new ArrayList<>();
         }
-
-        // calculate current used characters number
+        else
         {
-            m_currentCharactersFound = 0;
-            for (Integer wordIndex : m_state.foundSubWords)
-                m_currentCharactersFound += m_state.allSubWords.get(wordIndex).length();
+            m_state = savedInstanceState.getParcelable(InternalStateTag);
         }
 
         m_selection = new GridSelection();
@@ -282,77 +297,53 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
     private void constructUserInterface(View fragmentView)
     {
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        // fill destination grid
+        {
+            m_destinationGridElements = new RelativeLayout[m_state.mainWord.word.length()];
+            for (int charIndex = 0; charIndex < m_destinationGridElements.length; ++charIndex)
+            {
+                RelativeLayout characterLayout = createCharacterItem();
+                FramedTextItem.setTextSize(characterLayout
+                        , getResources().getDimension(R.dimen.create_words_from_specified_item_text_size));
+
+                final int elementIndex = charIndex;
+                characterLayout.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View view)
+                    {
+                        onGridItemClicked(0, elementIndex);
+                    }
+                });
+                m_destinationGridElements[charIndex] = characterLayout;
+            }
+        }
 
         // fill source grid
         {
-            m_sourceGridElements = new LinearLayout[m_state.mainWord.word.length()];
-
-            ViewAdapter viewAdapter = new ViewAdapter();
+            m_sourceGridElements = new RelativeLayout[m_state.mainWord.word.length()];
             for (int charIndex = 0; charIndex < m_state.mainWord.word.length(); ++charIndex)
             {
-                LinearLayout characterLayout = (LinearLayout) inflater.inflate(R.layout.character_item, null, false);
-                characterLayout.setBackgroundColor(NoSelectionColor);
-                TextView characterTextView = (TextView) characterLayout.findViewById(R.id.textView);
-                characterTextView.setText(((Character)m_state.mainWord.word.charAt(charIndex)).toString());
+                RelativeLayout characterLayout = createCharacterItem();
+                FramedTextItem.setText(characterLayout, m_state.mainWord.word.charAt(charIndex));
+                FramedTextItem.setTextSize(characterLayout
+                        , getResources().getDimension(R.dimen.create_words_from_specified_item_text_size));
 
-                final int ElementIndex = charIndex;
+                final int elementIndex = charIndex;
                 characterLayout.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
                     public void onClick(View view)
                     {
-                        onGridItemClicked(0, ElementIndex);
+                        onGridItemClicked(1, elementIndex);
                     }
                 });
-
-                viewAdapter.add(characterLayout);
-
                 m_sourceGridElements[charIndex] = characterLayout;
             }
-
-            GridView sourceGrid = (GridView) fragmentView.findViewById(R.id.sourceGridView);
-            final ViewGroup.LayoutParams gridLayoutParams = sourceGrid.getLayoutParams();
-            gridLayoutParams.width = (int)getResources().getDimension(R.dimen.large_grid_character_width) * m_state.mainWord.word.length();
-            sourceGrid.setLayoutParams(gridLayoutParams);
-            sourceGrid.setNumColumns(m_state.mainWord.word.length());
-            sourceGrid.setAdapter(viewAdapter);
-        }
-
-        // fill destination grid
-        {
-            m_destinationGridElements = new LinearLayout[m_state.mainWord.word.length()];
-
-            ViewAdapter viewAdapter = new ViewAdapter();
-            for (int charIndex = 0; charIndex < m_state.mainWord.word.length(); ++charIndex)
-            {
-                LinearLayout characterLayout = (LinearLayout) inflater.inflate(R.layout.character_item, null, false);
-                final int ElementIndex = charIndex;
-                characterLayout.setBackgroundColor(NoSelectionColor);
-                characterLayout.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        onGridItemClicked(1, ElementIndex);
-                    }
-                });
-
-                viewAdapter.add(characterLayout);
-
-                m_destinationGridElements[charIndex] = characterLayout;
-            }
-
-            GridView destinationGrid = (GridView) fragmentView.findViewById(R.id.destinationGridView);
-            final ViewGroup.LayoutParams gridLayoutParams = destinationGrid.getLayoutParams();
-            gridLayoutParams.width = (int)getResources().getDimension(R.dimen.large_grid_character_width) * m_state.mainWord.word.length();
-            destinationGrid.setLayoutParams(gridLayoutParams);
-            destinationGrid.setNumColumns(m_state.mainWord.word.length());
-            destinationGrid.setAdapter(viewAdapter);
         }
 
         // process characters text view
-        printCharactersFound(fragmentView, m_currentCharactersFound);
+        printWordsFound(fragmentView, m_state.foundSubWords.size());
 
         // process create word button
         {
@@ -395,8 +386,8 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
         // process right arrow
         {
-            ImageButton imageButton = (ImageButton) fragmentView.findViewById(R.id.skipImageButton);
-            imageButton.setOnClickListener(new View.OnClickListener()
+            Button skipButton = (Button) fragmentView.findViewById(R.id.skipButton);
+            skipButton.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View view)
@@ -408,18 +399,32 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
         // process found sub words list
         {
-            ListView foundWordsListView = (ListView) fragmentView.findViewById(R.id.wordsListView);
-            TextAdapter adapter = new TextAdapter(getActivity(), getResources().getDimension(R.dimen.small_text_size));
+            ListView foundWordsListView = (ListView) fragmentView.findViewById(R.id.resultWordsListView);
+            TextAdapter adapter = new TextAdapter(getActivity()
+                    , getResources().getDimension(R.dimen.create_words_from_specified_found_word_text_size)
+                    , TextAdapter.TextAlign.Left);
             for (int foundWordIndex : m_state.foundSubWords)
                 adapter.add(m_state.allSubWords.get(foundWordIndex));
             foundWordsListView.setAdapter(adapter);
         }
     }
 
-    private void printCharactersFound(@NonNull View view, int charactersCount)
+    private RelativeLayout createCharacterItem()
     {
-        TextView textView = (TextView) view.findViewById(R.id.charactersCountTextView);
-        textView.setText(String.format(getResources().getString(R.string.caption_current_character_count), charactersCount));
+        RelativeLayout characterLayout = (RelativeLayout)getActivity().getLayoutInflater().inflate(R.layout.framed_text_item, null, false);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                m_displayMetrics.getWidthInProportionDp(1.0 / MaxWordLength
+                        , 2 * (int)getResources().getDimension(R.dimen.small_margin))
+                , ViewGroup.LayoutParams.MATCH_PARENT);
+        characterLayout.setLayoutParams(layoutParams);
+        FramedTextItem.setInternalColorWithNoBorder(characterLayout, NoSelectionColor);
+        return characterLayout;
+    }
+
+    private void printWordsFound(@NonNull View view, int wordsCount)
+    {
+        TextView textView = (TextView) view.findViewById(R.id.wordsFoundNumberTextView);
+        textView.setText(String.format(getResources().getString(R.string.caption_current_words_count), wordsCount));
     }
 
     private void onGridItemClicked(int gridId, int elementId)
@@ -429,32 +434,28 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
             if ((m_selection.getGridSelectionIndex() == gridId) && (m_selection.getGridElementSelectionIndex() == elementId))
             {
                 // deselect
-                LinearLayout[] selectedGrid = (m_selection.getGridSelectionIndex() == 0) ? m_sourceGridElements : m_destinationGridElements;
-                LinearLayout selectedElement = selectedGrid[m_selection.getGridElementSelectionIndex()];
-                selectedElement.setBackgroundColor(NoSelectionColor);
-
+                RelativeLayout[] selectedGrid = getGridElementsArrayById(m_selection.getGridSelectionIndex());
+                FramedTextItem.setInternalColorWithNoBorder(selectedGrid[m_selection.getGridElementSelectionIndex()],
+                        NoSelectionColor);
                 m_selection.clear();
             }
             else
             {
                 // swap elements
                 // do not allow exchanging elements in source grid
-                if (!((m_selection.getGridSelectionIndex() == gridId) && (gridId == 0)))
+                if (!((m_selection.getGridSelectionIndex() == gridId) && (gridId == 1)))
                 {
-                    LinearLayout sourceElement = getGridElementsArrayById(m_selection.getGridSelectionIndex())[m_selection.getGridElementSelectionIndex()];
-                    LinearLayout destinationElement = getGridElementsArrayById(gridId)[elementId];
+                    RelativeLayout sourceElement = getGridElementsArrayById(m_selection.getGridSelectionIndex())[m_selection.getGridElementSelectionIndex()];
+                    RelativeLayout destinationElement = getGridElementsArrayById(gridId)[elementId];
 
-                    TextView sourceElementTextView = (TextView) sourceElement.findViewById(R.id.textView);
-                    TextView destinationElementTextView = (TextView) destinationElement.findViewById(R.id.textView);
+                    final String sourceElementText = FramedTextItem.getText(sourceElement);
+                    final String destinationElementText = FramedTextItem.getText(destinationElement);
 
-                    final CharSequence SourceElementText = sourceElementTextView.getText();
-                    final CharSequence DestinationElementText = destinationElementTextView.getText();
-
-                    sourceElementTextView.setText(DestinationElementText);
-                    destinationElementTextView.setText(SourceElementText);
+                    FramedTextItem.setText(sourceElement, destinationElementText);
+                    FramedTextItem.setText(destinationElement, sourceElementText);
 
                     // clear selection
-                    sourceElement.setBackgroundColor(NoSelectionColor);
+                    FramedTextItem.setInternalColorWithNoBorder(sourceElement, NoSelectionColor);
                     m_selection.clear();
                 }
             }
@@ -468,9 +469,9 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         // UI select element if needed
         if (m_selection.isValid())
         {
-            LinearLayout[] selectedGrid = getGridElementsArrayById(m_selection.getGridSelectionIndex());
-            LinearLayout selectedElement = selectedGrid[m_selection.getGridElementSelectionIndex()];
-            selectedElement.setBackgroundColor(SelectionColor);
+            RelativeLayout[] selectedGrid = getGridElementsArrayById(m_selection.getGridSelectionIndex());
+            RelativeLayout selectedElement = selectedGrid[m_selection.getGridElementSelectionIndex()];
+            FramedTextItem.setInternalColorWithNoBorder(selectedElement, SelectionColor);
         }
     }
 
@@ -483,12 +484,11 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
             boolean isWordCorrect = true;
 
             boolean isPreviousElementEmpty = false;
-            for (LinearLayout element : m_destinationGridElements)
+            for (RelativeLayout element : m_destinationGridElements)
             {
-                TextView textView = (TextView) element.findViewById(R.id.textView);
-                final CharSequence TextCharacters = textView.getText();
+                final String textCharacters = FramedTextItem.getText(element);
 
-                if (TextUtils.isEmpty(TextCharacters))
+                if (TextUtils.isEmpty(textCharacters))
                 {
                     isPreviousElementEmpty = true;
                 }
@@ -500,16 +500,15 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
                         break;
                     }
 
-                    word += TextCharacters;
+                    word += textCharacters;
                 }
             }
 
             if (!isWordCorrect)
             {
-                Resources resources = getResources();
                 AlertDialogHelper.showMessageBox(getActivity(),
-                        resources.getString(R.string.alert_title),
-                        resources.getString(R.string.alert_incorrect_word_creation));
+                        getResources().getString(R.string.alert_title),
+                        getResources().getString(R.string.alert_incorrect_word_creation));
                 return;
             }
         }
@@ -526,10 +525,9 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
 
         if (m_state.foundSubWords.contains(subWordIndex))
         {
-            Resources resources = getResources();
             AlertDialogHelper.showMessageBox(getActivity(),
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.alert_word_already_exists));
+                    getResources().getString(R.string.alert_title),
+                    getResources().getString(R.string.alert_word_already_exists));
             return;
         }
 
@@ -542,40 +540,35 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
         // return grids to initial state
         {
             for (int charIndex = 0; charIndex < m_sourceGridElements.length; ++charIndex)
-            {
-                TextView textView = (TextView) m_sourceGridElements[charIndex].findViewById(R.id.textView);
-                textView.setText(((Character)m_state.mainWord.word.charAt(charIndex)).toString());
-            }
+                FramedTextItem.setText(m_sourceGridElements[charIndex], m_state.mainWord.word.charAt(charIndex));
 
-            for (LinearLayout layout : m_destinationGridElements)
-            {
-                TextView textView = (TextView) layout.findViewById(R.id.textView);
-                textView.setText("");
-            }
+            for (RelativeLayout layout : m_destinationGridElements)
+                FramedTextItem.setText(layout, "");
         }
 
         // clear
         if (m_selection.isValid())
         {
-            LinearLayout sourceElement = getGridElementsArrayById(m_selection.getGridSelectionIndex())[m_selection.getGridElementSelectionIndex()];
-            sourceElement.setBackgroundColor(NoSelectionColor);
+            RelativeLayout sourceElement = getGridElementsArrayById(m_selection.getGridSelectionIndex())[m_selection.getGridElementSelectionIndex()];
+            FramedTextItem.setInternalColorWithNoBorder(sourceElement, NoSelectionColor);
             m_selection.clear();
         }
 
         // renew list of created words
         {
-            TextAdapter textAdapter = new TextAdapter(getActivity(), getResources().getDimension(R.dimen.small_text_size));
+            TextAdapter textAdapter = new TextAdapter(getActivity()
+                    , getResources().getDimension(R.dimen.create_words_from_specified_found_word_text_size)
+                    , TextAdapter.TextAlign.Left);
             for (Integer foundWordIndex : m_state.foundSubWords)
                 textAdapter.add(m_state.allSubWords.get(foundWordIndex));
 
-            ListView wordsListView = (ListView) getView().findViewById(R.id.wordsListView);
+            ListView wordsListView = (ListView) getView().findViewById(R.id.resultWordsListView);
             wordsListView.setAdapter(textAdapter);
         }
 
         // renew found characters text
         {
-            m_currentCharactersFound += m_state.allSubWords.get(subWordIndex).length();
-            printCharactersFound(getView(), m_currentCharactersFound);
+           printWordsFound(getView(), m_state.foundSubWords.size());
         }
     }
 
@@ -656,19 +649,20 @@ public class CreateWordsFromSpecifiedFragment extends Fragment
                 });
     }
 
-    private LinearLayout[] getGridElementsArrayById(int id)
+    private RelativeLayout[] getGridElementsArrayById(int id)
     {
-        return (id == 0) ? m_sourceGridElements : m_destinationGridElements;
+        return (id == 1) ? m_sourceGridElements : m_destinationGridElements;
     }
 
     private IExerciseStepCallback m_exerciseCallback;
     private IScoreNotification m_scoreNotification;
+    private DisplayMetricsHelper m_displayMetrics;
+    private ITracer m_tracer;
 
     private CreateWordsFromSpecifiedState m_state;
-    private int m_currentCharactersFound;
 
-    private LinearLayout[] m_sourceGridElements;
-    private LinearLayout[] m_destinationGridElements;
+    private RelativeLayout[] m_sourceGridElements;
+    private RelativeLayout[] m_destinationGridElements;
 
     private GridSelection m_selection;
 }

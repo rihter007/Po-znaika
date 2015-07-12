@@ -73,4 +73,8 @@
     <dimen name="word_gather_small_text_size">18sp</dimen>
     <dimen name="word_gather_large_text_size">24sp</dimen>
 
+    <!-- Create words from specified fragment -->
+    <dimen name="create_words_from_specified_item_text_size">22sp</dimen>
+    <dimen name="create_words_from_specified_found_word_text_size">12sp</dimen>
+
 </resources>
