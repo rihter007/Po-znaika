@@ -23,15 +23,29 @@
 {% include "header.html" %}
 {% include "menu.html" %}
 
-<table border=0 width=100%>
+<table border=0 width=100% cellpadding=5>
 <TR>
-<TD width=10%/>
+<TD valign=top width=248>
+
+<A href="mailto:contact@po-znaika.ru">
+    <img src="{% static "vopros.png" %}" alt="Задать вопрос" />
+</A>
+
+<div class="second_menu">
+<A class="menu_link" href="/">Главная</A><BR>
+<A class="menu_link" href="/products/">Наши программы</A><BR>
+<A class="menu_link" href="/accounts/">Личный кабинет</A><BR>
+<A class="menu_link" href="/contacts/">Контакты</A><BR>
+<A class="menu_link" href="/about/">О проекте</A><BR>
+</div>
+
+</TD>
 
 <TD>
 {% block content %} {% endblock %}
 </TD>
 
-<TD width=10%/>
+<TD width=3%/>
 </table>
 
 {% include "footer.html" %}

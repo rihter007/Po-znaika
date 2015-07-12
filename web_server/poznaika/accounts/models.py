@@ -4,6 +4,9 @@ from django.contrib.auth.models import User
 class Exercise(models.Model):
     Name = models.CharField(max_length=100, primary_key=True)
     Description = models.CharField(max_length=255, blank=True)
+    def __str__(self):
+        text = self.Description if self.Description else self.Name
+        return text.encode('utf8')
     
 class Course(models.Model):
     Name = models.CharField(max_length=100, primary_key=True)
@@ -46,5 +49,4 @@ class Pupil(models.Model):
     ForClass = models.ForeignKey(Class)
     
     def __str__(self):
-        return self.User.username + " (" + self.ForClass.Name + ")"
-        
+        return (self.User.username + " (" + self.ForClass.Name + ")").encode('utf8')

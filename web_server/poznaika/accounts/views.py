@@ -1,7 +1,8 @@
-# coding=1251
+# coding=cp1251
 
 import datetime 
 from datetime import date, timedelta
+from collections import defaultdict
 
 from django.shortcuts import render
 from django.shortcuts import render_to_response
@@ -70,32 +71,30 @@ def MakeDiary(user):
             diariesList += "\r\n"
     return diariesList
     
+def GetScoreByTime(pupil, time):
+    user_marks = defaultdict(int)
+    for mark in Mark.objects.filter(ForUser=pupil, DateTime__lte=time):
+        if mark.Score > user_marks[mark.ForExercise.Name]:
+            user_marks[mark.ForExercise.Name] = mark.Score
+    return sum(user_marks.itervalues())
+    
 def MakeUserTable(user):
-    general_score = 0
     table = []
     for mark in Mark.objects.filter(ForUser=user):
         item = {}
         item['date'] = str(mark.DateTime)[:16]
-        item['exercise'] = mark.ForExercise.Name
+        item['exercise'] = str(mark.ForExercise)
         item['score'] = mark.Score
-        general_score += mark.Score
         table.append(item)
-    return table, general_score
-
+    return table, GetScoreByTime(user, datetime.datetime.now())
+  
 def GetScoresByTime(pupil):
-    totalScore, yesterdayScore, weekScore = 0, 0, 0
     yesterday = date.today() - timedelta(days=1)
     weekAgo = date.today() - timedelta(days=7)
-    marks = Mark.objects.filter(ForUser=pupil)
-    for mark in marks:
-        markDate = mark.DateTime.date()
-        if markDate == yesterday:
-            yesterdayScore += mark.Score
-        if weekAgo < markDate and markDate <= date.today():
-            weekScore += mark.Score
-        totalScore += mark.Score
-    return totalScore, yesterdayScore, weekScore
-
+    return (GetScoreByTime(pupil, datetime.datetime.now()), 
+        GetScoreByTime(pupil, yesterday),
+        GetScoreByTime(pupil, weekAgo))
+        
 def MakeTeacherTable():
     table = []
     for pupil in Pupil.objects.all():

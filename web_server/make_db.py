@@ -1,3 +1,5 @@
+# coding=cp1251
+
 import os
 import sys
 from datetime import date
@@ -18,8 +20,8 @@ from poznaika.accounts.models import Class
 from poznaika.accounts.models import Pupil
 
 
-def AddE(name):
-    e = Exercise(Name=name)
+def AddE(name, descr=""):
+    e = Exercise(Name=name, Description=descr)
     e.save()
     return e
 
@@ -50,27 +52,27 @@ def AddPupil(user, clss):
 
     
 def MakeInitialDb():
-    #users = User.objects.filter(username='5')
-    #if len(users) == 1:
-    #    return # already created
     User.objects.all().delete()
     Exercise.objects.all().delete()
     Course.objects.all().delete()
         
-    u1 = AddUser('5', '5')
-    u2 = AddUser('6', '6')
-    u3 = AddUser('7', '7')
-    u4 = AddUser('8', '8')
-    uH = AddUser('sh', 'sh')
-    uT1 = AddUser('th1', 'th1')
-    uT2 = AddUser('th2', 'th2')
+    #u1 = AddUser(u'5', u'5')
+    u1 = AddUser(u'Коля Герасимов', '123')
+    u2 = AddUser(u'Фима Королев', '123')
+    u22 = AddUser(u'Юля Грибкова', '123')
+    u3 = AddUser(u'Вася Петров', '123')
+    u4 = AddUser(u'Петя Васечкин', '123')
+    u5 = AddUser(u'Маша Старцева', '123')
+    uH = AddUser(u'kino_school', '12345')
+    uT1 = AddUser(u'Макаренко АС', '12345')
+    uT2 = AddUser(u'Корчак Януш', '12345')
     
-    h = StudyHead(ForUser=uH, Description="school 1")
+    h = StudyHead(ForUser=uH, Description="Schools from movies")
     h.save()
     
-    t = Teacher(User=uT1, ForHead=h, Description="math")
+    t = Teacher(User=uT1, ForHead=h, Description=u"ГиБ / 100ЛтВ")
     t.save()
-    t = Teacher(User=uT2, ForHead=h, Description="rus")
+    t = Teacher(User=uT2, ForHead=h, Description=u"ППиВ")
     t.save()
     
     c1 = Class(ForHead=h, Name="1A")
@@ -80,15 +82,17 @@ def MakeInitialDb():
 
     AddPupil(u1, c1)
     AddPupil(u2, c1)
+    AddPupil(u22, c1)
     AddPupil(u3, c2)
     AddPupil(u4, c2)
+    AddPupil(u5, c2)
     
     e1 = AddE("E1")
-    e2 = AddE("E2")
-    e3 = AddE("E3")
+    e2 = AddE("E2", u"Слово склеилось")
+    e3 = AddE("E3", u"Еще слово какое-нибудь")
     e4 = AddE("E4")
     
-    e5 = AddE("Alphabet.Russian.WordGather")
+    e5 = AddE("Alphabet.Russian.WordGather", u"Слово рассыпалось")
     
     AddM(u1, e1, 11)
     AddM(u1, e2, 12)
@@ -112,3 +116,4 @@ def MakeInitialDb():
 
     
 MakeInitialDb()
+print("Done.")

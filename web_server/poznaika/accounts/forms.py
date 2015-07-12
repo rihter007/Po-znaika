@@ -1,4 +1,4 @@
-# coding=1251
+# coding=cp1251
 
 from django import forms
 from django.contrib import auth
@@ -21,14 +21,14 @@ class RegisterForm(forms.Form):
         name = self.cleaned_data['UserName']
         users = User.objects.filter(username=name)
         if len(users) > 0:
-            raise forms.ValidationError("Name already exists:")
+            raise forms.ValidationError(u"Имя уже существует!")
         return name
         
     def clean_Password2(self):
         pwd1 = self.cleaned_data['Password1']
         pwd2 = self.cleaned_data['Password2']
         if pwd1 != pwd2:
-            raise forms.ValidationError("Entered passwords are different:")
+            raise forms.ValidationError(u"Введенные пароли различаются!")
         return pwd1
 
 class LoginForm(forms.Form):
@@ -40,7 +40,7 @@ class LoginForm(forms.Form):
         pwd = password=cd['Password']
         user = auth.authenticate(username=cd['UserName'], password=pwd)
         if user is None or not user.is_active:
-            raise forms.ValidationError("Сочетание логин+пароль некорректно!")
+            raise forms.ValidationError(u"Сочетание логин+пароль некорректно!")
         return pwd
 
         
