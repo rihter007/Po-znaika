@@ -74,13 +74,13 @@ public class TextAdapter extends BaseAdapter
         if (elementView == null)
         {
             LayoutInflater layoutInflater = (LayoutInflater) m_context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            elementView = layoutInflater.inflate(R.layout.center_text_item, null, false);
+            elementView = layoutInflater.inflate(R.layout.left_text_item, null, false);
         }
 
         TextView textView = (TextView) elementView.findViewById(R.id.textView);
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)elementView.getLayoutParams();
 
-        switch (m_textAlign)
+        //RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)elementView.getLayoutParams();
+        /*switch (m_textAlign)
         {
             case Right:
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
@@ -90,9 +90,9 @@ public class TextAdapter extends BaseAdapter
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
                 break;
-        }
+        }*/
+        //elementView.setLayoutParams(layoutParams);
 
-        elementView.setLayoutParams(layoutParams);
         textView.setTextSize(m_textSize);
         textView.setText(m_textElements.get(position));
 

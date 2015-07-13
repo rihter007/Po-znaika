@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -295,10 +295,13 @@ public class  CreateWordsFromSpecifiedFragment extends Fragment
         m_selection = new GridSelection();
     }
 
-    private void constructUserInterface(View fragmentView)
+    private void constructUserInterface(View fragmentView) throws CommonException
     {
         // fill destination grid
         {
+            LinearLayout destinationLayout = (LinearLayout)fragmentView.findViewById(R.id.resultTextLayout);
+            destinationLayout.removeAllViews();
+
             m_destinationGridElements = new RelativeLayout[m_state.mainWord.word.length()];
             for (int charIndex = 0; charIndex < m_destinationGridElements.length; ++charIndex)
             {
@@ -315,12 +318,16 @@ public class  CreateWordsFromSpecifiedFragment extends Fragment
                         onGridItemClicked(0, elementIndex);
                     }
                 });
+                destinationLayout.addView(characterLayout);
                 m_destinationGridElements[charIndex] = characterLayout;
             }
         }
 
         // fill source grid
         {
+            LinearLayout sourceLayout = (LinearLayout)fragmentView.findViewById(R.id.sourceTextLayout);
+            sourceLayout.removeAllViews();
+
             m_sourceGridElements = new RelativeLayout[m_state.mainWord.word.length()];
             for (int charIndex = 0; charIndex < m_state.mainWord.word.length(); ++charIndex)
             {
@@ -338,6 +345,7 @@ public class  CreateWordsFromSpecifiedFragment extends Fragment
                         onGridItemClicked(1, elementIndex);
                     }
                 });
+                sourceLayout.addView(characterLayout);
                 m_sourceGridElements[charIndex] = characterLayout;
             }
         }
@@ -369,12 +377,17 @@ public class  CreateWordsFromSpecifiedFragment extends Fragment
                     onFinishButtonClicked();
                 }
             });
+
+            ViewGroup.LayoutParams layoutParams = finishButton.getLayoutParams();
+            layoutParams.width = m_displayMetrics.getWidthInProportionDp(0.45
+                    , 2 * (int)getResources().getDimension(R.dimen.small_margin));
+            finishButton.setLayoutParams(layoutParams);
         }
 
         // process left arrow
         {
-            ImageButton imageButton = (ImageButton) fragmentView.findViewById(R.id.backImageButton);
-            imageButton.setOnClickListener(new View.OnClickListener()
+            ImageView backImageView = (ImageView) fragmentView.findViewById(R.id.backImageView);
+            backImageView.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View view)
@@ -398,15 +411,7 @@ public class  CreateWordsFromSpecifiedFragment extends Fragment
         }
 
         // process found sub words list
-        {
-            ListView foundWordsListView = (ListView) fragmentView.findViewById(R.id.resultWordsListView);
-            TextAdapter adapter = new TextAdapter(getActivity()
-                    , getResources().getDimension(R.dimen.create_words_from_specified_found_word_text_size)
-                    , TextAdapter.TextAlign.Left);
-            for (int foundWordIndex : m_state.foundSubWords)
-                adapter.add(m_state.allSubWords.get(foundWordIndex));
-            foundWordsListView.setAdapter(adapter);
-        }
+        printFoundSubWords(fragmentView);
     }
 
     private RelativeLayout createCharacterItem()
@@ -421,10 +426,38 @@ public class  CreateWordsFromSpecifiedFragment extends Fragment
         return characterLayout;
     }
 
-    private void printWordsFound(@NonNull View view, int wordsCount)
+    private void printWordsFound(View view, int wordsCount) throws CommonException
     {
-        TextView textView = (TextView) view.findViewById(R.id.wordsFoundNumberTextView);
+        final View fragmentView = view == null ? getView() : view;
+        if (fragmentView == null)
+        {
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "printWordsFound for null view");
+            throw new CommonException(CommonResultCode.AssertError);
+        }
+
+        TextView textView = (TextView) fragmentView.findViewById(R.id.wordsFoundNumberTextView);
         textView.setText(String.format(getResources().getString(R.string.caption_current_words_count), wordsCount));
+    }
+
+    private void printFoundSubWords(View view) throws CommonException
+    {
+        final View fragmentView = view == null ? getView() : view;
+        if (fragmentView == null)
+        {
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "printFoundSubWords for null view");
+            throw new CommonException(CommonResultCode.AssertError);
+        }
+
+        ListView foundWordsListView = (ListView) fragmentView.findViewById(R.id.resultWordsListView);
+        TextAdapter adapter = new TextAdapter(getActivity()
+                , getResources().getDimension(R.dimen.create_words_from_specified_found_word_text_size)
+                , TextAdapter.TextAlign.Left);
+        for (int i = 0; i < m_state.foundSubWords.size(); ++i)
+        {
+            final int foundWordIndex = m_state.foundSubWords.get(i);
+            adapter.add(String.format("%d. %s", i+1, m_state.allSubWords.get(foundWordIndex)));
+        }
+        foundWordsListView.setAdapter(adapter);
     }
 
     private void onGridItemClicked(int gridId, int elementId)
@@ -477,98 +510,97 @@ public class  CreateWordsFromSpecifiedFragment extends Fragment
 
     private void onCreateWordButtonClicked()
     {
-        String word = "";
-
-        // get new word
+        try
         {
-            boolean isWordCorrect = true;
+            String word = "";
 
-            boolean isPreviousElementEmpty = false;
-            for (RelativeLayout element : m_destinationGridElements)
+            // get new word
             {
-                final String textCharacters = FramedTextItem.getText(element);
+                boolean isWordCorrect = true;
 
-                if (TextUtils.isEmpty(textCharacters))
+                boolean isPreviousElementEmpty = false;
+                for (RelativeLayout element : m_destinationGridElements)
                 {
-                    isPreviousElementEmpty = true;
-                }
-                else
-                {
-                    if (isPreviousElementEmpty)
+                    final String textCharacters = FramedTextItem.getText(element);
+
+                    if (TextUtils.isEmpty(textCharacters))
                     {
-                        isWordCorrect = false;
-                        break;
+                        isPreviousElementEmpty = true;
                     }
+                    else
+                    {
+                        if (isPreviousElementEmpty)
+                        {
+                            isWordCorrect = false;
+                            break;
+                        }
 
-                    word += textCharacters;
+                        word += textCharacters;
+                    }
+                }
+
+                if (!isWordCorrect)
+                {
+                    AlertDialogHelper.showMessageBox(getActivity(),
+                            getResources().getString(R.string.alert_title),
+                            getResources().getString(R.string.alert_incorrect_word_creation));
+                    return;
                 }
             }
 
-            if (!isWordCorrect)
+            final int subWordIndex = m_state.allSubWords.indexOf(word);
+            if (subWordIndex == -1)
+            {
+                Resources resources = getResources();
+                AlertDialogHelper.showMessageBox(getActivity(),
+                        resources.getString(R.string.alert_title),
+                        resources.getString(R.string.alert_incorrect_word_creation));
+                return;
+            }
+
+            if (m_state.foundSubWords.contains(subWordIndex))
             {
                 AlertDialogHelper.showMessageBox(getActivity(),
                         getResources().getString(R.string.alert_title),
-                        getResources().getString(R.string.alert_incorrect_word_creation));
+                        getResources().getString(R.string.alert_word_already_exists));
                 return;
             }
+
+            //
+            // word is ok
+            //
+
+            m_state.foundSubWords.add(subWordIndex);
+
+            // return grids to initial state
+            {
+                for (int charIndex = 0; charIndex < m_sourceGridElements.length; ++charIndex)
+                    FramedTextItem.setText(m_sourceGridElements[charIndex], m_state.mainWord.word.charAt(charIndex));
+
+                for (RelativeLayout layout : m_destinationGridElements)
+                    FramedTextItem.setText(layout, "");
+            }
+
+            // clear
+            if (m_selection.isValid())
+            {
+                RelativeLayout sourceElement = getGridElementsArrayById(m_selection.getGridSelectionIndex())[m_selection.getGridElementSelectionIndex()];
+                FramedTextItem.setInternalColorWithNoBorder(sourceElement, NoSelectionColor);
+                m_selection.clear();
+            }
+
+            // renew list of created words
+            printFoundSubWords(null);
+
+            // renew found characters text
+            printWordsFound(null, m_state.foundSubWords.size());
         }
-
-        final int subWordIndex = m_state.allSubWords.indexOf(word);
-        if (subWordIndex == -1)
+        catch (Exception exp)
         {
-            Resources resources = getResources();
-            AlertDialogHelper.showMessageBox(getActivity(),
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.alert_incorrect_word_creation));
-            return;
-        }
-
-        if (m_state.foundSubWords.contains(subWordIndex))
-        {
-            AlertDialogHelper.showMessageBox(getActivity(),
-                    getResources().getString(R.string.alert_title),
-                    getResources().getString(R.string.alert_word_already_exists));
-            return;
-        }
-
-        //
-        // word is ok
-        //
-
-        m_state.foundSubWords.add(subWordIndex);
-
-        // return grids to initial state
-        {
-            for (int charIndex = 0; charIndex < m_sourceGridElements.length; ++charIndex)
-                FramedTextItem.setText(m_sourceGridElements[charIndex], m_state.mainWord.word.charAt(charIndex));
-
-            for (RelativeLayout layout : m_destinationGridElements)
-                FramedTextItem.setText(layout, "");
-        }
-
-        // clear
-        if (m_selection.isValid())
-        {
-            RelativeLayout sourceElement = getGridElementsArrayById(m_selection.getGridSelectionIndex())[m_selection.getGridElementSelectionIndex()];
-            FramedTextItem.setInternalColorWithNoBorder(sourceElement, NoSelectionColor);
-            m_selection.clear();
-        }
-
-        // renew list of created words
-        {
-            TextAdapter textAdapter = new TextAdapter(getActivity()
-                    , getResources().getDimension(R.dimen.create_words_from_specified_found_word_text_size)
-                    , TextAdapter.TextAlign.Left);
-            for (Integer foundWordIndex : m_state.foundSubWords)
-                textAdapter.add(m_state.allSubWords.get(foundWordIndex));
-
-            ListView wordsListView = (ListView) getView().findViewById(R.id.resultWordsListView);
-            wordsListView.setAdapter(textAdapter);
-        }
-
-        // renew found characters text
-        {
-           printWordsFound(getView(), m_state.foundSubWords.size());
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
+            AlertDialogHelper.showMessageBox(getActivity()
+                    , getResources().getString(R.string.alert_title)
+                    , getResources().getString(R.string.error_unknown_error));
         }
     }
 

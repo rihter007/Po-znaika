@@ -1160,6 +1160,7 @@ INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (649,-345575051,'с�
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (650,-345575051,'сеть',1);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (651,-345575051,'нож',1);
 
+
 ----------------------------------- 652+
 
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (652,-345575051,'аист',2);
@@ -1257,6 +1258,7 @@ INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (743,-345575051,'м�
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (744,-345575051,'яблоко',3);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (745,-345575051,'месяц',2);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (746,-345575051,'семья',2);
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (747,-345575051,'бас',1);
 
 /* 
 ***************************

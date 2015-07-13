@@ -58,6 +58,7 @@
 
             <LinearLayout
                 android:orientation="horizontal"
+                android:id="@+id/sourceTextLayout"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="50"
@@ -151,6 +152,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/caption_check"
                 android:id="@+id/finishButton"
+                android:background="@color/internal_elements_background"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"/>

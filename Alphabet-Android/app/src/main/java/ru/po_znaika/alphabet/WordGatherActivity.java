@@ -1,5 +1,8 @@
 package ru.po_znaika.alphabet;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -8,17 +11,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Log;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import com.arz_x.CommonException;
+import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
 import com.arz_x.android.product_tracer.FileTracerInstance;
 import com.arz_x.android.product_tracer.ITracerGetter;
@@ -214,9 +213,9 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
                 (WordGatherActivityState)savedInstanceState.getParcelable(InternalStateTag);
     }
 
-    private void constructUserInterface(Bundle savedInstanceState)
+    private void constructUserInterface(Bundle savedInstanceState) throws CommonException
     {
-        Fragment currentFragment = null;
+        Fragment currentFragment;
         if (savedInstanceState == null)
         {
             switch (m_state.stage)
@@ -229,15 +228,18 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
 
                 case GameIsFinished:
                 {
-                    currentFragment = ScoreFragment.createFragment((int)(m_state.maxExerciseScore * m_state.completionRate));
+                    currentFragment = ExerciseFinishedFragment.createFragment((int) (m_state.maxExerciseScore * m_state.completionRate));
                 }
                 break;
 
                 default:
                 {
-                    Log.e(LogTag, String.format("Unknown game stage: \"%s\"", m_state.stage.name()));
+                    ProductTracer.traceMessage(m_tracer
+                            , TraceLevel.Error
+                            , LogTag
+                            , String.format("Unknown game stage: \"%s\"", m_state.stage.name()));
+                    throw new CommonException(CommonResultCode.AssertError);
                 }
-                break;
             }
         }
         else
@@ -258,12 +260,11 @@ public final class WordGatherActivity extends Activity implements IExerciseStepC
         }
         catch (Exception exp)
         {
-            Log.e(LogTag, String.format("Failed to repeat exercise: \"%s\"", exp.getMessage()));
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
 
-            final Resources resources = getResources();
             AlertDialogHelper.showMessageBox(this,
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.error_unknown_error));
+                    getResources().getString(R.string.alert_title),
+                    getResources().getString(R.string.error_unknown_error));
             finish();
         }
     }

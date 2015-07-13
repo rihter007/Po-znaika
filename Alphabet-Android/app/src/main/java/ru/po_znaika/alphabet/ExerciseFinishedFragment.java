@@ -99,10 +99,9 @@ public class ExerciseFinishedFragment extends Fragment
         }
         else
         {
-            int finishImagesArray[] = new int[]
+            final int finishImagesArray[] = new int[]
                     {
-                            R.drawable.exercise_finished_1,
-                            R.drawable.exercise_finished_2
+                            R.drawable.exercise_finished_2,
                     };
 
             Random random = new Random();

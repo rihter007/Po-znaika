@@ -26,6 +26,7 @@ import com.arz_x.tracer.ITracer;
 import com.arz_x.tracer.ProductTracer;
 import com.arz_x.tracer.TraceLevel;
 
+import ru.po_znaika.common.ExerciseScore;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
@@ -235,7 +236,7 @@ public class CreateWordsFromSpecifiedActivity extends Activity
             if (m_state.stage == ActivityInternalState.GameStage.GameIsActive)
                 currentFragment = CreateWordsFromSpecifiedFragment.createFragment(m_alphabetType);
             else
-                currentFragment = ScoreFragment.createFragment((int)(m_state.exerciseMaxScore * m_state.completeRate));
+                currentFragment = ExerciseFinishedFragment.createFragment((int)(m_state.exerciseMaxScore * m_state.completeRate));
         }
         else
         {
