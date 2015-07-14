@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -137,6 +138,9 @@ public class CreateWordsFromSpecifiedActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_words_from_specified);
+
+        setRequestedOrientation(getResources().getDimension(R.dimen.orientation_flag) == 0 ?
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         try
         {
