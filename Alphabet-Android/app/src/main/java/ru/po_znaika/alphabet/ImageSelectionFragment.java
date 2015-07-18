@@ -24,6 +24,7 @@ import java.util.List;
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.DisplayMetricsHelper;
 import com.arz_x.android.product_tracer.ITracerGetter;
 import com.arz_x.tracer.ITracer;
 import com.arz_x.tracer.ProductTracer;
@@ -259,7 +260,7 @@ public class ImageSelectionFragment extends Fragment
                         , TraceLevel.Error
                         , LogTag
                         , String.format("Failed to get resources id for '%s'"
-                            , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath));
+                        , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath));
                 throw new CommonException(CommonResultCode.InvalidExternalSource);
             }
 
@@ -318,11 +319,22 @@ public class ImageSelectionFragment extends Fragment
                         }
                         catch (CommonException exp)
                         {
+                            AlertDialogHelper.showMessageBox(getActivity()
+                                    , getResources().getString(R.string.alert_title)
+                                    , getResources().getString(R.string.error_unknown_error)
+                                    , false
+                                    , new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    getActivity().finish();
+                                }
+                            });
                             ProductTracer.traceException(m_tracer
                                     , TraceLevel.Error
                                     , LogTag
                                     , exp);
-                            getActivity().finish();
                         }
                     }
                 });
@@ -378,6 +390,8 @@ public class ImageSelectionFragment extends Fragment
         m_stepsCallback = (IExerciseStepCallback) activity;
         m_scoreNotification = (IScoreNotification) activity;
 
+        m_displayMetrics = new DisplayMetricsHelper(activity);
+
         if (activity instanceof ITracerGetter)
             m_tracer = ((ITracerGetter)activity).getTracer();
     }
@@ -388,6 +402,7 @@ public class ImageSelectionFragment extends Fragment
         super.onDetach();
         m_stepsCallback = null;
         m_scoreNotification = null;
+        m_displayMetrics = null;
         m_tracer = null;
 
         m_mediaPlayerManager.stop();
@@ -432,7 +447,7 @@ public class ImageSelectionFragment extends Fragment
             }
             catch (CommonException exp)
             {
-                Log.e(LogTag, "Failed to play correct media " + exp.getMessage());
+                ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
             }
         }
         else
@@ -508,6 +523,7 @@ public class ImageSelectionFragment extends Fragment
     }
 
     private ITracer m_tracer;
+    private DisplayMetricsHelper m_displayMetrics;
     private IMediaPlayerManager m_mediaPlayerManager;
 
     private IExerciseStepCallback m_stepsCallback;

@@ -154,10 +154,9 @@ public class TheoryPageFragment extends Fragment
         }
         catch (Exception exp)
         {
-            Resources resources = getResources();
             AlertDialogHelper.showMessageBox(getActivity(),
-                    resources.getString(R.string.alert_title),
-                    resources.getString(R.string.failed_action),
+                    getResources().getString(R.string.alert_title),
+                    getResources().getString(R.string.failed_action),
                     false,
                     new DialogInterface.OnClickListener()
                     {

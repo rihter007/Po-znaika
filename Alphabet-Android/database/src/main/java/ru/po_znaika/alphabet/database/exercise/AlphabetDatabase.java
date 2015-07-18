@@ -842,8 +842,10 @@ public final class AlphabetDatabase
                 characterItem.id = dataReader.getInt(0);
                 characterItem.exerciseInfo = getExerciseInfoById(dataReader.getInt(1));
                 characterItem.characterExercise = getCharacterExerciseById(characterExerciseId);
-                characterItem.iconImageName = dataReader.getString(2);
-                characterItem.menuElementType = CharacterExerciseItemType.getTypeByValue(dataReader.getInt(1));
+                final int iconId = dataReader.getInt(2);
+                if (iconId != DatabaseConstant.InvalidDatabaseIndex)
+                    characterItem.iconImageName = getImageFileNameById(iconId);
+                characterItem.menuElementType = CharacterExerciseItemType.getTypeByValue(dataReader.getInt(3));
 
                 resultList.add(characterItem);
             }
@@ -915,8 +917,6 @@ public final class AlphabetDatabase
 
     public CharacterExerciseItemStepInfo[] getAllCharacterExerciseStepsByCharacterExerciseItemId(int characterExerciseItemId)
     {
-        return null;
-        /*
         CharacterExerciseItemStepInfo[] result = null;
         Cursor dataReader = null;
 
@@ -926,6 +926,10 @@ public final class AlphabetDatabase
             dataReader = m_databaseConnection.rawQuery(ExtractAllCharacterExerciseStepsByCharacterExerciseItemIdSqlStatement,
                     new String[]{characterExerciseItemIdObject.toString()});
 
+            final CharacterExerciseItemInfo characterExerciseItemInfo = getCharacterExerciseItemById(characterExerciseItemId);
+            if (characterExerciseItemInfo == null)
+                throw new CommonException(CommonResultCode.InvalidArgument);
+
             if (dataReader.moveToFirst())
             {
                 List<CharacterExerciseItemStepInfo> resultsList = new ArrayList<>();
@@ -933,7 +937,7 @@ public final class AlphabetDatabase
                 {
                     CharacterExerciseItemStepInfo item = new CharacterExerciseItemStepInfo();
                     item.id = dataReader.getInt(0);
-                    item.characterExerciseItemId = characterExerciseItemId;
+                    item.characterExerciseItem = characterExerciseItemInfo;
                     item.stepNumber = dataReader.getInt(1);
                     item.action = CharacterExerciseActionType.getTypeByValue(dataReader.getInt(2));
                     item.value = dataReader.getInt(3);
@@ -956,7 +960,6 @@ public final class AlphabetDatabase
         }
 
         return result;
-        */
     }
 
     public TheoryPageInfo getTheoryPageById(int theoryPageId)

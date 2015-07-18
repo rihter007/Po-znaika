@@ -1,5 +1,8 @@
 package ru.po_znaika.alphabet;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,9 +14,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
-
-import java.util.Arrays;
-import java.util.Comparator;
 
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
@@ -114,7 +114,7 @@ public class CharacterExerciseMenuActivity extends Activity
             savedInstance.putInt(PageNumberTag, m_pageNumber);
             FileTracerInstance.saveInstance(m_tracer, savedInstance);
         }
-        catch (Throwable exp)
+        catch (Exception exp)
         {
             ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
             throw exp;
@@ -267,7 +267,7 @@ public class CharacterExerciseMenuActivity extends Activity
 
     private void drawCharacterExercises() throws CommonException
     {
-        ProductTracer.traceMessage(m_tracer, TraceLevel.Info, "Page number: " + m_pageNumber);
+        ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "Draw menu, page number: " + m_pageNumber);
 
         final int[] imageViewIds = new int[]
                 {
@@ -315,6 +315,8 @@ public class CharacterExerciseMenuActivity extends Activity
 
             ImageView imageView = (ImageView)findViewById(imageViewIds[exerciseIndex]);
             imageView.setImageDrawable(drawable);
+
+            final int characterExerciseId = exerciseDisplayInfo.characterExerciseId;
             imageView.setOnClickListener(new View.OnClickListener()
             {
                 @Override
@@ -322,11 +324,16 @@ public class CharacterExerciseMenuActivity extends Activity
                 {
                     try
                     {
+                        ProductTracer.traceMessage(m_tracer
+                                , TraceLevel.Info
+                                , LogTag
+                                , String.format("Start exercise for character exercise id: '%d'", characterExerciseId));
                         SingleCharacterExerciseMenuActivity.startActivity(CharacterExerciseMenuActivity.this
-                                , exerciseDisplayInfo.characterExerciseId);
+                                , characterExerciseId);
                     }
                     catch (Exception exp)
                     {
+                        ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
                         AlertDialogHelper.showMessageBox(CharacterExerciseMenuActivity.this,
                                 getResources().getString(R.string.alert_title),
                                 getResources().getString(R.string.failed_exercise_start));

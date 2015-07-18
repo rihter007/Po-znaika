@@ -135,13 +135,14 @@ public class SingleCharacterExerciseMenuActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_single_character_exercise_menu);
-
-        setRequestedOrientation(getResources().getDimension(R.dimen.orientation_flag) == 0 ?
-                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         try
         {
+            setContentView(R.layout.activity_single_character_exercise_menu);
+
+            setRequestedOrientation(getResources().getDimension(R.dimen.orientation_flag) == 0 ?
+                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
             m_tracer = TracerHelper.continueOrCreateFileTracer(this, savedInstanceState);
 
             restoreInternalState();
@@ -286,6 +287,18 @@ public class SingleCharacterExerciseMenuActivity extends Activity
         }
 
         {
+            ImageView backImageView = (ImageView)findViewById(R.id.backImageView);
+            backImageView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    finish();
+                }
+            });
+        }
+
+        {
             final List<Pair<AlphabetDatabase.CharacterExerciseItemType, Integer>> exercisesInfo =
                     new ArrayList<Pair<AlphabetDatabase.CharacterExerciseItemType, Integer>>()
                     {
@@ -306,14 +319,12 @@ public class SingleCharacterExerciseMenuActivity extends Activity
             for (Pair<AlphabetDatabase.CharacterExerciseItemType, Integer> exerciseUI : exercisesInfo)
             {
                 ImageView characterExerciseImageView = (ImageView)findViewById(exerciseUI.second);
-                final CharacterExerciseItem exerciseItem =
-                        m_characterExerciseItems.get(AlphabetDatabase.CharacterExerciseItemType.CharacterSound);
+                final CharacterExerciseItem exerciseItem = m_characterExerciseItems.get(exerciseUI.first);
                 if (exerciseItem != null)
                 {
                     characterExerciseImageView.setVisibility(View.VISIBLE);
                     characterExerciseImageView.setImageDrawable(getResources().getDrawable(
-                            getExerciseImageId(AlphabetDatabase.CharacterExerciseItemType.CharacterSound
-                                    , exerciseItem.scoreType)));
+                            getExerciseImageId(exerciseUI.first, exerciseItem.scoreType)));
                     final int characterExerciseItemId = exerciseItem.id;
                     characterExerciseImageView.setOnClickListener(new View.OnClickListener()
                     {

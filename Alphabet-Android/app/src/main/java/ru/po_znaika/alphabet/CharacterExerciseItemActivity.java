@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -345,8 +344,6 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
             m_currentFragment = m_exerciseStepManager.getCurrentExerciseStep();
         ProcessFragment(m_currentFragment);
     }
-
-
 
     @Override
     public void processPreviousStep()

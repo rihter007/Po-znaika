@@ -11,6 +11,7 @@ import android.app.Fragment;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.DisplayMetricsHelper;
 import com.arz_x.android.product_tracer.ITracerGetter;
 import com.arz_x.tracer.ITracer;
 import com.arz_x.tracer.ProductTracer;
@@ -136,6 +138,7 @@ public class FindCharacterFragment extends Fragment
 
     private static final String LogTag = FindCharacterFragment.class.getName();
 
+    private static final int MaxCharactersInRowCount = 30;
     private static final int MaxMistakesCount = 5;
 
     private static final String InternalStateTag = "internal_state";
@@ -203,6 +206,8 @@ public class FindCharacterFragment extends Fragment
         m_stepCallback = (IExerciseStepCallback)activity;
         m_exerciseScoreNotificator = (IScoreNotification)activity;
 
+        m_displayMetrics = new DisplayMetricsHelper(activity);
+
         if (activity instanceof ITracerGetter)
             m_tracer = ((ITracerGetter)activity).getTracer();
     }
@@ -211,6 +216,9 @@ public class FindCharacterFragment extends Fragment
     public void onDetach()
     {
         super.onDetach();
+
+        m_tracer = null;
+        m_displayMetrics = null;
 
         m_stepCallback = null;
         m_exerciseScoreNotificator = null;
@@ -225,6 +233,15 @@ public class FindCharacterFragment extends Fragment
         m_searchCharacter = arguments.getChar(SearchCharacterTag);
 
         final int maxRowLength = Helpers.getMaxRowLength(m_text);
+        if (maxRowLength > MaxCharactersInRowCount)
+        {
+            ProductTracer.traceMessage(m_tracer
+                    , TraceLevel.Error
+                    , LogTag
+                    , String.format("Exceeded row length, current '%d', max '%d'", maxRowLength, MaxCharactersInRowCount));
+            throw new CommonException(CommonResultCode.InvalidArgument);
+        }
+
         final int totalElementsCount = maxRowLength * (m_text.length - 1) + m_text[m_text.length - 1].length();
         if (savedInstanceState != null)
             m_state = savedInstanceState.getParcelable(InternalStateTag);
@@ -285,7 +302,9 @@ public class FindCharacterFragment extends Fragment
 
         // put characters
         {
-            final int gridWidth = maxRowLength * (int)getResources().getDimension(R.dimen.single_character_width);
+            final int elementWidth = (m_displayMetrics.getDisplayWidthInDp() -
+                    2 * (int)getResources().getDimension(R.dimen.small_margin)) / MaxCharactersInRowCount;
+            final int gridWidth = maxRowLength * elementWidth;
 
             GridView charactersGridView = (GridView) fragmentView.findViewById(R.id.charactersGridView);
             charactersGridView.setNumColumns(maxRowLength);
@@ -450,6 +469,7 @@ public class FindCharacterFragment extends Fragment
     }
 
     private ITracer m_tracer;
+    private DisplayMetricsHelper m_displayMetrics;
     private IExerciseStepCallback m_stepCallback;
     private IScoreNotification m_exerciseScoreNotificator;
 
