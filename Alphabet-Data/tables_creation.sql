@@ -459,6 +459,18 @@ action is a column which specifies what to do
 	1 - fragment with selection of words for that CHARACTER
 	2 - fragment with selection of specified CHARACTER in verse
 ***************************
+
+CREATE TABLE character_exercise_item_step (
+	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
+	character_exercise_item_id INTEGER NOT NULL,
+	step_number INTEGER NOT NULL,
+	action INTEGER NOT NULL,
+	value INTEGER NOT NULL,
+	
+	FOREIGN KEY(character_exercise_item_id) REFERENCES character_exercise_item(_id)
+	
+	UNIQUE (character_exercise_item_id, step_number) ON CONFLICT FAIL
+);
 */
 
 /* Sound ch1 */
@@ -1258,7 +1270,12 @@ INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (743,-345575051,'м�
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (744,-345575051,'яблоко',3);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (745,-345575051,'месяц',2);
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (746,-345575051,'семья',2);
+
+-- additional words
 INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (747,-345575051,'бас',1);
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (748,-345575051,'тема',2);
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (749,-345575051,'сад',1);
+INSERT INTO word(_id, alphabet_id, word, complexity) VALUES (750,-345575051,'тесак',2);
 
 /* 
 ***************************
