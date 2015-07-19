@@ -353,8 +353,174 @@ INSERT INTO image(_id, file_name) VALUES (303,'database_russian_icon_light_ch2')
 ***************************
 Sound table
 ***************************
+CREATE TABLE sound (
+    _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
+    file_name TEXT NOT NULL,
+	
+    UNIQUE (file_name) ON CONFLICT FAIL
+);
+
 */
-INSERT INTO sound(_id, file_name) VALUES(1, 'database_sound_test');
+
+-- Id: 1 - 200: for special sounds
+INSERT INTO sound(_id, file_name) VALUES(1, 'database_sound_cheer');
+INSERT INTO sound(_id, file_name) VALUES(2, 'database_sound_cheer_2');
+INSERT INTO sound(_id, file_name) VALUES(3, 'database_sound_notice');
+INSERT INTO sound(_id, file_name) VALUES(4, 'database_sound_try_again');
+
+-- Id: 1 - 100: for general sounds
+INSERT INTO sound(_id, file_name) VALUES(101, 'database_sound_lowercase_handwrite_character');
+INSERT INTO sound(_id, file_name) VALUES(102, 'database_sound_lowercase_print_character');
+INSERT INTO sound(_id, file_name) VALUES(103, 'database_sound_uppercase_handwrite_character');
+INSERT INTO sound(_id, file_name) VALUES(104, 'database_sound_uppercase_print_character');
+INSERT INTO sound(_id, file_name) VALUES(105, 'database_sound_way_it_is_pronounced');
+INSERT INTO sound(_id, file_name) VALUES(106, 'database_sound_way_it_is_written');
+INSERT INTO sound(_id, file_name) VALUES(107, 'database_sound_clunk_and_voiced');
+INSERT INTO sound(_id, file_name) VALUES(108, 'database_sound_hard_and_soft');
+INSERT INTO sound(_id, file_name) VALUES(109, 'database_sound_stressed_not_stressed');
+INSERT INTO sound(_id, file_name) VALUES(110, 'database_sound_select_character_in_verse');
+
+-- Id: 201+ - alphabet characters
+INSERT INTO sound(_id, file_name) VALUES(201, 'database_sound_russian_ch1');
+INSERT INTO sound(_id, file_name) VALUES(202, 'database_sound_russian_ch2');
+INSERT INTO sound(_id, file_name) VALUES(203, 'database_sound_russian_ch3');
+INSERT INTO sound(_id, file_name) VALUES(204, 'database_sound_russian_ch4');
+INSERT INTO sound(_id, file_name) VALUES(205, 'database_sound_russian_ch5');
+INSERT INTO sound(_id, file_name) VALUES(206, 'database_sound_russian_ch6');
+INSERT INTO sound(_id, file_name) VALUES(207, 'database_sound_russian_ch7');
+INSERT INTO sound(_id, file_name) VALUES(208, 'database_sound_russian_ch8');
+INSERT INTO sound(_id, file_name) VALUES(209, 'database_sound_russian_ch9');
+INSERT INTO sound(_id, file_name) VALUES(210, 'database_sound_russian_ch10');
+INSERT INTO sound(_id, file_name) VALUES(211, 'database_sound_russian_ch11');
+INSERT INTO sound(_id, file_name) VALUES(212, 'database_sound_russian_ch12');
+INSERT INTO sound(_id, file_name) VALUES(213, 'database_sound_russian_ch13');
+INSERT INTO sound(_id, file_name) VALUES(214, 'database_sound_russian_ch14');
+INSERT INTO sound(_id, file_name) VALUES(215, 'database_sound_russian_ch15');
+INSERT INTO sound(_id, file_name) VALUES(216, 'database_sound_russian_ch16');
+INSERT INTO sound(_id, file_name) VALUES(217, 'database_sound_russian_ch17');
+INSERT INTO sound(_id, file_name) VALUES(218, 'database_sound_russian_ch18');
+INSERT INTO sound(_id, file_name) VALUES(219, 'database_sound_russian_ch19');
+INSERT INTO sound(_id, file_name) VALUES(220, 'database_sound_russian_ch20');
+INSERT INTO sound(_id, file_name) VALUES(221, 'database_sound_russian_ch21');
+INSERT INTO sound(_id, file_name) VALUES(222, 'database_sound_russian_ch22');
+INSERT INTO sound(_id, file_name) VALUES(223, 'database_sound_russian_ch23');
+INSERT INTO sound(_id, file_name) VALUES(224, 'database_sound_russian_ch24');
+INSERT INTO sound(_id, file_name) VALUES(225, 'database_sound_russian_ch25');
+INSERT INTO sound(_id, file_name) VALUES(226, 'database_sound_russian_ch26');
+INSERT INTO sound(_id, file_name) VALUES(227, 'database_sound_russian_ch27');
+INSERT INTO sound(_id, file_name) VALUES(228, 'database_sound_russian_ch28');
+INSERT INTO sound(_id, file_name) VALUES(229, 'database_sound_russian_ch29');
+INSERT INTO sound(_id, file_name) VALUES(230, 'database_sound_russian_ch30');
+INSERT INTO sound(_id, file_name) VALUES(231, 'database_sound_russian_ch31');
+INSERT INTO sound(_id, file_name) VALUES(232, 'database_sound_russian_ch32');
+INSERT INTO sound(_id, file_name) VALUES(233, 'database_sound_russian_ch33');
+
+-- Id: 301+ for objects
+INSERT INTO sound(_id, file_name) VALUES(301, 'database_sound_yogurt');
+INSERT INTO sound(_id, file_name) VALUES(302, 'database_sound_house');
+INSERT INTO sound(_id, file_name) VALUES(303, 'database_sound_house_2');
+INSERT INTO sound(_id, file_name) VALUES(304, 'database_sound_airport');
+INSERT INTO sound(_id, file_name) VALUES(305, 'database_sound_aloe');
+INSERT INTO sound(_id, file_name) VALUES(306, 'database_sound_apple');
+INSERT INTO sound(_id, file_name) VALUES(307, 'database_sound_balalaika');
+INSERT INTO sound(_id, file_name) VALUES(308, 'database_sound_ball');
+INSERT INTO sound(_id, file_name) VALUES(309, 'database_sound_beads');
+INSERT INTO sound(_id, file_name) VALUES(310, 'database_sound_bear');
+INSERT INTO sound(_id, file_name) VALUES(311, 'database_sound_beaver');
+INSERT INTO sound(_id, file_name) VALUES(312, 'database_sound_beehive');
+INSERT INTO sound(_id, file_name) VALUES(313, 'database_sound_bell');
+INSERT INTO sound(_id, file_name) VALUES(314, 'database_sound_bird');
+INSERT INTO sound(_id, file_name) VALUES(315, 'database_sound_bread');
+INSERT INTO sound(_id, file_name) VALUES(316, 'database_sound_bumblebee');
+INSERT INTO sound(_id, file_name) VALUES(317, 'database_sound_butterfly');
+INSERT INTO sound(_id, file_name) VALUES(318, 'database_sound_cake');
+INSERT INTO sound(_id, file_name) VALUES(319, 'database_sound_cake_2');
+INSERT INTO sound(_id, file_name) VALUES(320, 'database_sound_camomile');
+INSERT INTO sound(_id, file_name) VALUES(321, 'database_sound_candy');
+INSERT INTO sound(_id, file_name) VALUES(322, 'database_sound_car');
+INSERT INTO sound(_id, file_name) VALUES(323, 'database_sound_carrot');
+INSERT INTO sound(_id, file_name) VALUES(324, 'database_sound_cat');
+INSERT INTO sound(_id, file_name) VALUES(325, 'database_sound_catfish');
+INSERT INTO sound(_id, file_name) VALUES(326, 'database_sound_chair');
+INSERT INTO sound(_id, file_name) VALUES(327, 'database_sound_chick');
+INSERT INTO sound(_id, file_name) VALUES(328, 'database_sound_chiken');
+INSERT INTO sound(_id, file_name) VALUES(329, 'database_sound_clover');
+INSERT INTO sound(_id, file_name) VALUES(330, 'database_sound_coil');
+INSERT INTO sound(_id, file_name) VALUES(331, 'database_sound_compass');
+INSERT INTO sound(_id, file_name) VALUES(332, 'database_sound_condensed milk');
+INSERT INTO sound(_id, file_name) VALUES(333, 'database_sound_cook');
+INSERT INTO sound(_id, file_name) VALUES(334, 'database_sound_corn');
+INSERT INTO sound(_id, file_name) VALUES(335, 'database_sound_cow');
+INSERT INTO sound(_id, file_name) VALUES(336, 'database_sound_crab');
+INSERT INTO sound(_id, file_name) VALUES(337, 'database_sound_cup');
+INSERT INTO sound(_id, file_name) VALUES(338, 'database_sound_dog');
+INSERT INTO sound(_id, file_name) VALUES(339, 'database_sound_drum');
+INSERT INTO sound(_id, file_name) VALUES(340, 'database_sound_excavator');
+INSERT INTO sound(_id, file_name) VALUES(341, 'database_sound_family');
+INSERT INTO sound(_id, file_name) VALUES(342, 'database_sound_fire');
+INSERT INTO sound(_id, file_name) VALUES(343, 'database_sound_fish');
+INSERT INTO sound(_id, file_name) VALUES(344, 'database_sound_footprints');
+INSERT INTO sound(_id, file_name) VALUES(345, 'database_sound_fountain');
+INSERT INTO sound(_id, file_name) VALUES(346, 'database_sound_frog');
+INSERT INTO sound(_id, file_name) VALUES(347, 'database_sound_fur coat');
+INSERT INTO sound(_id, file_name) VALUES(348, 'database_sound_futher');
+INSERT INTO sound(_id, file_name) VALUES(349, 'database_sound_giraffe');
+INSERT INTO sound(_id, file_name) VALUES(350, 'database_sound_gnome');
+INSERT INTO sound(_id, file_name) VALUES(351, 'database_sound_goat');
+INSERT INTO sound(_id, file_name) VALUES(352, 'database_sound_goldfinch');
+INSERT INTO sound(_id, file_name) VALUES(353, 'database_sound_grain');
+INSERT INTO sound(_id, file_name) VALUES(354, 'database_sound_gun');
+INSERT INTO sound(_id, file_name) VALUES(355, 'database_sound_hare');
+INSERT INTO sound(_id, file_name) VALUES(356, 'database_sound_hat');
+INSERT INTO sound(_id, file_name) VALUES(357, 'database_sound_hat_2');
+INSERT INTO sound(_id, file_name) VALUES(358, 'database_sound_hedgehog');
+INSERT INTO sound(_id, file_name) VALUES(359, 'database_sound_hippopotamus');
+INSERT INTO sound(_id, file_name) VALUES(360, 'database_sound_honey');
+INSERT INTO sound(_id, file_name) VALUES(361, 'database_sound_horse');
+INSERT INTO sound(_id, file_name) VALUES(363, 'database_sound_hug');
+INSERT INTO sound(_id, file_name) VALUES(364, 'database_sound_icecream');
+INSERT INTO sound(_id, file_name) VALUES(365, 'database_sound_iron');
+INSERT INTO sound(_id, file_name) VALUES(366, 'database_sound_island');
+INSERT INTO sound(_id, file_name) VALUES(367, 'database_sound_jam');
+INSERT INTO sound(_id, file_name) VALUES(368, 'database_sound_kangaroo');
+INSERT INTO sound(_id, file_name) VALUES(369, 'database_sound_lancet_fish');
+INSERT INTO sound(_id, file_name) VALUES(370, 'database_sound_menu');
+INSERT INTO sound(_id, file_name) VALUES(371, 'database_sound_monkey');
+INSERT INTO sound(_id, file_name) VALUES(372, 'database_sound_moon');
+INSERT INTO sound(_id, file_name) VALUES(373, 'database_sound_mosquito');
+INSERT INTO sound(_id, file_name) VALUES(374, 'database_sound_mouse');
+INSERT INTO sound(_id, file_name) VALUES(375, 'database_sound_mushroom');
+INSERT INTO sound(_id, file_name) VALUES(376, 'database_sound_nest');
+INSERT INTO sound(_id, file_name) VALUES(377, 'database_sound_orange');
+INSERT INTO sound(_id, file_name) VALUES(378, 'database_sound_owl');
+INSERT INTO sound(_id, file_name) VALUES(379, 'database_sound_penguin');
+INSERT INTO sound(_id, file_name) VALUES(380, 'database_sound_pie');
+INSERT INTO sound(_id, file_name) VALUES(381, 'database_sound_poppy');
+INSERT INTO sound(_id, file_name) VALUES(382, 'database_sound_raccoon');
+INSERT INTO sound(_id, file_name) VALUES(383, 'database_sound_rainbow');
+INSERT INTO sound(_id, file_name) VALUES(384, 'database_sound_raincoat');
+INSERT INTO sound(_id, file_name) VALUES(385, 'database_sound_rhino');
+INSERT INTO sound(_id, file_name) VALUES(386, 'database_sound_ruff');
+INSERT INTO sound(_id, file_name) VALUES(387, 'database_sound_ship');
+INSERT INTO sound(_id, file_name) VALUES(388, 'database_sound_snake');
+INSERT INTO sound(_id, file_name) VALUES(389, 'database_sound_sparrow');
+INSERT INTO sound(_id, file_name) VALUES(390, 'database_sound_squirrel');
+INSERT INTO sound(_id, file_name) VALUES(391, 'database_sound_stork');
+INSERT INTO sound(_id, file_name) VALUES(392, 'database_sound_sun');
+INSERT INTO sound(_id, file_name) VALUES(393, 'database_sound_sunflower');
+INSERT INTO sound(_id, file_name) VALUES(394, 'database_sound_swallow');
+INSERT INTO sound(_id, file_name) VALUES(395, 'database_sound_threads');
+INSERT INTO sound(_id, file_name) VALUES(396, 'database_sound_thumbelina');
+INSERT INTO sound(_id, file_name) VALUES(397, 'database_sound_toad');
+INSERT INTO sound(_id, file_name) VALUES(398, 'database_sound_turkey');
+INSERT INTO sound(_id, file_name) VALUES(399, 'database_sound_turkey_female');
+INSERT INTO sound(_id, file_name) VALUES(400, 'database_sound_turtle');
+INSERT INTO sound(_id, file_name) VALUES(401, 'database_sound_walrus');
+INSERT INTO sound(_id, file_name) VALUES(402, 'database_sound_watermelon');
+INSERT INTO sound(_id, file_name) VALUES(403, 'database_sound_wolf');
+INSERT INTO sound(_id, file_name) VALUES(404, 'database_sound_zebra');
+INSERT INTO sound(_id, file_name) VALUES(405, 'database_tv_set');
+INSERT INTO sound(_id, file_name) VALUES(406, 'databse_sound_whirligig');
 
 /* 
 ***************************
