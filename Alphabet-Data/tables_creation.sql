@@ -519,8 +519,8 @@ INSERT INTO sound(_id, file_name) VALUES(401, 'database_sound_walrus');
 INSERT INTO sound(_id, file_name) VALUES(402, 'database_sound_watermelon');
 INSERT INTO sound(_id, file_name) VALUES(403, 'database_sound_wolf');
 INSERT INTO sound(_id, file_name) VALUES(404, 'database_sound_zebra');
-INSERT INTO sound(_id, file_name) VALUES(405, 'database_tv_set');
-INSERT INTO sound(_id, file_name) VALUES(406, 'databse_sound_whirligig');
+INSERT INTO sound(_id, file_name) VALUES(405, 'database_sound_tv_set');
+INSERT INTO sound(_id, file_name) VALUES(406, 'database_sound_whirligig');
 
 /* 
 ***************************
