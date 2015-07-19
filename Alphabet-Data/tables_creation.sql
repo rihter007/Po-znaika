@@ -524,6 +524,33 @@ INSERT INTO sound(_id, file_name) VALUES(406, 'database_sound_whirligig');
 
 /* 
 ***************************
+special_sound table
+
+Represents special sound selection by their type.
+For example: 'Good', 'Well done'
+Following categories:
+-813790127 - crc32 of 'Cheer'
+1335967988 - crc32 of 'Notice'
+2010528955 - crc32 of 'TryAgain'
+
+CREATE TABLE special_sound (
+    _id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
+	type INTEGER NOT NULL,
+	sound_id INTEGER NOT NULL,
+	
+	FOREIGN KEY (sound_id) REFERENCES sound(id),
+	
+	UNIQUE (sound_id) ON CONFLICT FAIL
+);
+***************************
+*/
+INSERT INTO special_sound(type, sound_id) VALUES(-813790127, 1);
+INSERT INTO special_sound(type, sound_id) VALUES(-813790127, 2);
+INSERT INTO special_sound(type, sound_id) VALUES(1335967988, 3);
+INSERT INTO special_sound(type, sound_id) VALUES(2010528955, 4);
+
+/* 
+***************************
 exercise table
 Here:
 type column represents hardcoded identifiers of exercise type:
