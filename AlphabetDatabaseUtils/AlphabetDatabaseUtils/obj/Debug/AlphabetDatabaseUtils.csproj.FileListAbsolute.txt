@@ -1,0 +1,6 @@
+D:\po-znaika\Repository\Po-znaika\AlphabetDatabaseUtils\AlphabetDatabaseUtils\bin\Debug\AlphabetDatabaseUtils.exe.config
+D:\po-znaika\Repository\Po-znaika\AlphabetDatabaseUtils\AlphabetDatabaseUtils\bin\Debug\AlphabetDatabaseUtils.exe
+D:\po-znaika\Repository\Po-znaika\AlphabetDatabaseUtils\AlphabetDatabaseUtils\bin\Debug\AlphabetDatabaseUtils.pdb
+D:\po-znaika\Repository\Po-znaika\AlphabetDatabaseUtils\AlphabetDatabaseUtils\obj\Debug\AlphabetDatabaseUtils.csprojResolveAssemblyReference.cache
+D:\po-znaika\Repository\Po-znaika\AlphabetDatabaseUtils\AlphabetDatabaseUtils\obj\Debug\AlphabetDatabaseUtils.exe
+D:\po-znaika\Repository\Po-znaika\AlphabetDatabaseUtils\AlphabetDatabaseUtils\obj\Debug\AlphabetDatabaseUtils.pdb
