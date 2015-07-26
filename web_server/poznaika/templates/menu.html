@@ -4,4 +4,8 @@
 <A class="menu_link" href="/contacts/">Контакты</A>
 <A class="menu_link" href="/about/">О проекте</A>
 
+{% if is_logged %}
+    Пользователь: {{user}} (<A href="/accounts/logout/">выйти</A>)
+{% endif %}
+
 </div>
