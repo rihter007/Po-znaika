@@ -8,6 +8,8 @@ import android.text.TextUtils;
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
 
+import java.util.Arrays;
+
 import ru.po_znaika.alphabet.database.DatabaseHelpers;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
@@ -19,6 +21,7 @@ interface IMediaPlayerManager
 {
     void play(int soundId) throws CommonException;
     void play(@NonNull AlphabetDatabase.SoundType soundType) throws CommonException;
+    void playSequentially(int[] soundsResourceId) throws CommonException;
     void pause();
     void resume();
     void stop();
@@ -35,27 +38,19 @@ class MediaPlayerManager implements IMediaPlayerManager
     @Override
     public void play(int soundResourceId) throws CommonException
     {
-        if (m_mediaPlayer != null)
-        {
-            m_mediaPlayer.stop();
-            m_mediaPlayer = null;
-        }
+        resetInternalState();
 
-        m_mediaPlayer = MediaPlayer.create(m_context, soundResourceId);
-        if (m_mediaPlayer == null)
+        m_currentMediaPlayer = MediaPlayer.create(m_context, soundResourceId);
+        if (m_currentMediaPlayer == null)
             throw new CommonException(CommonResultCode.InvalidArgument);
 
-        m_mediaPlayer.start();
+        m_currentMediaPlayer.start();
     }
 
     @Override
     public void play(@NonNull AlphabetDatabase.SoundType soundType) throws CommonException
     {
-        if (m_mediaPlayer != null)
-        {
-            m_mediaPlayer.stop();
-            m_mediaPlayer = null;
-        }
+        resetInternalState();
 
         final String soundFileName = m_alphabetDatabase.getRandomSoundFileNameByType(soundType);
         if (TextUtils.isEmpty(soundFileName))
@@ -64,33 +59,90 @@ class MediaPlayerManager implements IMediaPlayerManager
         if (soundResourceId == 0)
             throw new CommonException(CommonResultCode.InvalidExternalSource);
 
-        m_mediaPlayer = MediaPlayer.create(m_context, soundResourceId);
-        m_mediaPlayer.start();
+        m_currentMediaPlayer = MediaPlayer.create(m_context, soundResourceId);
+        if (m_currentMediaPlayer == null)
+            throw new CommonException(CommonResultCode.InvalidArgument);
+        m_currentMediaPlayer.start();
+    }
+
+    @Override
+    public void playSequentially(int[] soundsResourceId) throws CommonException
+    {
+        resetInternalState();
+
+        m_soundsSequence = Arrays.copyOf(soundsResourceId, soundsResourceId.length);
+        m_currentMediaPlayer = MediaPlayer.create(m_context, soundsResourceId[0]);
+        if (m_currentMediaPlayer == null)
+            throw new CommonException(CommonResultCode.InvalidArgument);
+        m_currentMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            @Override
+            public void onCompletion(MediaPlayer mp)
+            {
+                internalPlaySound();
+            }
+        });
+        m_currentMediaPlayer.start();
     }
 
     @Override
     public void pause()
     {
-        if (m_mediaPlayer != null)
-            m_mediaPlayer.pause();
+        if (m_currentMediaPlayer != null)
+            m_currentMediaPlayer.pause();
     }
 
     @Override
     public void resume()
     {
-        if (m_mediaPlayer != null)
-            m_mediaPlayer.start();
+        if (m_currentMediaPlayer != null)
+            m_currentMediaPlayer.start();
     }
 
     @Override
     public void stop()
     {
-        if (m_mediaPlayer != null)
-            m_mediaPlayer.stop();
+        if (m_currentMediaPlayer != null)
+            m_currentMediaPlayer.stop();
+    }
+
+    private void resetInternalState()
+    {
+        if (m_currentMediaPlayer != null)
+        {
+            m_currentMediaPlayer.stop();
+            m_currentMediaPlayer = null;
+        }
+
+        m_soundsSequence = null;
+        m_currentSoundIndex = 0;
+    }
+
+    private void internalPlaySound()
+    {
+        ++m_currentSoundIndex;
+        if (m_currentSoundIndex < m_soundsSequence.length)
+        {
+            m_currentMediaPlayer = MediaPlayer.create(m_context, m_soundsSequence[m_currentSoundIndex]);
+            if (m_currentMediaPlayer != null) // Fail silently
+            {
+                m_currentMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+                {
+                    @Override
+                    public void onCompletion(MediaPlayer mp)
+                    {
+                        internalPlaySound();
+                    }
+                });
+                m_currentMediaPlayer.start();
+            }
+        }
     }
 
     private AlphabetDatabase m_alphabetDatabase;
     private Context m_context;
 
-    private MediaPlayer m_mediaPlayer;
+    private MediaPlayer m_currentMediaPlayer;
+    private int[] m_soundsSequence;
+    private int m_currentSoundIndex;
 }
