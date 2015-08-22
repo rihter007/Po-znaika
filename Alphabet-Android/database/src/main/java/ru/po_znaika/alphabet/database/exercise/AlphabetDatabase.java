@@ -16,6 +16,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -462,7 +463,7 @@ public final class AlphabetDatabase
      * SQL-expressions for theory_page table
      */
     private static final String ExtractTheoryPageById =
-            "SELECT image_id, image_redirect_url, sound_id, message " +
+            "SELECT image_id, image_redirect_url, sound_id, sound2_id, message " +
             "FROM theory_page " +
             "WHERE _id = ?";
 
@@ -969,7 +970,6 @@ public final class AlphabetDatabase
 
         try
         {
-            //TODO: New table structure
             final Integer theoryPageIdObject = theoryPageId;
             dataReader = m_databaseConnection.rawQuery(ExtractTheoryPageById, new String[]{theoryPageIdObject.toString()});
 
@@ -978,10 +978,30 @@ public final class AlphabetDatabase
                 result = new TheoryPageInfo();
 
                 result.id = theoryPageId;
-                result.imageName = getImageFileNameById(dataReader.getInt(0));
-                result.imageRedirectUrl = dataReader.getString(1);
-                //result.soundName = getSoundFileNameById(dataReader.getInt(2));
-                result.message = dataReader.getString(3);
+                if (!dataReader.isNull(0))
+                    result.imageName = getImageFileNameById(dataReader.getInt(0));
+                if (!dataReader.isNull(1))
+                    result.imageRedirectUrl = dataReader.getString(1);
+
+                {
+                    final int StartSoundIndex = 2;
+                    final int EndSoundIndex = 3;
+
+                    List<String> sounds = new ArrayList<>();
+                    for (int soundIndex = StartSoundIndex; soundIndex <= EndSoundIndex && !dataReader.isNull(soundIndex);
+                         ++soundIndex)
+                    {
+                        final String soundName = getSoundFileNameById(dataReader.getInt(soundIndex));
+                        if (TextUtils.isEmpty(soundName))
+                            throw new CommonException(CommonResultCode.InvalidExternalSource);
+                        sounds.add(soundName);
+                    }
+                    result.soundsName = new String[sounds.size()];
+                    sounds.toArray(result.soundsName);
+                }
+
+                if (!dataReader.isNull(4))
+                    result.message = dataReader.getString(4);
             }
         }
         catch (Exception exp)
