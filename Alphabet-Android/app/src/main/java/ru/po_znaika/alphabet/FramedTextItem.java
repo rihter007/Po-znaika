@@ -15,6 +15,12 @@ public class FramedTextItem
        framedItemLayout.setBackgroundColor(color);
     }
 
+    public static void setTextColor(@NonNull RelativeLayout framedItemLayout, int color)
+    {
+        TextView textView = (TextView) framedItemLayout.findViewById(R.id.textView);
+        textView.setTextColor(color);
+    }
+
     public static void setInternalColor(@NonNull RelativeLayout framedItemLayout, int color)
     {
         RelativeLayout internalLayout = (RelativeLayout)framedItemLayout.findViewById(R.id.internalLayout);

@@ -4,7 +4,6 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -24,6 +23,7 @@ import android.widget.TextView;
 import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.DisplayMetricsHelper;
 import com.arz_x.android.product_tracer.ITracerGetter;
 import com.arz_x.tracer.ITracer;
 import com.arz_x.tracer.ProductTracer;
@@ -58,7 +58,7 @@ public class TheoryPageFragment extends Fragment
         public int theoryImageResourceId;
         public String theoryImageRedirectUrl;
         public String theoryMessage;
-        public int theorySoundResourceId;
+        public int[] theorySoundsResourceId;
 
         public TheoryPageState()
         {
@@ -69,7 +69,13 @@ public class TheoryPageFragment extends Fragment
             theoryImageResourceId = parcel.readInt();
             theoryImageRedirectUrl = (String)parcel.readValue(String.class.getClassLoader());
             theoryMessage = (String)parcel.readValue(String.class.getClassLoader());
-            theorySoundResourceId = parcel.readInt();
+
+            final int soundsNumber = parcel.readInt();
+            if (soundsNumber > 0)
+            {
+                this.theorySoundsResourceId = new int[soundsNumber];
+                parcel.readIntArray(this.theorySoundsResourceId);
+            }
         }
 
         @Override
@@ -84,7 +90,15 @@ public class TheoryPageFragment extends Fragment
             out.writeInt(theoryImageResourceId);
             out.writeValue(theoryImageRedirectUrl);
             out.writeValue(theoryMessage);
-            out.writeInt(theorySoundResourceId);
+            if (theorySoundsResourceId == null)
+            {
+                out.writeInt(0);
+            }
+            else
+            {
+                out.writeInt(theorySoundsResourceId.length);
+                out.writeIntArray(theorySoundsResourceId);
+            }
         }
 
         public static final Creator CREATOR = new Creator()
@@ -232,19 +246,36 @@ public class TheoryPageFragment extends Fragment
                 }
             }
 
-            if (!TextUtils.isEmpty(theoryPageInfo.soundName))
+            if (theoryPageInfo.soundsName != null)
             {
-                m_state.theorySoundResourceId = DatabaseHelpers.getSoundIdByName(getResources()
-                        , theoryPageInfo.soundName);
+                int[] theorySounds = new int[theoryPageInfo.soundsName.length];
 
-                if (m_state.theorySoundResourceId == 0)
+                for (int i = 0; i < theoryPageInfo.soundsName.length; ++i)
                 {
-                    ProductTracer.traceMessage(m_tracer
-                            , TraceLevel.Error
-                            , LogTag
-                            , String.format("Failed to get sound resource id for '%s'", theoryPageInfo.soundName));
-                    throw new CommonException(CommonResultCode.InvalidExternalSource);
+                    final String soundName = theoryPageInfo.soundsName[i];
+                    if (TextUtils.isEmpty(soundName))
+                    {
+                        ProductTracer.traceMessage(m_tracer
+                                , TraceLevel.Error
+                                , LogTag
+                                , "Empty sound name");
+                        throw new CommonException(CommonResultCode.InvalidExternalSource);
+                    }
+
+                    final int theorySoundResourceId = DatabaseHelpers.getSoundIdByName(getResources(), soundName);
+                    if (theorySoundResourceId == 0)
+                    {
+                        ProductTracer.traceMessage(m_tracer
+                                , TraceLevel.Error
+                                , LogTag
+                                , String.format("Failed to get sound resource id for '%s'", soundName));
+                        throw new CommonException(CommonResultCode.InvalidExternalSource);
+                    }
+
+                    theorySounds[i] = theorySoundResourceId;
                 }
+
+                m_state.theorySoundsResourceId = theorySounds;
             }
 
             m_state.theoryImageRedirectUrl = theoryPageInfo.imageRedirectUrl;
@@ -276,6 +307,18 @@ public class TheoryPageFragment extends Fragment
         if (m_state.theoryImageResourceId != 0)
         {
             ImageView theoryImageView = (ImageView) fragmentView.findViewById(R.id.imageInformationImageView);
+
+            // programmatically scale to square size
+            {
+                DisplayMetricsHelper displayMetricsHelper = new DisplayMetricsHelper(getActivity());
+                final int imageHeight = displayMetricsHelper.getHeightInProportionDp(1.0 / 7.0, 0);
+                final int imageWidth = displayMetricsHelper.getDisplayWidth()
+                        - 2 * (int) getResources().getDimension(R.dimen.small_margin);
+
+                ViewGroup.LayoutParams imageLayoutParams = theoryImageView.getLayoutParams();
+                imageLayoutParams.height = imageLayoutParams.width = Math.min(imageHeight, imageWidth);
+                theoryImageView.setLayoutParams(imageLayoutParams);
+            }
             theoryImageView.setImageDrawable(getResources().getDrawable(m_state.theoryImageResourceId));
 
             if (!TextUtils.isEmpty(m_state.theoryImageRedirectUrl))
@@ -314,7 +357,7 @@ public class TheoryPageFragment extends Fragment
         }
 
         // process sound
-        if (m_state.theorySoundResourceId != 0)
+        if (m_state.theorySoundsResourceId != null)
         {
             ImageView soundPlayImageView = (ImageView)fragmentView.findViewById(R.id.soundImageView);
             soundPlayImageView.setOnClickListener(new View.OnClickListener()
@@ -325,6 +368,8 @@ public class TheoryPageFragment extends Fragment
                     onPlaySoundButtonClick();
                 }
             });
+
+            onPlaySoundButtonClick();
         }
         else
         {
@@ -388,17 +433,17 @@ public class TheoryPageFragment extends Fragment
 
     private void onPlaySoundButtonClick()
     {
-        if (m_state.theorySoundResourceId != 0)
+        if (m_state.theorySoundsResourceId == null)
             return;
 
         try
         {
-            m_theorySoundPlayer.play(m_state.theorySoundResourceId);
+            m_theorySoundPlayer.playSequentially(m_state.theorySoundsResourceId);
         }
         catch (CommonException exp)
         {
             ProductTracer.traceException(m_tracer
-                    , TraceLevel.Error
+                    , TraceLevel.Assert
                     , LogTag
                     , exp);
         }

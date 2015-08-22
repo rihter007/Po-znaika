@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/standard_background"
     tools:context="ru.po_znaika.alphabet.ImageSelectionFragment">
 
     <LinearLayout
@@ -45,17 +46,18 @@
             android:layout_weight="4"
             android:orientation="horizontal">
 
-            <RelativeLayout
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="0px"
                 android:layout_height="match_parent"
                 android:id="@+id/leftLayout"
                 android:layout_weight="45">
 
-                <RelativeLayout
-                    android:layout_width="0px"
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
                     android:layout_height="0px"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
+                    android:layout_weight="45"
                     android:id="@+id/topLeftLayout">
 
                     <ImageView
@@ -68,13 +70,20 @@
                         android:layout_marginRight="@dimen/min_margin"
                         android:layout_marginEnd="@dimen/min_margin"
                         android:id="@+id/topLeftImageView" />
-                </RelativeLayout>
+                </LinearLayout>
 
-                <RelativeLayout
-                    android:layout_width="0px"
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
                     android:layout_height="0px"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
+                    android:layout_weight="10">
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="0px"
+                    android:layout_weight="45"
                     android:id="@+id/topRightLayout">
 
                     <ImageView
@@ -87,9 +96,9 @@
                         android:layout_marginRight="@dimen/min_margin"
                         android:layout_marginEnd="@dimen/min_margin"
                         android:id="@+id/topRightImageView" />
-                </RelativeLayout>
+                </LinearLayout>
 
-            </RelativeLayout>
+            </LinearLayout>
 
             <RelativeLayout
                 android:layout_width="0px"
@@ -97,17 +106,17 @@
                 android:layout_weight="10">
             </RelativeLayout>
 
-            <RelativeLayout
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="0px"
                 android:layout_height="match_parent"
                 android:id="@+id/rightLayout"
                 android:layout_weight="45">
 
-                <RelativeLayout
-                    android:layout_width="0px"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="0px"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
+                    android:layout_weight="45"
                     android:id="@+id/bottomLeftLayout">
 
                     <ImageView
@@ -120,13 +129,20 @@
                         android:layout_marginRight="@dimen/min_margin"
                         android:layout_marginEnd="@dimen/min_margin"
                         android:id="@+id/bottomLeftImageView" />
-                </RelativeLayout>
+                </LinearLayout>
 
-                <RelativeLayout
-                    android:layout_width="0px"
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
                     android:layout_height="0px"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
+                    android:layout_weight="10">
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="0px"
+                    android:layout_weight="45"
                     android:id="@+id/bottomRightLayout">
 
                     <ImageView
@@ -139,9 +155,9 @@
                         android:layout_marginRight="@dimen/min_margin"
                         android:layout_marginEnd="@dimen/min_margin"
                         android:id="@+id/bottomRightImageView" />
-                </RelativeLayout>
+                </LinearLayout>
 
-            </RelativeLayout>
+            </LinearLayout>
         </LinearLayout>
 
         <RelativeLayout

@@ -273,7 +273,7 @@ public final class AlphabetDatabase
         public String imageRedirectUrl;
 
         /* Optional: sound id which contains oral theory description */
-        public String soundName;
+        public String[] soundsName;
 
         /* Optional: Text information theory description */
         public String message;
@@ -969,6 +969,7 @@ public final class AlphabetDatabase
 
         try
         {
+            //TODO: New table structure
             final Integer theoryPageIdObject = theoryPageId;
             dataReader = m_databaseConnection.rawQuery(ExtractTheoryPageById, new String[]{theoryPageIdObject.toString()});
 
@@ -979,7 +980,7 @@ public final class AlphabetDatabase
                 result.id = theoryPageId;
                 result.imageName = getImageFileNameById(dataReader.getInt(0));
                 result.imageRedirectUrl = dataReader.getString(1);
-                result.soundName = getSoundFileNameById(dataReader.getInt(2));
+                //result.soundName = getSoundFileNameById(dataReader.getInt(2));
                 result.message = dataReader.getString(3);
             }
         }

@@ -15,7 +15,8 @@ public enum TraceLevel
     Warning(300),
     Important(400),
     Error(500),
-    Always(1000);
+    Always(1000),
+    Assert(2000);
 
     private static Map<Integer, TraceLevel> ValuesMap = new HashMap<Integer, TraceLevel>()
     {

@@ -92,6 +92,7 @@ public class StartActivity extends Activity
                 @Override
                 public void onClick(View v)
                 {
+
                     ProductTracer.traceMessage(m_tracer, TraceLevel.Info, LogTag, "Play is selected");
                     MainMenuActivity.startActivity(StartActivity.this);
                 }

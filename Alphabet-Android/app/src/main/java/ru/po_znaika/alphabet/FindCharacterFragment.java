@@ -11,13 +11,13 @@ import android.app.Fragment;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.arz_x.CommonException;
@@ -229,6 +229,8 @@ public class FindCharacterFragment extends Fragment
         final Bundle arguments = getArguments();
 
         final String exerciseText = arguments.getString(TextTag);
+        if (exerciseText == null)
+            throw new CommonException(CommonResultCode.InvalidArgument);
         m_text = exerciseText.split(Constant.NewLineDelimiter);
         m_searchCharacter = arguments.getChar(SearchCharacterTag);
 
@@ -254,19 +256,17 @@ public class FindCharacterFragment extends Fragment
         final int totalElementsCount = m_state.elementsSelection.getElementsCount();
         final int maxRowLength = m_state.elementsSelection.getColumnsCount();
 
-        LinearLayout[] elements = new LinearLayout[totalElementsCount];
+        RelativeLayout[] elements = new RelativeLayout[totalElementsCount];
         for (int elementIndex = 0; elementIndex < elements.length; ++elementIndex)
         {
-            elements[elementIndex] = (LinearLayout) inflater.inflate(R.layout.character_item, null, false);
+            elements[elementIndex] = (RelativeLayout) inflater.inflate(R.layout.framed_text_item, null, false);
             final int rowIndex = elementIndex / maxRowLength;
             final int columnIndex = elementIndex % maxRowLength;
 
             if ((columnIndex < m_text[rowIndex].length()) &&
                     (!Character.isWhitespace(m_text[rowIndex].charAt(columnIndex))))
             {
-                TextView textView = (TextView) elements[elementIndex].findViewById(R.id.textView);
-                final String itemText = ((Character)m_text[rowIndex].charAt(columnIndex)).toString();
-                textView.setText(itemText);
+                FramedTextItem.setText(elements[elementIndex], m_text[rowIndex].charAt(columnIndex));
 
                 elements[elementIndex].setOnClickListener(new View.OnClickListener()
                 {
@@ -302,7 +302,7 @@ public class FindCharacterFragment extends Fragment
 
         // put characters
         {
-            final int elementWidth = (m_displayMetrics.getDisplayWidthInDp() -
+            final int elementWidth = (m_displayMetrics.getDisplayWidth() -
                     2 * (int)getResources().getDimension(R.dimen.small_margin)) / MaxCharactersInRowCount;
             final int gridWidth = maxRowLength * elementWidth;
 
@@ -353,7 +353,7 @@ public class FindCharacterFragment extends Fragment
     public void markCharacterElement(int rowIndex, int columnIndex
             , @NonNull SelectionType selectionType) throws CommonException
     {
-        LinearLayout layout = m_uiElements.get(rowIndex, columnIndex);
+        RelativeLayout layout = m_uiElements.get(rowIndex, columnIndex);
         if (layout == null)
         {
             ProductTracer.traceMessage(m_tracer
@@ -388,8 +388,7 @@ public class FindCharacterFragment extends Fragment
             }
         }
 
-        TextView textView = (TextView)layout.findViewById(R.id.textView);
-        textView.setTextColor(color);
+        FramedTextItem.setTextColor(layout, color);
     }
 
     public void onBackButtonPressed()
@@ -477,5 +476,5 @@ public class FindCharacterFragment extends Fragment
     private char m_searchCharacter;
 
     private InternalState m_state;
-    private MatrixAccessor<LinearLayout> m_uiElements;
+    private MatrixAccessor<RelativeLayout> m_uiElements;
 }

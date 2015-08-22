@@ -144,11 +144,13 @@ CREATE TABLE theory_page (
 	image_id INTEGER,
 	image_redirect_url TEXT,
 	sound_id INTEGER,
+	sound2_id INTEGER,
 	message TEXT,
 	
 	FOREIGN KEY (image_id) REFERENCES image(_id),
 	FOREIGN KEY (sound_id) REFERENCES sound(_id),
-	UNIQUE(image_id, image_redirect_url, sound_id, message) ON CONFLICT FAIL
+	FOREIGN KEY (sound2_id) REFERENCES sound2_id(_id),
+	UNIQUE(image_id, image_redirect_url, sound_id, sound2_id, message) ON CONFLICT FAIL
 );
 
 -- Represents special table that contain words with certain sound
@@ -348,6 +350,68 @@ INSERT INTO image(_id, file_name) VALUES (300,'database_russian_icon_dark_ch1');
 INSERT INTO image(_id, file_name) VALUES (301,'database_russian_icon_light_ch1');
 INSERT INTO image(_id, file_name) VALUES (302,'database_russian_icon_dark_ch2');
 INSERT INTO image(_id, file_name) VALUES (303,'database_russian_icon_light_ch2');
+INSERT INTO image(_id, file_name) VALUES (304,'database_russian_icon_dark_ch3');
+INSERT INTO image(_id, file_name) VALUES (305,'database_russian_icon_light_ch3');
+INSERT INTO image(_id, file_name) VALUES (306,'database_russian_icon_dark_ch4');
+INSERT INTO image(_id, file_name) VALUES (307,'database_russian_icon_light_ch4');
+INSERT INTO image(_id, file_name) VALUES (308,'database_russian_icon_dark_ch5');
+INSERT INTO image(_id, file_name) VALUES (309,'database_russian_icon_light_ch5');
+INSERT INTO image(_id, file_name) VALUES (310,'database_russian_icon_dark_ch6');
+INSERT INTO image(_id, file_name) VALUES (311,'database_russian_icon_light_ch6');
+INSERT INTO image(_id, file_name) VALUES (312,'database_russian_icon_dark_ch7');
+INSERT INTO image(_id, file_name) VALUES (313,'database_russian_icon_light_ch7');
+INSERT INTO image(_id, file_name) VALUES (314,'database_russian_icon_dark_ch8');
+INSERT INTO image(_id, file_name) VALUES (315,'database_russian_icon_light_ch8');
+INSERT INTO image(_id, file_name) VALUES (316,'database_russian_icon_dark_ch9');
+INSERT INTO image(_id, file_name) VALUES (317,'database_russian_icon_light_ch9');
+INSERT INTO image(_id, file_name) VALUES (318,'database_russian_icon_dark_ch10');
+INSERT INTO image(_id, file_name) VALUES (319,'database_russian_icon_light_ch10');
+INSERT INTO image(_id, file_name) VALUES (320,'database_russian_icon_dark_ch11');
+INSERT INTO image(_id, file_name) VALUES (321,'database_russian_icon_light_ch11');
+INSERT INTO image(_id, file_name) VALUES (322,'database_russian_icon_dark_ch12');
+INSERT INTO image(_id, file_name) VALUES (323,'database_russian_icon_light_ch12');
+INSERT INTO image(_id, file_name) VALUES (324,'database_russian_icon_dark_ch13');
+INSERT INTO image(_id, file_name) VALUES (325,'database_russian_icon_light_ch13');
+INSERT INTO image(_id, file_name) VALUES (326,'database_russian_icon_dark_ch14');
+INSERT INTO image(_id, file_name) VALUES (327,'database_russian_icon_light_ch14');
+INSERT INTO image(_id, file_name) VALUES (328,'database_russian_icon_dark_ch15');
+INSERT INTO image(_id, file_name) VALUES (329,'database_russian_icon_light_ch15');
+INSERT INTO image(_id, file_name) VALUES (330,'database_russian_icon_dark_ch16');
+INSERT INTO image(_id, file_name) VALUES (331,'database_russian_icon_light_ch16');
+INSERT INTO image(_id, file_name) VALUES (332,'database_russian_icon_dark_ch17');
+INSERT INTO image(_id, file_name) VALUES (333,'database_russian_icon_light_ch17');
+INSERT INTO image(_id, file_name) VALUES (334,'database_russian_icon_dark_ch18');
+INSERT INTO image(_id, file_name) VALUES (335,'database_russian_icon_light_ch18');
+INSERT INTO image(_id, file_name) VALUES (336,'database_russian_icon_dark_ch19');
+INSERT INTO image(_id, file_name) VALUES (337,'database_russian_icon_light_ch19');
+INSERT INTO image(_id, file_name) VALUES (338,'database_russian_icon_dark_ch20');
+INSERT INTO image(_id, file_name) VALUES (339,'database_russian_icon_light_ch20');
+INSERT INTO image(_id, file_name) VALUES (340,'database_russian_icon_dark_ch21');
+INSERT INTO image(_id, file_name) VALUES (341,'database_russian_icon_light_ch21');
+INSERT INTO image(_id, file_name) VALUES (342,'database_russian_icon_dark_ch22');
+INSERT INTO image(_id, file_name) VALUES (343,'database_russian_icon_light_ch22');
+INSERT INTO image(_id, file_name) VALUES (344,'database_russian_icon_dark_ch23');
+INSERT INTO image(_id, file_name) VALUES (345,'database_russian_icon_light_ch23');
+INSERT INTO image(_id, file_name) VALUES (346,'database_russian_icon_dark_ch24');
+INSERT INTO image(_id, file_name) VALUES (347,'database_russian_icon_light_ch24');
+INSERT INTO image(_id, file_name) VALUES (348,'database_russian_icon_dark_ch25');
+INSERT INTO image(_id, file_name) VALUES (349,'database_russian_icon_light_ch25');
+INSERT INTO image(_id, file_name) VALUES (350,'database_russian_icon_dark_ch26');
+INSERT INTO image(_id, file_name) VALUES (351,'database_russian_icon_light_ch26');
+INSERT INTO image(_id, file_name) VALUES (352,'database_russian_icon_dark_ch27');
+INSERT INTO image(_id, file_name) VALUES (353,'database_russian_icon_light_ch27');
+INSERT INTO image(_id, file_name) VALUES (354,'database_russian_icon_dark_ch28');
+INSERT INTO image(_id, file_name) VALUES (355,'database_russian_icon_light_ch28');
+INSERT INTO image(_id, file_name) VALUES (356,'database_russian_icon_dark_ch29');
+INSERT INTO image(_id, file_name) VALUES (357,'database_russian_icon_light_ch29');
+INSERT INTO image(_id, file_name) VALUES (358,'database_russian_icon_dark_ch30');
+INSERT INTO image(_id, file_name) VALUES (359,'database_russian_icon_light_ch30');
+INSERT INTO image(_id, file_name) VALUES (360,'database_russian_icon_dark_ch31');
+INSERT INTO image(_id, file_name) VALUES (361,'database_russian_icon_light_ch31');
+INSERT INTO image(_id, file_name) VALUES (362,'database_russian_icon_dark_ch32');
+INSERT INTO image(_id, file_name) VALUES (363,'database_russian_icon_light_ch32');
+INSERT INTO image(_id, file_name) VALUES (364,'database_russian_icon_dark_ch33');
+INSERT INTO image(_id, file_name) VALUES (365,'database_russian_icon_light_ch33');
 
 /*
 ***************************
@@ -668,26 +732,24 @@ CREATE TABLE character_exercise_item_step (
 */
 
 /* Sound ch1 */
-INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(3, 1195583655, 2, 1986991965, 1);
-INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(4, 1195583655, 3, 1986991965, 2);
-INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(5, 1195583655, 4, 1986991965, 3);
-INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(6, 1195583655, 5, 1986991965, 4);
+INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
+    VALUES(1195583655, 2, 1986991965, 1);
+INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
+    VALUES(1195583655, 3, 1986991965, 2);
+INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
+    VALUES(1195583655, 4, 1986991965, 3);
 	
 /* Print ch1 */
-INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(11, 1196999958, 0, 1986991965, 11);
---INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
---    VALUES(12, 1196999958, 1, 1986991965, 12);
-INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
+INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
+    VALUES(1196999958, 0, 1986991965, 10);
+INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
+    VALUES(1196999958, 1, 1986991965, 11);
+/*INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
     VALUES(13, 1196999958, 2, 1986991965, 2);
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
     VALUES(14, 1196999958, 3, 1986991965, 14);
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-    VALUES(15, 1196999958, 4, 1986991965, 15);
+    VALUES(15, 1196999958, 4, 1986991965, 15);*/
 
 /* Handwrite ch1 */
 --INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
@@ -696,12 +758,12 @@ INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_n
 --	VALUES(21, -588490738, 1, 1986991965, 23)
 
 /* FindImage ch1 */
-INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-	VALUES(31, -1101215443, 0, 291784361, 2);
+INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
+	VALUES(-1101215443, 0, 291784361, 2);
 	
 /* Find character ch1 */
-INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
-	VALUES(41, 1879715682, 0, 291784361, 3);
+INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
+	VALUES(1879715682, 0, 291784361, 3);
 	
 /*
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
@@ -721,18 +783,19 @@ Availible formatters:
 
 -- Character 1
 
--- Sound of character 1
-INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(1, 200, 0, 'Бывает ударный и безударный');
-INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(2, 201, 0, 'а');
-INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(3, 400, 0, '<format color=''ffff0000''>А</format>ист');
-INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(4, 404, 0, 'Белк<format color=''ffff0000''>а</format>');
+-- Звук буквы А
+-- TODO: Wrong picture: Need mouth
+INSERT INTO theory_page(_id, image_id, sound_id, sound2_id, message) VALUES(1, 200, 105, 201, '<<<format color=''ffff0000''>а/format>>>');
+INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(2, 119, 355, 'З<format color=''ffff0000''>а</format>яц');
+INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(3, 98, 324, 'Кошк<format color=''ffff0000''>а</format>');
 
--- Print character 1
-INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(11, 1, 0, 'Печатный вариант буквы ''А''');
+-- Печатная буква А
+INSERT INTO theory_page(_id, image_id, sound_id, sound2_id) VALUES(10, 1, 104, 201);
+INSERT INTO theory_page(_id, image_id, sound_id, sound2_id) VALUES(11, 1, 102, 201);
 --INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(12, 5, 0, 'Прописной вариант буквы ''а''');
 --INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(13, 400, 0, '<format color=''ffff0000''>А</format>ист');
-INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(14, 401, 0, 'лош<format color=''ffff0000''>а</format>дь');
-INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(15, 402, 0, 'сов<format color=''ffff0000''>а</format>');
+--INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(14, 401, 0, 'лош<format color=''ffff0000''>а</format>дь');
+--INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(15, 402, 0, 'сов<format color=''ffff0000''>а</format>');
 
 -- Handwrite character 1
 --INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(21, 5, 0, 'Прописаной вариант буквы ''а''');

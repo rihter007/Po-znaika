@@ -21,7 +21,7 @@ public class DisplayMetricsHelper
         m_screenWidthInPx = displayMetrics.widthPixels;
     }
 
-    public int getDisplayWidthInDp()
+    public int getDisplayWidth()
     {
         return m_screenWidthInPx;
     }
