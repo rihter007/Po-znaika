@@ -2,7 +2,7 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#ff95d3f6"
+    android:background="@color/standard_background"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
@@ -22,7 +22,7 @@
             <ImageView
                 android:layout_width="@dimen/help_icon_size"
                 android:layout_height="@dimen/help_icon_size"
-                android:id="@+id/characterImageView"
+                android:id="@+id/exerciseIconImageView"
                 android:layout_centerVertical="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
@@ -43,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="0px"
             android:layout_weight="3"
-            android:background="@drawable/image_square">
+            android:background="@color/internal_elements_background">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -53,46 +53,46 @@
                 android:layout_centerHorizontal="true"/>
         </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="2">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="2">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text=""
-            android:id="@+id/textInformationTextView"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"/>
-    </RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text=""
+                android:id="@+id/textInformationTextView"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="1"
-        android:layout_marginBottom="@dimen/small_margin">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:layout_marginBottom="@dimen/small_margin">
 
-        <ImageView
-            android:layout_width="@dimen/help_icon_size"
-            android:layout_height="@dimen/help_icon_size"
-            android:id="@+id/backImageView"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:src="@drawable/arrow_back"/>
+            <ImageView
+                android:layout_width="@dimen/help_icon_size"
+                android:layout_height="@dimen/help_icon_size"
+                android:id="@+id/backImageView"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/arrow_back"/>
 
-        <ImageView
-            android:layout_width="@dimen/help_icon_size"
-            android:layout_height="@dimen/help_icon_size"
-            android:id="@+id/forwardImageView"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/arrow_forward"/>
+            <ImageView
+                android:layout_width="@dimen/help_icon_size"
+                android:layout_height="@dimen/help_icon_size"
+                android:id="@+id/forwardImageView"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/arrow_forward"/>
 
-    </RelativeLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 

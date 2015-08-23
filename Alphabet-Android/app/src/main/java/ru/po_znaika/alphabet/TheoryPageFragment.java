@@ -4,6 +4,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -168,6 +169,7 @@ public class TheoryPageFragment extends Fragment
         }
         catch (Exception exp)
         {
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
             AlertDialogHelper.showMessageBox(getActivity(),
                     getResources().getString(R.string.alert_title),
                     getResources().getString(R.string.failed_action),
@@ -311,7 +313,7 @@ public class TheoryPageFragment extends Fragment
             // programmatically scale to square size
             {
                 DisplayMetricsHelper displayMetricsHelper = new DisplayMetricsHelper(getActivity());
-                final int imageHeight = displayMetricsHelper.getHeightInProportionDp(1.0 / 7.0, 0);
+                final int imageHeight = displayMetricsHelper.getHeightInProportionDp(3 * (1.0 / 7.0), 0);
                 final int imageWidth = displayMetricsHelper.getDisplayWidth()
                         - 2 * (int) getResources().getDimension(R.dimen.small_margin);
 
@@ -406,7 +408,7 @@ public class TheoryPageFragment extends Fragment
         // set buttons callbacks
         {
             {
-                Button forwardButton = (Button) fragmentView.findViewById(R.id.forwardButton);
+                ImageView forwardButton = (ImageView) fragmentView.findViewById(R.id.forwardImageView);
                 forwardButton.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
@@ -418,7 +420,7 @@ public class TheoryPageFragment extends Fragment
             }
 
             {
-                Button backButton = (Button) fragmentView.findViewById(R.id.backButton);
+                ImageView backButton = (ImageView) fragmentView.findViewById(R.id.backImageView);
                 backButton.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
