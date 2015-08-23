@@ -116,12 +116,10 @@ CREATE TABLE character_exercise_item (
 	_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
 	exercise_id INTEGER NOT NULL,
 	character_exercise_id INTEGER NOT NULL,
-	icon_id INTEGER,
 	menu_element_type INTEGER NOT NULL,
 	
 	FOREIGN KEY(exercise_id) REFERENCES exercise(_id),
 	FOREIGN KEY(character_exercise_id) REFERENCES character_exercise(_id),
-	FOREIGN KEY(icon_id) REFERENCES image(_id),
 	
 	UNIQUE (character_exercise_id, exercise_id) ON CONFLICT FAIL,
 	UNIQUE (character_exercise_id, menu_element_type) ON CONFLICT FAIL
@@ -733,17 +731,17 @@ CREATE TABLE character_exercise_item_step (
 
 /* Sound ch1 */
 INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
-    VALUES(1195583655, 2, 1986991965, 1);
+    VALUES(1, 2, 1986991965, 1);
 INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
-    VALUES(1195583655, 3, 1986991965, 2);
+    VALUES(1, 3, 1986991965, 2);
 INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
-    VALUES(1195583655, 4, 1986991965, 3);
+    VALUES(1, 4, 1986991965, 3);
 	
 /* Print ch1 */
 INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
-    VALUES(1196999958, 0, 1986991965, 10);
+    VALUES(2, 0, 1986991965, 10);
 INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
-    VALUES(1196999958, 1, 1986991965, 11);
+    VALUES(2, 1, 1986991965, 11);
 /*INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
     VALUES(13, 1196999958, 2, 1986991965, 2);
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
@@ -759,11 +757,11 @@ INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_n
 
 /* FindImage ch1 */
 INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
-	VALUES(-1101215443, 0, 291784361, 2);
+	VALUES(4, 0, 291784361, 2);
 	
 /* Find character ch1 */
 INSERT INTO character_exercise_item_step(character_exercise_item_id, step_number, action, value)
-	VALUES(1879715682, 0, 291784361, 3);
+	VALUES(5, 0, 291784361, 3);
 	
 /*
 INSERT INTO character_exercise_item_step(_id, character_exercise_item_id, step_number, action, value)
@@ -785,7 +783,7 @@ Availible formatters:
 
 -- Звук буквы А
 -- TODO: Wrong picture: Need mouth
-INSERT INTO theory_page(_id, image_id, sound_id, sound2_id, message) VALUES(1, 200, 105, 201, '<<<format color=''ffff0000''>а/format>>>');
+INSERT INTO theory_page(_id, image_id, sound_id, sound2_id, message) VALUES(1, 1, 105, 201, '<<<format color=''ffff0000''>а</format>>>');
 INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(2, 119, 355, 'З<format color=''ffff0000''>а</format>яц');
 INSERT INTO theory_page(_id, image_id, sound_id, message) VALUES(3, 98, 324, 'Кошк<format color=''ffff0000''>а</format>');
 

@@ -376,9 +376,9 @@ public final class AlphabetDatabase
                     "      AND (ce._id = ?)";
 
     private static final String ExtractCharacterItemByIdSqlStatement =
-            "SELECT exercise_id, character_exercise_id, icon_id, menu_element_type FROM character_exercise_item WHERE _id = ?";
+            "SELECT exercise_id, character_exercise_id,  menu_element_type FROM character_exercise_item WHERE _id = ?";
     private static final String ExtractAllCharacterExerciseItemsByCharacterExerciseIdSqlStatement =
-            "SELECT _id, exercise_id, icon_id, menu_element_type " +
+            "SELECT _id, exercise_id, menu_element_type " +
                     "FROM character_exercise_item " +
                     "WHERE character_exercise_id = ?";
     private static final String ExtractAllCharacterExerciseStepsByCharacterExerciseItemIdSqlStatement =
@@ -810,7 +810,7 @@ public final class AlphabetDatabase
                 result.exerciseInfo = getExerciseInfoById(dataReader.getInt(0));
                 result.characterExercise = getCharacterExerciseById(dataReader.getInt(1));
                 result.menuElementType = CharacterExerciseItemType.getTypeByValue(dataReader.getInt(2));
-                result.iconImageName = dataReader.getString(3);
+                result.iconImageName = result.characterExercise.passedImageName;
             }
         }
         catch (Exception exp)
@@ -843,10 +843,8 @@ public final class AlphabetDatabase
                 characterItem.id = dataReader.getInt(0);
                 characterItem.exerciseInfo = getExerciseInfoById(dataReader.getInt(1));
                 characterItem.characterExercise = getCharacterExerciseById(characterExerciseId);
-                final int iconId = dataReader.getInt(2);
-                if (iconId != DatabaseConstant.InvalidDatabaseIndex)
-                    characterItem.iconImageName = getImageFileNameById(iconId);
-                characterItem.menuElementType = CharacterExerciseItemType.getTypeByValue(dataReader.getInt(3));
+                characterItem.iconImageName = characterItem.characterExercise.passedImageName;
+                characterItem.menuElementType = CharacterExerciseItemType.getTypeByValue(dataReader.getInt(2));
 
                 resultList.add(characterItem);
             }
