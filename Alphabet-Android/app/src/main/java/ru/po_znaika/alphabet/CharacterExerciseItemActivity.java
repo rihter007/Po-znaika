@@ -57,8 +57,8 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         public Map<Integer, Double> exerciseStepsScore;
 
         public CharacterExerciseItemState(@NonNull String _exerciseName,
-                                          int _exerciseIconId,
                                           int _exerciseMaxScore,
+                                          int _exerciseIconId,
                                           @NonNull Collection<CharacterExerciseItemStep> _exerciseSteps)
 
         {
