@@ -3,13 +3,20 @@ package ru.po_znaika.alphabet;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.arz_x.CommonException;
 import com.arz_x.android.AlertDialogHelper;
+import com.arz_x.android.DisplayMetricsHelper;
+import com.arz_x.android.ImageHelper;
 import com.arz_x.android.product_tracer.FileTracerInstance;
 import com.arz_x.android.product_tracer.TraceActivity;
 import com.arz_x.tracer.ProductTracer;
@@ -49,6 +56,7 @@ public class StartActivity extends Activity
     protected void onPause()
     {
         super.onPause();
+        releaseUserInterface();
         m_tracer.pause();
     }
 
@@ -56,6 +64,7 @@ public class StartActivity extends Activity
     protected void onResume()
     {
         super.onResume();
+        drawUserInterface();
         try
         {
             m_tracer.resume();
@@ -85,6 +94,7 @@ public class StartActivity extends Activity
 
     private void constructUserInterface()
     {
+        //drawUserInterface();
         {
             ImageView playImageView = (ImageView)findViewById(R.id.playImageView);
             playImageView.setOnClickListener(new View.OnClickListener()
@@ -122,6 +132,63 @@ public class StartActivity extends Activity
                     StartActivity.this.finish();
                 }
             });
+        }
+    }
+
+    private void drawUserInterface()
+    {
+        final DisplayMetricsHelper displayMetricsHelper = new DisplayMetricsHelper(this);
+
+        {
+            RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.mainLayout);
+            final Bitmap backgroundImage = ImageHelper.getImageForSpecifiedDimensions(getResources()
+                    , R.drawable.start_screen_background
+                    , displayMetricsHelper.getDisplayWidth()
+                    , displayMetricsHelper.getDisplayHeight());
+            relativeLayout.setBackground(new BitmapDrawable(getResources(), backgroundImage));
+        }
+
+        Pair<Integer, Integer>[] viewImagePairs = new Pair[]
+                {
+                        new Pair(R.id.sunImageView, R.drawable.start_screen_sun),
+                        new Pair(R.id.helloPupilImageView, R.drawable.start_screen_hello_pupil),
+                        new Pair(R.id.playImageView, R.drawable.start_screen_play),
+                        new Pair(R.id.parentsImageView, R.drawable.start_screen_parents),
+                        new Pair(R.id.exitImageView, R.drawable.start_screen_exit),
+                        new Pair(R.id.settingsImageView, R.drawable.start_screen_settings)
+                };
+
+        for (Pair<Integer, Integer> viewImage : viewImagePairs)
+        {
+            View processedView = findViewById(viewImage.first);
+            final ViewGroup.LayoutParams viewParams = processedView.getLayoutParams();
+            final Bitmap backgroundImage = ImageHelper.getImageForSpecifiedDimensions(getResources()
+                    , viewImage.second
+                    , viewParams.width
+                    , viewParams.height);
+            findViewById(viewImage.first).setBackground(new BitmapDrawable(getResources(), backgroundImage));
+        }
+    }
+
+    private void releaseUserInterface()
+    {
+        final int backgroundColor = getResources().getColor(R.color.standard_background);
+
+        final int[] viewIds = new int[]
+                {
+                        R.id.mainLayout,
+                        R.id.sunImageView,
+                        R.id.helloPupilImageView,
+                        R.id.playImageView,
+                        R.id.parentsImageView,
+                        R.id.exitImageView,
+                        R.id.settingsImageView
+                };
+
+        for (int viewId : viewIds)
+        {
+            View backgroundedView = findViewById(viewId);
+            backgroundedView.setBackgroundColor(backgroundColor);
         }
     }
 

@@ -7,7 +7,8 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:paddingBottom="@dimen/activity_vertical_margin"
                 tools:context="ru.po_znaika.alphabet.StartActivity"
-                android:background="@drawable/start_screen_background">
+                android:id="@+id/mainLayout"
+                android:background="@color/standard_background">
     <ImageView
         android:layout_width="@dimen/start_activity_sun_image_size"
         android:layout_height="@dimen/start_activity_sun_image_size"
@@ -15,7 +16,6 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/start_screen_sun"
         android:scaleType="centerInside"
         android:clickable="true"/>
 
@@ -23,7 +23,6 @@
         android:layout_width="@dimen/start_activity_hello_pupil_image_width"
         android:layout_height="@dimen/start_activity_hello_pupil_image_height"
         android:id="@+id/helloPupilImageView"
-        android:src="@drawable/start_screen_hello_pupil"
         android:scaleType="centerInside"
         android:layout_marginLeft="@dimen/start_activity_hello_pupil_margin_left"
         android:layout_marginStart="@dimen/start_activity_hello_pupil_margin_left"
@@ -37,18 +36,16 @@
         android:layout_height="@dimen/start_activity_play_image_height"
         android:id="@+id/playImageView"
         android:clickable="true"
-        android:src="@drawable/start_screen_play"
         android:layout_below="@+id/helloPupilImageView"
         android:layout_alignRight="@+id/exitImageView"
         android:layout_alignEnd="@+id/exitImageView"
         android:layout_marginTop="42dp"/>
 
     <ImageView
-        android:layout_width="@dimen/start_activity_parents_image_size"
-        android:layout_height="@dimen/start_activity_parents_image_size"
+        android:layout_width="@dimen/start_activity_parents_image_width"
+        android:layout_height="@dimen/start_activity_parents_image_height"
         android:id="@+id/parentsImageView"
         android:clickable="true"
-        android:src="@drawable/start_screen_parents"
         android:layout_marginLeft="49dp"
         android:layout_marginStart="49dp"
         android:layout_below="@+id/sunImageView"
@@ -57,22 +54,18 @@
         android:layout_marginTop="24dp"/>
 
     <ImageView
-        android:layout_width="@dimen/start_activity_exit_image_size"
-        android:layout_height="@dimen/start_activity_exit_image_size"
+        android:layout_width="@dimen/start_activity_exit_image_width"
+        android:layout_height="@dimen/start_activity_exit_image_height"
         android:id="@+id/exitImageView"
         android:clickable="true"
-        android:src="@drawable/start_screen_exit"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/helloPupilImageView"
-        android:layout_toEndOf="@+id/helloPupilImageView"
-        android:layout_marginBottom="@dimen/start_activity_exit_margin_bottom"/>
+        android:layout_above="@+id/settingsImageView"
+        android:layout_centerHorizontal="true"/>
 
     <ImageView
         android:layout_width="@dimen/start_activity_settings_image_size"
         android:layout_height="@dimen/start_activity_settings_image_size"
         android:id="@+id/settingsImageView"
         android:layout_marginBottom="@dimen/start_activity_settings_margin_bottom"
-        android:src="@drawable/start_screen_settings"
         android:layout_alignParentBottom="true"
         android:layout_alignLeft="@+id/helloPupilImageView"
         android:layout_alignStart="@+id/helloPupilImageView"/>
