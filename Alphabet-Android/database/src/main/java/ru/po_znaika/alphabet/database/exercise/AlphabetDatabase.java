@@ -35,8 +35,8 @@ public final class AlphabetDatabase
      */
     public enum SoundType
     {
-        Correct(78467623),                     // crc32 of 'Correct'
-        Praise(-1022835248),                   // crc32 of 'Praise'
+        Cheer(-813790127),                     // crc32 of 'Cheer'
+        Notice(1335967988),                    // crc32 of 'Notice'
         TryAgain(2010528955);                  // crc32 of 'TryAgain'
 
         private int m_value;
@@ -53,9 +53,9 @@ public final class AlphabetDatabase
 
         private static final Map<Integer, SoundType> ValuesMap = new HashMap<Integer, SoundType>()
         {{
-                put(78467623, Correct);
-                put(-1022835248, Praise);
-                put(2010528955, TryAgain);
+                put(Cheer.getValue(), Cheer);
+                put(Notice.getValue(), Notice);
+                put(TryAgain.getValue(), TryAgain);
             }};
 
         public static SoundType getTypeByValue(int value)
@@ -481,7 +481,7 @@ public final class AlphabetDatabase
      * SQL-expressions with special_sound table
      */
     private static final String ExtractRandomSoundNameByTypeSqlStatement = "SELECT s.file_name FROM sound s, special_sound ss " +
-            "WHERE (s._id = ss.sound_id) AND (ss.sound_type = ?) ORDER BY RANDOM() LIMIT 1";
+            "WHERE (s._id = ss.sound_id) AND (ss.type = ?) ORDER BY RANDOM() LIMIT 1";
 
     public AlphabetDatabase(Context _context, boolean _failIfNotFound) throws CommonException
     {

@@ -46,8 +46,9 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
     private static final class CharacterExerciseItemState implements Parcelable
     {
         public String exerciseName;
-        public int exerciseIconId;
+        public int characterExerciseId;
         public int exerciseMaxScore;
+        public int exerciseIconId;
 
         /* Current exercise step (starts from 0) */
         public int currentStep;
@@ -57,14 +58,16 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         public Map<Integer, Double> exerciseStepsScore;
 
         public CharacterExerciseItemState(@NonNull String _exerciseName,
+                                          int _characterExerciseId,
                                           int _exerciseMaxScore,
                                           int _exerciseIconId,
                                           @NonNull Collection<CharacterExerciseItemStep> _exerciseSteps)
 
         {
             this.exerciseName = _exerciseName;
-            this.exerciseIconId = _exerciseIconId;
+            this.characterExerciseId = _characterExerciseId;
             this.exerciseMaxScore = _exerciseMaxScore;
+            this.exerciseIconId = _exerciseIconId;
 
             this.currentStep = 0;
             this.exerciseSteps = new CharacterExerciseItemStep[_exerciseSteps.size()];
@@ -76,8 +79,9 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         public CharacterExerciseItemState(@NonNull Parcel _in)
         {
             this.exerciseName = _in.readString();
-            this.exerciseIconId = _in.readInt();
+            this.characterExerciseId = _in.readInt();
             this.exerciseMaxScore = _in.readInt();
+            this.exerciseIconId = _in.readInt();
 
             this.currentStep = _in.readInt();
 
@@ -108,8 +112,9 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
         public void writeToParcel(@NonNull Parcel out, int flags)
         {
             out.writeString(this.exerciseName);
-            out.writeInt(this.exerciseIconId);
+            out.writeInt(this.characterExerciseId);
             out.writeInt(this.exerciseMaxScore);
+            out.writeInt(this.exerciseIconId);
 
             out.writeInt(this.currentStep);
 
@@ -322,13 +327,14 @@ public class CharacterExerciseItemActivity extends Activity implements IExercise
                     itemSteps.add(new CharacterExerciseItemStep(stepInfo.action, stepInfo.value));
 
                 m_state = new CharacterExerciseItemState(characterExerciseItemInfo.exerciseInfo.name
+                        , characterExerciseItemInfo.characterExercise.id
                         , characterExerciseItemInfo.exerciseInfo.maxScore
                         , exerciseIconId
                         , itemSteps);
             }
         }
 
-        final CharacterExerciseActionsFactory actionsFactory = new CharacterExerciseActionsFactory(characterExerciseItemId
+        final CharacterExerciseActionsFactory actionsFactory = new CharacterExerciseActionsFactory(m_state.characterExerciseId
                 , m_state.exerciseIconId
                 , this
                 , m_serviceLocator.getAlphabetDatabase());

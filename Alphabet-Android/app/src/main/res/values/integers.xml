@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Image selection fragment -->
+    <integer name="image_selection_fragment_images_part">60</integer>
+    <integer name="image_selection_fragment_single_image_area_part">48</integer>
+    <integer name="image_selection_fragemnt_single_image_part">85</integer>
+    <integer name="image_selection_fragemnt_single_text_part">15</integer>
+
+</resources>

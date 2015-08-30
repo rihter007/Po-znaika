@@ -8,13 +8,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -47,8 +45,9 @@ public class ImageSelectionFragment extends Fragment
     {
         /**
          * The number of try after which correct variant was selected
+         *
          */
-        public int[] exercisesTryCount;
+        private int[] exercisesTryCount;
 
         /**
          * Incorrect variants selected by user
@@ -58,14 +57,13 @@ public class ImageSelectionFragment extends Fragment
         /**
          * Current exercise number
          */
-        public int currentStepNumber;
+        private int currentStepNumber;
 
         public ImageSelectionState(int exerciseCount)
         {
-            exercisesTryCount = new int[exerciseCount];
-
-            currentStepVariants = new boolean[ImagesCount];
-            currentStepNumber = 0;
+            this.exercisesTryCount = new int[exerciseCount];
+            this.currentStepVariants = new boolean[ImagesCount];
+            this.currentStepNumber = 0;
         }
 
         public ImageSelectionState(@NonNull Parcel _in)
@@ -76,9 +74,32 @@ public class ImageSelectionFragment extends Fragment
                 _in.readIntArray(exercisesTryCount);
             }
 
-            currentStepVariants = new boolean[4];
-            _in.readBooleanArray(currentStepVariants);
-            currentStepNumber = _in.readInt();
+            this.currentStepVariants = new boolean[4];
+            _in.readBooleanArray(this.currentStepVariants);
+
+            this.currentStepNumber = _in.readInt();
+        }
+
+        public int getCurrentStepNumber()
+        {
+            return this.currentStepNumber;
+        }
+
+        public void newStep()
+        {
+            ++this.currentStepNumber;
+            for (int variantIndex = 0; variantIndex < this.currentStepVariants.length; ++variantIndex)
+                this.currentStepVariants[variantIndex] = false;
+        }
+
+        public void incrementTriesCount()
+        {
+            ++this.exercisesTryCount[this.currentStepNumber];
+        }
+
+        public int getTriesCount()
+        {
+            return this.exercisesTryCount[this.currentStepNumber];
         }
 
         @Override
@@ -90,11 +111,10 @@ public class ImageSelectionFragment extends Fragment
         @Override
         public void writeToParcel(@NonNull Parcel container, int flags)
         {
-            container.writeInt(exercisesTryCount.length);
-            container.writeIntArray(exercisesTryCount);
-
-            container.writeBooleanArray(currentStepVariants);
-            container.writeInt(currentStepNumber);
+            container.writeInt(this.exercisesTryCount.length);
+            container.writeIntArray(this.exercisesTryCount);
+            container.writeBooleanArray(this.currentStepVariants);
+            container.writeInt(this.currentStepNumber);
         }
 
         public static final Creator CREATOR = new Creator()
@@ -111,23 +131,32 @@ public class ImageSelectionFragment extends Fragment
         };
     }
 
+    private static class SingleImageArea
+    {
+        public SingleImageArea() { }
+
+        public SingleImageArea(int _layoutId, int _imageViewId, int _textViewId)
+        {
+            this.layoutId = _layoutId;
+            this.imageViewId = _imageViewId;
+            this.textViewId = _textViewId;
+        }
+
+        int layoutId;
+        int imageViewId;
+        int textViewId;
+    }
+
     private static final String LogTag = ImageSelectionFragment.class.getName();
 
     public static final int ImagesCount = 4;
 
-    private static final int LayoutViewIds[] = new int[]
+    public static final SingleImageArea ImageAreas[] = new SingleImageArea[]
             {
-                    R.id.topLeftLayout,
-                    R.id.topRightLayout,
-                    R.id.bottomLeftLayout,
-                    R.id.bottomRightLayout
-            };
-    private static final int ImageViewIds[] = new int[]
-            {
-                    R.id.topLeftImageView,
-                    R.id.topRightImageView,
-                    R.id.bottomLeftImageView,
-                    R.id.bottomRightImageView
+                    new SingleImageArea(R.id.topLeftLayout, R.id.topLeftImageView, R.id.topLeftHintTextView),
+                    new SingleImageArea(R.id.topRightLayout, R.id.topRightImageView, R.id.topRightHintTextView),
+                    new SingleImageArea(R.id.bottomLeftLayout, R.id.bottomLeftImageView, R.id.bottomLeftHintTextView),
+                    new SingleImageArea(R.id.bottomRightLayout, R.id.bottomRightImageView, R.id.bottomRightHintTextView),
             };
 
     private static final String ExercisesTag = "image_selection_exercises";
@@ -176,7 +205,8 @@ public class ImageSelectionFragment extends Fragment
         try
         {
             restoreInternalState(savedInstanceState);
-            constructUserInterface(fragmentView, true);
+            constructUserInterface(fragmentView);
+            setUserInteractionControllers(fragmentView);
         }
         catch (Exception exp)
         {
@@ -225,9 +255,9 @@ public class ImageSelectionFragment extends Fragment
     /**
      * Constructs parts of user interface
      */
-    void constructUserInterface(@NonNull View fragmentView, boolean doSetUserInteraction) throws CommonException
+    void constructUserInterface(@NonNull View fragmentView) throws CommonException
     {
-        final ImageSelectionSingleExerciseState currentExerciseInfo = m_exerciseStates.get(m_state.currentStepNumber);
+        final ImageSelectionSingleExerciseState currentExerciseInfo = m_exerciseStates.get(m_state.getCurrentStepNumber());
 
         // place exercise caption
         {
@@ -239,131 +269,44 @@ public class ImageSelectionFragment extends Fragment
             exerciseCaption.setText(newExerciseCaption);
         }
 
-        final float selectionImageSize = calculateSelectionImageSize(fragmentView);
-
-        // set images
-        for (int imageIndex = 0; imageIndex < LayoutViewIds.length; ++imageIndex)
+        for (int imageIndex = 0; imageIndex < ImageAreas.length; ++imageIndex)
         {
-            View selectionView = fragmentView.findViewById(LayoutViewIds[imageIndex]);
+            // process main single image area view
             {
-                ViewGroup.LayoutParams layoutParams = selectionView.getLayoutParams();
-                layoutParams.height = layoutParams.width = (int) selectionImageSize;
-                selectionView.setLayoutParams(layoutParams);
-            }
-            ImageView uiImage = (ImageView)fragmentView.findViewById(ImageViewIds[imageIndex]);
+                View selectionView = fragmentView.findViewById(ImageAreas[imageIndex].layoutId);
 
-            final int imageResourceId = DatabaseHelpers.getDrawableIdByName(getResources()
-                    , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath);
-            if (imageResourceId == DatabaseConstant.InvalidDatabaseIndex)
-            {
-                ProductTracer.traceMessage(m_tracer
-                        , TraceLevel.Error
-                        , LogTag
-                        , String.format("Failed to get resources id for '%s'"
-                        , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath));
-                throw new CommonException(CommonResultCode.InvalidExternalSource);
-            }
-
-            uiImage.setImageDrawable(getResources().getDrawable(imageResourceId));
-            if (doSetUserInteraction)
-            {
-                final int imageViewId = imageIndex;
-                uiImage.setOnClickListener(new View.OnClickListener()
+                final boolean isVariantProcessed = m_state.currentStepVariants[imageIndex];
+                if (isVariantProcessed)
                 {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        try
-                        {
-                            onImageSelected(imageViewId);
-                        }
-                        catch (CommonException exp)
-                        {
-                            ProductTracer.traceException(m_tracer
-                                    , TraceLevel.Error
-                                    , LogTag
-                                    , exp);
-                            getActivity().finish();
-                        }
-                    }
-                });
-            }
-
-            final boolean isVariantProcessed = m_state.currentStepVariants[imageIndex];
-            if (isVariantProcessed)
-            {
-                if (currentExerciseInfo.answerIndex == imageIndex)
-                    selectionView.setBackgroundColor(CorrectSelectionColor);
+                    if (currentExerciseInfo.answerIndex == imageIndex)
+                        selectionView.setBackgroundColor(CorrectSelectionColor);
+                    else
+                        selectionView.setBackgroundColor(IncorrectSelectionColor);
+                }
                 else
-                    selectionView.setBackgroundColor(IncorrectSelectionColor);
+                {
+                    selectionView.setBackgroundColor(NoSelectionColor);
+                }
             }
-            else
+
+            // process hint text
             {
-                selectionView.setBackgroundColor(NoSelectionColor);
+                TextView hintTextView = (TextView) fragmentView.findViewById(ImageAreas[imageIndex].textViewId);
+                final int wordLength = currentExerciseInfo.selectionVariants[imageIndex].name.length();
+
+                String hintText = "";
+                if (wordLength > 0)
+                {
+                    hintText = "_";
+                    for (int wordIndex = 1; wordIndex < wordLength; ++wordIndex)
+                        hintText += " _";
+                }
+                hintTextView.setText(hintText);
             }
         }
 
-        // process buttons
-        if (doSetUserInteraction)
-        {
-            {
-                Button forwardButton = (Button) fragmentView.findViewById(R.id.forwardButton);
-                forwardButton.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        try
-                        {
-                            processNextStep();
-                        }
-                        catch (CommonException exp)
-                        {
-                            AlertDialogHelper.showMessageBox(getActivity()
-                                    , getResources().getString(R.string.alert_title)
-                                    , getResources().getString(R.string.error_unknown_error)
-                                    , false
-                                    , new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    getActivity().finish();
-                                }
-                            });
-                            ProductTracer.traceException(m_tracer
-                                    , TraceLevel.Error
-                                    , LogTag
-                                    , exp);
-                        }
-                    }
-                });
-            }
-
-            {
-                Button backButton = (Button) fragmentView.findViewById(R.id.backButton);
-                backButton.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        m_stepsCallback.processPreviousStep();
-                    }
-                });
-            }
-        }
-    }
-
-    float calculateSelectionImageSize(@NonNull View fragmentView)
-    {
-        final RelativeLayout layout = (RelativeLayout)fragmentView.findViewById(R.id.leftLayout);
-        final ViewGroup.LayoutParams layoutParams = layout.getLayoutParams();
-
-        final float imageMargin = getResources().getDimension(R.dimen.small_margin);
-        if (layoutParams.height >= imageMargin + 2*layoutParams.width)
-            return layoutParams.width;
-
-        return (layoutParams.height - imageMargin) / 2;
+        // draw object images
+        drawImages(fragmentView);
     }
 
     @Override
@@ -371,7 +314,8 @@ public class ImageSelectionFragment extends Fragment
     {
         super.onPause();
 
-       m_mediaPlayerManager.pause();
+        clearImages(getView());
+        m_mediaPlayerManager.pause();
     }
 
     @Override
@@ -379,6 +323,16 @@ public class ImageSelectionFragment extends Fragment
     {
         super.onResume();
 
+        try
+        {
+            View fragmentView = getView();
+            if (fragmentView != null)
+                drawImages(fragmentView);
+        }
+        catch (CommonException exp)
+        {
+            ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
+        }
         m_mediaPlayerManager.resume();
     }
 
@@ -416,18 +370,137 @@ public class ImageSelectionFragment extends Fragment
         savedInstanceState.putParcelable(StateTag, m_state);
     }
 
+    private void drawImages(@NonNull View fragmentView) throws CommonException
+    {
+        final ImageSelectionSingleExerciseState currentExerciseInfo = m_exerciseStates.get(m_state.currentStepNumber);
+
+        // process image
+        for (int imageIndex = 0; imageIndex < ImageAreas.length; ++imageIndex)
+        {
+            ImageView uiImage = (ImageView) fragmentView.findViewById(ImageAreas[imageIndex].imageViewId);
+            final int imageResourceId = DatabaseHelpers.getDrawableIdByName(getResources()
+                    , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath);
+            if (imageResourceId == DatabaseConstant.InvalidDatabaseIndex)
+            {
+                ProductTracer.traceMessage(m_tracer
+                        , TraceLevel.Error
+                        , LogTag
+                        , String.format("Failed to get resources id for '%s'"
+                        , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath));
+                throw new CommonException(CommonResultCode.InvalidExternalSource);
+            }
+
+            uiImage.setImageDrawable(getResources().getDrawable(imageResourceId));
+        }
+    }
+
+    private void clearImages(@NonNull View fragmentView)
+    {
+        final int backgroundColor = getResources().getColor(R.color.standard_background);
+        for (int imageIndex = 0; imageIndex < ImageAreas.length; ++imageIndex)
+            fragmentView.findViewById(ImageAreas[imageIndex].imageViewId).setBackgroundColor(backgroundColor);
+    }
+
+    private void setUserInteractionControllers(@NonNull View fragmentView)
+    {
+        for (int imageIndex = 0; imageIndex < ImageAreas.length; ++imageIndex)
+        {
+            ImageView uiImage = (ImageView) fragmentView.findViewById(ImageAreas[imageIndex].imageViewId);
+            final int imageViewId = imageIndex;
+            uiImage.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    try
+                    {
+                        onImageSelected(imageViewId);
+                    }
+                    catch (CommonException exp)
+                    {
+                        ProductTracer.traceException(m_tracer
+                                , TraceLevel.Error
+                                , LogTag
+                                , exp);
+                        getActivity().finish();
+                    }
+                }
+            });
+        }
+
+        {
+            ImageView soundImageView = (ImageView)fragmentView.findViewById(R.id.soundImageView);
+            soundImageView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    // TODO: Add exercise caption
+                    //m_mediaPlayerManager.
+                }
+            });
+        }
+
+        {
+            ImageView forwardImageView = (ImageView) fragmentView.findViewById(R.id.forwardImageView);
+            forwardImageView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    try
+                    {
+                        processNextStep();
+                    }
+                    catch (CommonException exp)
+                    {
+                        AlertDialogHelper.showMessageBox(getActivity()
+                                , getResources().getString(R.string.alert_title)
+                                , getResources().getString(R.string.error_unknown_error)
+                                , false
+                                , new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                getActivity().finish();
+                            }
+                        });
+                        ProductTracer.traceException(m_tracer
+                                , TraceLevel.Error
+                                , LogTag
+                                , exp);
+                    }
+                }
+            });
+        }
+
+        {
+            ImageView backImageView = (ImageView) fragmentView.findViewById(R.id.backImageView);
+            backImageView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    m_stepsCallback.processPreviousStep();
+                }
+            });
+        }
+    }
+
     private void onImageSelected(int selectedImageId) throws CommonException
     {
         final ImageSelectionSingleExerciseState currentExercise = m_exerciseStates.get(m_state.currentStepNumber);
 
         if (m_state.currentStepVariants[selectedImageId])
             return;
-        ++m_state.exercisesTryCount[m_state.currentStepNumber];
+        m_state.incrementTriesCount();
+        m_state.currentStepVariants[selectedImageId] = true;
 
         final View fragmentView = getView();
         if (fragmentView == null)
         {
-            Log.e(LogTag, "Fragment view is null");
+            ProductTracer.traceMessage(m_tracer, TraceLevel.Error, LogTag, "Fragment view is null");
             throw new CommonException(CommonResultCode.InvalidInternalState);
         }
 
@@ -437,13 +510,13 @@ public class ImageSelectionFragment extends Fragment
         {
             // set color
             {
-                View linearLayoutView = fragmentView.findViewById(LayoutViewIds[selectedImageId]);
+                View linearLayoutView = fragmentView.findViewById(ImageAreas[selectedImageId].layoutId);
                 linearLayoutView.setBackgroundColor(CorrectSelectionColor);
             }
 
             try
             {
-                m_mediaPlayerManager.play(AlphabetDatabase.SoundType.Correct);
+                m_mediaPlayerManager.play(AlphabetDatabase.SoundType.Cheer);
             }
             catch (CommonException exp)
             {
@@ -454,7 +527,7 @@ public class ImageSelectionFragment extends Fragment
         {
             // set color
             {
-                View linearLayoutView = fragmentView.findViewById(LayoutViewIds[selectedImageId]);
+                View linearLayoutView = fragmentView.findViewById(ImageAreas[selectedImageId].layoutId);
                 linearLayoutView.setBackgroundColor(IncorrectSelectionColor);
             }
 
@@ -471,8 +544,12 @@ public class ImageSelectionFragment extends Fragment
                 }
                 catch (CommonException exp)
                 {
-                    Log.e(LogTag, "Failed to play sound hint " + exp.getMessage());
+                    ProductTracer.traceException(m_tracer, TraceLevel.Error, LogTag, exp);
                 }
+            }
+            else
+            {
+                m_mediaPlayerManager.play(AlphabetDatabase.SoundType.TryAgain);
             }
         }
     }
@@ -483,7 +560,7 @@ public class ImageSelectionFragment extends Fragment
         if (fragmentView == null)
             throw new CommonException(CommonResultCode.InvalidInternalState);
 
-        if (m_state.currentStepNumber >= m_exerciseStates.size() - 1)
+        if (m_state.getCurrentStepNumber() >= m_exerciseStates.size() - 1)
         {
             // rename button
             {
@@ -501,7 +578,8 @@ public class ImageSelectionFragment extends Fragment
             // calculate results
             int resultScore = 0;
 
-            {
+            /// TODO: process scores according to the latest algorithm
+            /*{
                 for (int tryCount : m_state.exercisesTryCount)
                 {
                     if (tryCount == 1)
@@ -510,15 +588,15 @@ public class ImageSelectionFragment extends Fragment
                         resultScore += ScoreStep / 2;
                     // if we got more than 2 tries... than 0 is the mark!!
                 }
-            }
+            }*/
 
             // remember results
             m_scoreNotification.setCompletionRate(resultScore);
         }
         else
         {
-            ++m_state.currentStepNumber;
-            constructUserInterface(fragmentView, false);
+            m_state.newStep();
+            constructUserInterface(fragmentView);
         }
     }
 

@@ -17,8 +17,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_weight="1">
+            android:layout_height="0dp"
+            android:layout_weight="10">
 
             <ImageView
                 android:layout_width="@dimen/help_icon_size"
@@ -42,27 +42,28 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_weight="4"
+            android:layout_height="0dp"
+            android:layout_weight="@integer/image_selection_fragment_images_part"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="0px"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:id="@+id/leftLayout"
-                android:layout_weight="45">
+                android:layout_weight="@integer/image_selection_fragment_single_image_area_part">
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="0px"
-                    android:layout_weight="45"
+                    android:layout_weight="@integer/image_selection_fragment_single_image_area_part"
                     android:id="@+id/topLeftLayout">
 
                     <ImageView
+                        android:layout_weight="@integer/image_selection_fragemnt_single_image_part"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="0dp"
                         android:layout_marginTop="@dimen/min_margin"
                         android:layout_marginBottom="@dimen/min_margin"
                         android:layout_marginLeft="@dimen/min_margin"
@@ -70,25 +71,35 @@
                         android:layout_marginRight="@dimen/min_margin"
                         android:layout_marginEnd="@dimen/min_margin"
                         android:id="@+id/topLeftImageView" />
+
+                    <TextView
+                        android:layout_weight="@integer/image_selection_fragemnt_single_text_part"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:layout_gravity="center_horizontal"
+                        android:text=""
+                        android:id="@+id/topLeftHintTextView"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="0px"
-                    android:layout_weight="10">
+                    android:layout_weight="5">
                 </LinearLayout>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="0px"
-                    android:layout_weight="45"
+                    android:layout_weight="@integer/image_selection_fragment_single_image_area_part"
                     android:id="@+id/topRightLayout">
 
                     <ImageView
+                        android:layout_weight="@integer/image_selection_fragemnt_single_image_part"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="0dp"
                         android:layout_marginTop="@dimen/min_margin"
                         android:layout_marginBottom="@dimen/min_margin"
                         android:layout_marginLeft="@dimen/min_margin"
@@ -96,6 +107,15 @@
                         android:layout_marginRight="@dimen/min_margin"
                         android:layout_marginEnd="@dimen/min_margin"
                         android:id="@+id/topRightImageView" />
+
+                    <TextView
+                        android:layout_weight="@integer/image_selection_fragemnt_single_text_part"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:layout_gravity="center_horizontal"
+                        android:text=""
+                        android:id="@+id/topRightHintTextView"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -103,7 +123,7 @@
             <RelativeLayout
                 android:layout_width="0px"
                 android:layout_height="match_parent"
-                android:layout_weight="10">
+                android:layout_weight="5">
             </RelativeLayout>
 
             <LinearLayout
@@ -111,17 +131,19 @@
                 android:layout_width="0px"
                 android:layout_height="match_parent"
                 android:id="@+id/rightLayout"
-                android:layout_weight="45">
+                android:layout_weight="@integer/image_selection_fragment_single_image_area_part">
 
                 <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="0px"
-                    android:layout_weight="45"
+                    android:layout_weight="@integer/image_selection_fragment_single_image_area_part"
                     android:id="@+id/bottomLeftLayout">
 
                     <ImageView
+                        android:layout_weight="@integer/image_selection_fragemnt_single_image_part"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="0dp"
                         android:layout_marginTop="@dimen/min_margin"
                         android:layout_marginBottom="@dimen/min_margin"
                         android:layout_marginLeft="@dimen/min_margin"
@@ -129,25 +151,35 @@
                         android:layout_marginRight="@dimen/min_margin"
                         android:layout_marginEnd="@dimen/min_margin"
                         android:id="@+id/bottomLeftImageView" />
+
+                    <TextView
+                        android:layout_weight="@integer/image_selection_fragemnt_single_text_part"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:layout_gravity="center_horizontal"
+                        android:text=""
+                        android:id="@+id/bottomLeftHintTextView"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="0px"
-                    android:layout_weight="10">
+                    android:layout_weight="5">
                 </LinearLayout>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="0px"
-                    android:layout_weight="45"
+                    android:layout_weight="@integer/image_selection_fragment_single_image_area_part"
                     android:id="@+id/bottomRightLayout">
 
                     <ImageView
+                        android:layout_weight="@integer/image_selection_fragemnt_single_image_part"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="0dp"
                         android:layout_marginTop="@dimen/min_margin"
                         android:layout_marginBottom="@dimen/min_margin"
                         android:layout_marginLeft="@dimen/min_margin"
@@ -155,6 +187,16 @@
                         android:layout_marginRight="@dimen/min_margin"
                         android:layout_marginEnd="@dimen/min_margin"
                         android:id="@+id/bottomRightImageView" />
+
+                    <TextView
+                        android:layout_weight="@integer/image_selection_fragemnt_single_text_part"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:layout_gravity="center_horizontal"
+                        android:text=""
+                        android:id="@+id/bottomRightHintTextView"/>
+
                 </LinearLayout>
 
             </LinearLayout>
@@ -162,8 +204,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_weight="2">
+            android:layout_height="0dp"
+            android:layout_weight="20">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -177,8 +219,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_weight="1"
+            android:layout_height="0dp"
+            android:layout_weight="10"
             android:layout_marginBottom="@dimen/small_margin">
 
             <ImageView

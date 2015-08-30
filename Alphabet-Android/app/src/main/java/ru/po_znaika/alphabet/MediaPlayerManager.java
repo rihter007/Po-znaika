@@ -22,6 +22,7 @@ interface IMediaPlayerManager
     void play(int soundId) throws CommonException;
     void play(@NonNull AlphabetDatabase.SoundType soundType) throws CommonException;
     void playSequentially(int[] soundsResourceId) throws CommonException;
+    //void playSequentially()
     void pause();
     void resume();
     void stop();

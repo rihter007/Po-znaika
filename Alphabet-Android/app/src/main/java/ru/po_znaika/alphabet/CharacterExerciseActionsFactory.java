@@ -171,10 +171,8 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                         final int correctAnswerIndex = random.nextInt(ImageSelectionFragment.ImagesCount);
 
                         ImageSelectionSingleExerciseState exerciseStep = new ImageSelectionSingleExerciseState();
-                        final String exerciseTitleTemplate = resources.getString(objectExercise.exerciseTitleResourceId);
-                        if (exerciseTitleTemplate == null)
-                            throw new CommonException(CommonResultCode.InvalidExternalSource);
 
+                        final String exerciseTitleTemplate = resources.getString(objectExercise.exerciseTitleResourceId);
                         exerciseStep.exerciseTitle = String.format(exerciseTitleTemplate, characterExerciseInfo.character);
 
                         exerciseStep.selectionVariants = new ObjectDescription[ImageSelectionFragment.ImagesCount];
