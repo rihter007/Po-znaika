@@ -186,10 +186,7 @@ public class StartActivity extends Activity
                 };
 
         for (int viewId : viewIds)
-        {
-            View backgroundedView = findViewById(viewId);
-            backgroundedView.setBackgroundColor(backgroundColor);
-        }
+            findViewById(viewId).setBackgroundColor(backgroundColor);
     }
 
     private FileTracerInstance m_tracer;
