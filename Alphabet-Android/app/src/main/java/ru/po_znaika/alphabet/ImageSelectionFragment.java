@@ -133,8 +133,6 @@ public class ImageSelectionFragment extends Fragment
 
     private static class SingleImageArea
     {
-        public SingleImageArea() { }
-
         public SingleImageArea(int _layoutId, int _imageViewId, int _textViewId)
         {
             this.layoutId = _layoutId;
@@ -161,15 +159,14 @@ public class ImageSelectionFragment extends Fragment
 
     private static final String ExercisesTag = "image_selection_exercises";
     private static final String StateTag = "state";
-
-    private static final int ScoreStep = 10;
+    private static final String ExerciseIconImageIdTag = "exercise_icon_image_id";
 
     private static final int NoSelectionColor = Constant.Color.BackgroundBlue;
     private static final int CorrectSelectionColor = Constant.Color.LightGreen;
     private static final int IncorrectSelectionColor = Constant.Color.LightRed;
 
-    public static ImageSelectionFragment createFragment(@NonNull Collection<ImageSelectionSingleExerciseState> selectionExercises)
-            throws CommonException
+    public static ImageSelectionFragment createFragment(@NonNull Collection<ImageSelectionSingleExerciseState> selectionExercises
+            , int exerciseIconImageId) throws CommonException
     {
         for (ImageSelectionSingleExerciseState exerciseState : selectionExercises)
         {
@@ -184,6 +181,9 @@ public class ImageSelectionFragment extends Fragment
 
             final ArrayList<ImageSelectionSingleExerciseState> exerciseStates = new ArrayList<>(selectionExercises);
             arguments.putParcelableArrayList(ExercisesTag, exerciseStates);
+            if (exerciseIconImageId != 0)
+                arguments.putInt(ExerciseIconImageIdTag, exerciseIconImageId);
+
             resultFragment.setArguments(arguments);
         }
 
@@ -241,15 +241,12 @@ public class ImageSelectionFragment extends Fragment
         CoreServiceLocator serviceLocator = new CoreServiceLocator(getActivity());
         m_mediaPlayerManager = serviceLocator.getMediaPlayerManager();
 
+        m_exerciseIconImageId = getArguments().getInt(ExerciseIconImageIdTag, 0);
         m_exerciseStates = getArguments().getParcelableArrayList(ExercisesTag);
         if (savedInstanceState == null)
-        {
             m_state = new ImageSelectionState(m_exerciseStates.size());
-        }
         else
-        {
             m_state = savedInstanceState.getParcelable(StateTag);
-        }
     }
 
     /**
@@ -344,7 +341,7 @@ public class ImageSelectionFragment extends Fragment
         m_stepsCallback = (IExerciseStepCallback) activity;
         m_scoreNotification = (IScoreNotification) activity;
 
-        m_displayMetrics = new DisplayMetricsHelper(activity);
+        m_displayMetricsHelper = new DisplayMetricsHelper(activity);
 
         if (activity instanceof ITracerGetter)
             m_tracer = ((ITracerGetter)activity).getTracer();
@@ -356,7 +353,7 @@ public class ImageSelectionFragment extends Fragment
         super.onDetach();
         m_stepsCallback = null;
         m_scoreNotification = null;
-        m_displayMetrics = null;
+        m_displayMetricsHelper = null;
         m_tracer = null;
 
         m_mediaPlayerManager.stop();
@@ -372,33 +369,46 @@ public class ImageSelectionFragment extends Fragment
 
     private void drawImages(@NonNull View fragmentView) throws CommonException
     {
-        final ImageSelectionSingleExerciseState currentExerciseInfo = m_exerciseStates.get(m_state.currentStepNumber);
-
-        // process image
-        for (int imageIndex = 0; imageIndex < ImageAreas.length; ++imageIndex)
         {
-            ImageView uiImage = (ImageView) fragmentView.findViewById(ImageAreas[imageIndex].imageViewId);
-            final int imageResourceId = DatabaseHelpers.getDrawableIdByName(getResources()
-                    , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath);
-            if (imageResourceId == DatabaseConstant.InvalidDatabaseIndex)
-            {
-                ProductTracer.traceMessage(m_tracer
-                        , TraceLevel.Error
-                        , LogTag
-                        , String.format("Failed to get resources id for '%s'"
-                        , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath));
-                throw new CommonException(CommonResultCode.InvalidExternalSource);
-            }
+            ImageView iconImageView = (ImageView)fragmentView.findViewById(R.id.exerciseIconImageView);
+            if (m_exerciseIconImageId != 0)
+                iconImageView.setBackground(getResources().getDrawable(m_exerciseIconImageId));
+            else
+                iconImageView.setBackgroundColor(getResources().getColor(R.color.standard_background));
+        }
 
-            uiImage.setImageDrawable(getResources().getDrawable(imageResourceId));
+        {
+            final ImageSelectionSingleExerciseState currentExerciseInfo = m_exerciseStates.get(m_state.currentStepNumber);
+
+            // process image
+            for (int imageIndex = 0; imageIndex < ImageAreas.length; ++imageIndex)
+            {
+                ImageView uiImage = (ImageView) fragmentView.findViewById(ImageAreas[imageIndex].imageViewId);
+                final int imageResourceId = DatabaseHelpers.getDrawableIdByName(getResources()
+                        , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath);
+                if (imageResourceId == DatabaseConstant.InvalidDatabaseIndex)
+                {
+                    ProductTracer.traceMessage(m_tracer
+                            , TraceLevel.Error
+                            , LogTag
+                            , String.format("Failed to get resources id for '%s'"
+                            , currentExerciseInfo.selectionVariants[imageIndex].imageFilePath));
+                    throw new CommonException(CommonResultCode.InvalidExternalSource);
+                }
+
+                uiImage.setImageDrawable(getResources().getDrawable(imageResourceId));
+            }
         }
     }
 
     private void clearImages(@NonNull View fragmentView)
     {
         final int backgroundColor = getResources().getColor(R.color.standard_background);
-        for (int imageIndex = 0; imageIndex < ImageAreas.length; ++imageIndex)
-            fragmentView.findViewById(ImageAreas[imageIndex].imageViewId).setBackgroundColor(backgroundColor);
+
+        fragmentView.findViewById(R.id.exerciseIconImageView).setBackgroundColor(backgroundColor);
+
+        for (SingleImageArea singleImageArea : ImageAreas)
+            fragmentView.findViewById(singleImageArea.imageViewId).setBackgroundColor(backgroundColor);
     }
 
     private void setUserInteractionControllers(@NonNull View fragmentView)
@@ -600,13 +610,14 @@ public class ImageSelectionFragment extends Fragment
         }
     }
 
-    private ITracer m_tracer;
-    private DisplayMetricsHelper m_displayMetrics;
     private IMediaPlayerManager m_mediaPlayerManager;
 
     private IExerciseStepCallback m_stepsCallback;
     private IScoreNotification m_scoreNotification;
+    private ITracer m_tracer;
+    private DisplayMetricsHelper m_displayMetricsHelper;
 
     private List<ImageSelectionSingleExerciseState> m_exerciseStates;
+    private int m_exerciseIconImageId;
     private ImageSelectionState m_state;
 }

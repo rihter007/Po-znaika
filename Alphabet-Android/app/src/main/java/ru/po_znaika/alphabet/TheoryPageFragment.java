@@ -4,7 +4,6 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -17,7 +16,6 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -42,6 +40,12 @@ import ru.po_znaika.common.ru.po_znaika.common.helpers.TextFormatter;
  */
 public class TheoryPageFragment extends Fragment
 {
+    private static final String LogTag = TheoryPageFragment.class.getName();
+
+    private static final String TheoryTableIndexTag = "theory_table_index";
+    private static final String ExerciseIconImageIdTag = "exercise_icon_image_id";
+    private static final String InternalStateTag = "internal_state";
+
     public static TheoryPageFragment createFragment(int theoryPageDatabaseId, int exerciseIconImageId)
     {
         TheoryPageFragment pageFragment = new TheoryPageFragment();
@@ -115,12 +119,6 @@ public class TheoryPageFragment extends Fragment
             }
         };
     }
-
-    private static final String LogTag = TheoryPageFragment.class.getName();
-
-    private static final String TheoryTableIndexTag = "theory_table_index";
-    private static final String ExerciseIconImageIdTag = "exercise_icon_image_id";
-    private static final String InternalStateTag = "internal_state";
 
     @Override
     public void onAttach(Activity activity)
@@ -294,15 +292,12 @@ public class TheoryPageFragment extends Fragment
      */
     void constructUserInterface(View fragmentView) throws CommonException
     {
-        if (m_exerciseIconResourceId != 0)
         {
             ImageView exerciseIconImageView = (ImageView)fragmentView.findViewById(R.id.exerciseIconImageView);
-            exerciseIconImageView.setImageDrawable(getResources().getDrawable(m_exerciseIconResourceId));
-        }
-        else
-        {
-            ImageView exerciseIconImageView = (ImageView)fragmentView.findViewById(R.id.exerciseIconImageView);
-            exerciseIconImageView.setVisibility(View.INVISIBLE);
+            if (m_exerciseIconResourceId != 0)
+                exerciseIconImageView.setImageDrawable(getResources().getDrawable(m_exerciseIconResourceId));
+            else
+                exerciseIconImageView.setVisibility(View.INVISIBLE);
         }
 
         // process image

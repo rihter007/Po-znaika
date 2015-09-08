@@ -54,7 +54,7 @@ class MediaPlayerManager implements IMediaPlayerManager
         resetInternalState();
 
         final String soundFileName = m_alphabetDatabase.getRandomSoundFileNameByType(soundType);
-        if (TextUtils.isEmpty(soundFileName))
+        if (TextUtils.isEmpty(soundFileName)) // TODO: exception comes here: No soundFileName
             throw new CommonException(CommonResultCode.InvalidExternalSource);
         final int soundResourceId = DatabaseHelpers.getSoundIdByName(m_context.getResources(), soundFileName);
         if (soundResourceId == 0)

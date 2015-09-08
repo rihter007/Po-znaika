@@ -93,7 +93,7 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
             , @NonNull AlphabetDatabase _alphabetDatabase)
     {
         m_characterExerciseId = _characterExerciseId;
-        m_exerciseLogoId = exerciseLogoId;
+        m_exerciseIconId = exerciseLogoId;
         m_context = _context;
         m_alphabetDatabase = _alphabetDatabase;
     }
@@ -113,7 +113,7 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                 break;
 
             case TheoryPage:
-                resultFragment = TheoryPageFragment.createFragment(value, m_exerciseLogoId);
+                resultFragment = TheoryPageFragment.createFragment(value, m_exerciseIconId);
                 break;
         }
 
@@ -192,7 +192,7 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                         }
                         imageSelectionExercises.add(exerciseStep);
                     }
-                    resultFragment = ImageSelectionFragment.createFragment(imageSelectionExercises);
+                    resultFragment = ImageSelectionFragment.createFragment(imageSelectionExercises, m_exerciseIconId);
                 }
                 break;
 
@@ -222,7 +222,7 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
     }
 
     private int m_characterExerciseId;
-    private int m_exerciseLogoId;
+    private int m_exerciseIconId;
     private Context m_context;
     private AlphabetDatabase m_alphabetDatabase;
 }
