@@ -208,7 +208,7 @@ public final class CharacterExerciseActionsFactory implements CharacterExerciseS
                     if (TextUtils.isEmpty(verseText))
                         throw new CommonException(CommonResultCode.InvalidExternalSource);
 
-                    resultFragment = FindCharacterFragment.createFragment(verseText, exerciseInfo.character);
+                    resultFragment = FindCharacterFragment.createFragment(verseText, exerciseInfo.character, m_exerciseIconId);
                 }
                 break;
             }

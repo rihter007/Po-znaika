@@ -6,6 +6,8 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Parcel;
@@ -16,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -24,6 +27,7 @@ import com.arz_x.CommonException;
 import com.arz_x.CommonResultCode;
 import com.arz_x.android.AlertDialogHelper;
 import com.arz_x.android.DisplayMetricsHelper;
+import com.arz_x.android.ImageHelper;
 import com.arz_x.android.product_tracer.ITracerGetter;
 import com.arz_x.tracer.ITracer;
 import com.arz_x.tracer.ProductTracer;
@@ -144,19 +148,22 @@ public class FindCharacterFragment extends Fragment
     private static final String InternalStateTag = "internal_state";
     private static final String TextTag = "text";
     private static final String SearchCharacterTag = "search_character";
+    private static final String ExerciseIconTag = "exercise_icon";
 
     private static final int NoSelectionColor = Constant.Color.BackgroundBlue;
     private static final int SelectionColor = Constant.Color.LightBlue;
     private static final int CorrectSelectionColor = Constant.Color.LightGreen;
     private static final int IncorrectSelectionColor = Constant.Color.LightRed;
 
-    public static FindCharacterFragment createFragment(@NonNull String text, char searchChar)
+    public static FindCharacterFragment createFragment(@NonNull String text, char searchChar, int exerciseIconId)
     {
         FindCharacterFragment fragment = new FindCharacterFragment();
 
         Bundle args = new Bundle();
         args.putString(TextTag, text);
         args.putChar(SearchCharacterTag, searchChar);
+        if (exerciseIconId != 0)
+            args.putInt(ExerciseIconTag, exerciseIconId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -172,6 +179,7 @@ public class FindCharacterFragment extends Fragment
         final View fragmentView = inflater.inflate(R.layout.fragment_find_character, container, false);
         try
         {
+            calculateDimensions(fragmentView);
             restoreInternalState(savedInstanceState);
             constructUserInterface(fragmentView, inflater);
         }
@@ -224,6 +232,26 @@ public class FindCharacterFragment extends Fragment
         m_exerciseScoreNotificator = null;
     }
 
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+
+        clearImages(getView());
+        //m_mediaPlayerManager.pause();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        View fragmentView = getView();
+        if (fragmentView != null)
+            drawImages(fragmentView);
+        //m_mediaPlayerManager.resume();
+    }
+
     void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
         final Bundle arguments = getArguments();
@@ -233,6 +261,7 @@ public class FindCharacterFragment extends Fragment
             throw new CommonException(CommonResultCode.InvalidArgument);
         m_text = exerciseText.split(Constant.NewLineDelimiter);
         m_searchCharacter = arguments.getChar(SearchCharacterTag);
+        m_exerciseIconId = arguments.getInt(ExerciseIconTag, 0);
 
         final int maxRowLength = Helpers.getMaxRowLength(m_text);
         if (maxRowLength > MaxCharactersInRowCount)
@@ -318,8 +347,8 @@ public class FindCharacterFragment extends Fragment
         }
 
         {
-            Button backButton = (Button) fragmentView.findViewById(R.id.backButton);
-            backButton.setOnClickListener(new View.OnClickListener()
+            ImageView backImageView = (ImageView) fragmentView.findViewById(R.id.backImageView);
+            backImageView.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
@@ -330,8 +359,8 @@ public class FindCharacterFragment extends Fragment
         }
 
         {
-            Button forwardButton = (Button) fragmentView.findViewById(R.id.forwardButton);
-            forwardButton.setOnClickListener(new View.OnClickListener()
+            ImageView forwardImageView = (ImageView) fragmentView.findViewById(R.id.forwardImageView);
+            forwardImageView.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
@@ -339,8 +368,6 @@ public class FindCharacterFragment extends Fragment
                     onForwardButtonPressed();
                 }
             });
-
-            forwardButton.setText(getResources().getText(R.string.caption_check));
         }
 
         // exercise title
@@ -348,6 +375,30 @@ public class FindCharacterFragment extends Fragment
             TextView titleTextView = (TextView)fragmentView.findViewById(R.id.textInformationTextView);
             titleTextView.setText(String.format(getResources().getString(R.string.caption_find_character), m_searchCharacter));
         }
+    }
+
+    void calculateDimensions(@NonNull View fragmentView)
+    {
+        // TODO: auto calculation of all dimensions
+    }
+
+    void drawImages(@NonNull View fragmentView)
+    {
+        if (m_exerciseIconId != 0)
+        {
+            final ImageView exerciseIconImageView = (ImageView)fragmentView.findViewById(R.id.exerciseIconImageView);
+
+            final Bitmap iconImage = ImageHelper.getImageForSpecifiedView(getResources()
+                , m_exerciseIconId
+                , exerciseIconImageView);
+            exerciseIconImageView.setBackground(new BitmapDrawable(getResources(), iconImage));
+        }
+    }
+
+    void clearImages(@NonNull View fragmentView)
+    {
+        final int backgroundColor = getResources().getColor(R.color.standard_background);
+        fragmentView.findViewById(R.id.exerciseIconImageView).setBackgroundColor(backgroundColor);
     }
 
     public void markCharacterElement(int rowIndex, int columnIndex
@@ -417,6 +468,7 @@ public class FindCharacterFragment extends Fragment
         {
             if (m_state.stage == ExerciseStage.Active)
             {
+                // TODO: place messagebox here
                 m_state.stage = ExerciseStage.Processed;
 
                 final String searchCharacter = ((Character) m_searchCharacter).toString();
@@ -474,6 +526,7 @@ public class FindCharacterFragment extends Fragment
 
     private String[] m_text;
     private char m_searchCharacter;
+    private int m_exerciseIconId;
 
     private InternalState m_state;
     private MatrixAccessor<RelativeLayout> m_uiElements;

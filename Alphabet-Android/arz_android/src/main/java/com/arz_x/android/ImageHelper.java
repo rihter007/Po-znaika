@@ -4,6 +4,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
+import android.view.View;
+import android.view.ViewGroup;
 
 /**
  * Created by Rihter on 30.08.2015.
@@ -24,6 +26,13 @@ public class ImageHelper
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeResource(res, imageResourceId, options);
+    }
+
+    public static Bitmap getImageForSpecifiedView(@NonNull Resources res, int imageResourceId, @NonNull View view)
+    {
+        final ViewGroup.LayoutParams viewParams = view.getLayoutParams();
+        // TODO: throw exception if height or width are special values
+        return getImageForSpecifiedDimensions(res, imageResourceId, viewParams.width, viewParams.height);
     }
 
     private static int calculateInSampleSize(@NonNull BitmapFactory.Options options, int reqWidth, int reqHeight)
