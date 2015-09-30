@@ -16,7 +16,6 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -142,7 +141,7 @@ public class FindCharacterFragment extends Fragment
 
     private static final String LogTag = FindCharacterFragment.class.getName();
 
-    private static final int MaxCharactersInRowCount = 30;
+    private static final int MaxCharactersInRowCount = 20;
     private static final int MaxMistakesCount = 5;
 
     private static final String InternalStateTag = "internal_state";
@@ -150,7 +149,7 @@ public class FindCharacterFragment extends Fragment
     private static final String SearchCharacterTag = "search_character";
     private static final String ExerciseIconTag = "exercise_icon";
 
-    private static final int NoSelectionColor = Constant.Color.BackgroundBlue;
+    private static int NoSelectionColor = Constant.Color.BackgroundBlue;
     private static final int SelectionColor = Constant.Color.LightBlue;
     private static final int CorrectSelectionColor = Constant.Color.LightGreen;
     private static final int IncorrectSelectionColor = Constant.Color.LightRed;
@@ -254,8 +253,11 @@ public class FindCharacterFragment extends Fragment
 
     void restoreInternalState(Bundle savedInstanceState) throws CommonException
     {
-        final Bundle arguments = getArguments();
+        // colors
+        NoSelectionColor = getResources().getColor(R.color.no_selection);
 
+        // restore internal state
+        final Bundle arguments = getArguments();
         final String exerciseText = arguments.getString(TextTag);
         if (exerciseText == null)
             throw new CommonException(CommonResultCode.InvalidArgument);
@@ -331,8 +333,8 @@ public class FindCharacterFragment extends Fragment
 
         // put characters
         {
-            final int elementWidth = (m_displayMetrics.getDisplayWidth() -
-                    2 * (int)getResources().getDimension(R.dimen.small_margin)) / MaxCharactersInRowCount;
+            final int elementWidth = m_displayMetrics.getWidthInProportionPx(1.0 / MaxCharactersInRowCount,
+                    2 * (int) getResources().getDimension(R.dimen.small_margin));
             final int gridWidth = maxRowLength * elementWidth;
 
             GridView charactersGridView = (GridView) fragmentView.findViewById(R.id.charactersGridView);

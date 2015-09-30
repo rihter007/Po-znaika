@@ -1,6 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <integer name="start_screen_hello_student_left_margin">5</integer>
+    <integer name="start_screen_hello_student_top_margin">1</integer>
+    <integer name="start_screen_hello_student_width">25</integer>
+    <integer name="start_screen_hello_student_height">10</integer>
+    <integer name="start_screen_hello_student_height_width_proportion">67</integer>
+
+    <integer name="start_screen_play_left_margin">5</integer>
+    <integer name="start_screen_play_top_margin">18</integer>
+    <integer name="start_screen_play_width">70</integer>
+    <integer name="start_screen_play_height">25</integer>
+    <integer name="start_screen_play_height_width_proportion">60</integer>
+
+    <integer name="start_screen_sun_right_margin">5</integer>
+    <integer name="start_screen_sun_top_margin">1</integer>
+    <integer name="start_screen_sun_width">50</integer>
+    <integer name="start_screen_sun_height">30</integer>
+    <integer name="start_screen_sun_height_width_proportion">100</integer>
+
+    <integer name="start_screen_parents_right_margin">12</integer>
+    <integer name="start_screen_parents_top_margin">43</integer>
+    <integer name="start_screen_parents_width">50</integer>
+    <integer name="start_screen_parents_height">20</integer>
+    <integer name="start_screen_parents_height_width_proportion">65</integer>
+
+    <integer name="start_screen_exit_left_margin">15</integer>
+    <integer name="start_screen_exit_top_margin">63</integer>
+    <integer name="start_screen_exit_width">50</integer>
+    <integer name="start_screen_exit_height">20</integer>
+    <integer name="start_screen_exit_height_width_proportion">65</integer>
+
+    <integer name="start_screen_settings_left_margin">7</integer>
+    <integer name="start_screen_settings_bottom_margin">3</integer>
+    <integer name="start_screen_settings_width">16</integer>
+    <integer name="start_screen_settings_height">9</integer>
+    <integer name="start_screen_settings_height_width_proportion">100</integer>
+
     <!-- Image selection fragment -->
     <integer name="image_selection_fragment_images_part">60</integer>
     <integer name="image_selection_fragment_single_image_area_part">48</integer>

@@ -43,7 +43,7 @@
             android:layout_height="0px"
             android:layout_weight="3.5"
             android:id="@+id/characterLayout"
-            android:background="@drawable/image_square">
+            android:background="@color/internal_elements_background">
 
             <GridView
                 android:layout_width="match_parent"

@@ -347,7 +347,7 @@ public final class AlphabetDatabase
     /**
      * SQL-expressions from verse table
      */
-    private static final String ExtractVerseTextByAlphabetIdSqlStatement =
+    private static final String ExtractVerseTextByAlphabeTypeSqlStatement =
             "SELECT verse_text " +
             "FROM verse " +
             "WHERE (alphabet_type = ?) AND (verse_text LIKE ?) AND (length(verse_text) < ?) " +
@@ -392,54 +392,37 @@ public final class AlphabetDatabase
      * SQL-expressions from sound_words table
      */
     private static final String ExtractRandomSoundWordsByCharacterExerciseIdAndFlagSqlStatement =
-            "SELECT sw._id, sw.word_id, sw.sound_flag, w.alphabet_id, w.word, w.complexity, wid.image_id, wsd.sound_id " +
+            "SELECT sw._id, sw.word_id, sw.sound_flag, w.alphabet_type, w.word, w.complexity, wid.image_id, wsd.sound_id " +
                     "FROM sound_words sw, word w, word_image_description wid, word_sound_description wsd " +
                     "WHERE (sw.character_exercise_id = ?) AND (sw.sound_flag & ? <> 0) AND " +
                     "(sw.word_id = w._id) AND (w._id = wid.word_id) AND (w._id = wsd.word_id) GROUP BY sw.word_id ORDER BY RANDOM() LIMIT ?";
 
     private static final String ExtractRandomSoundWordsByCharacterExerciseIdNotMatchFlagSqlStatement =
-            "SELECT sw._id, sw.word_id, sw.sound_flag, w.alphabet_id, w.word, w.complexity, wid.image_id, wsd.sound_id " +
+            "SELECT sw._id, sw.word_id, sw.sound_flag, w.alphabet_type, w.word, w.complexity, wid.image_id, wsd.sound_id " +
                     "FROM sound_words sw,word w, word_image_description wid, word_sound_description wsd " +
                     "WHERE (sw.word_id = w._id) AND (w._id = wid.word_id) AND (w._id = wsd.word_id) AND " +
                     "sw.word_id NOT IN(SELECT word_id FROM sound_words WHERE (character_exercise_id = ?) AND (sound_flag & ? <> 0)) " +
                     "GROUP BY sw.word_id ORDER BY RANDOM() LIMIT ?";
 
-    //private static final String ExtractRandomSoundWordsByCharacterExerciseIdNotMatchFlagSqlStatement =
-    //        "SELECT sw._id, sw.word_id, sw.sound_flag, w.alphabet_id, w.word, w.complexity, wid.image_id, wsd.sound_id " +
-    //                "FROM sound_words sw, word w, word_image_description wid, word_sound_description wsd " +
-    //                "WHERE (NOT ((sw.character_exercise_id = ?) AND (sw.sound_flag & ? <> 0))) AND " +
-    //                "(sw.word_id = w._id) AND (w._id = wid.word_id) AND (w._id = wsd.word_id) GROUP BY sw.word_id ORDER BY RANDOM() LIMIT ?";
-    /*
-    private static final String ExtractRandomSoundWordsByCharacterExerciseIdAndFlagSqlStatement =
-            "SELECT sw._id, sw.word_id, sw.sound_flag, w.alphabet_id, w.word, w.complexity " +
-                    "FROM sound_words sw, word w " +
-                    "WHERE (sw.word_id = w._id) AND (sw.character_exercise_id = ?) AND (sw.sound_flag & ? <> 0) " +
-                    "GROUP BY sw.word_id ORDER BY RANDOM() LIMIT ?";
-    private static final String ExtractRandomSoundWordsByCharacterExerciseIdNotMatchFlagSqlStatement =
-            "SELECT sw._id, sw.word_id, sw.sound_flag, w.alphabet_id, w.word, w.complexity " +
-                    "FROM sound_words sw, word w " +
-                    "WHERE (sw.word_id = w._id) AND (NOT ((sw.character_exercise_id = ?) AND (sw.sound_flag & ? <> 0))) " +
-                    "GROUP BY sw.word_id ORDER BY RANDOM() LIMIT ?";*/
-
     /**
      * SQL-expressions for word tables
      */
-    private static final String ExtractWordsByLengthAndAlphabetId =
-            "SELECT _id, alphabet_id, complexity, word " +
+    private static final String ExtractWordsByLengthAndAlphabetType =
+            "SELECT _id, alphabet_type, complexity, word " +
                     "FROM word " +
-                    "WHERE (alphabet_id = ?) AND (length(word) >= %d) AND (length(word) <= %d)";
-    private static final String ExtractRandomWordByAlphabetIdAndLength =
-            "SELECT _id, alphabet_id, complexity, word " +
+                    "WHERE (alphabet_type = ?) AND (length(word) >= %d) AND (length(word) <= %d)";
+    private static final String ExtractRandomWordByAlphabetTypeAndLength =
+            "SELECT _id, alphabet_type, complexity, word " +
                     "FROM word " +
-                    "WHERE (alphabet_id = ?) AND (length(word) >= %d) AND (length(word) <= %d) ORDER BY RANDOM() LIMIT 1";
+                    "WHERE (alphabet_type = ?) AND (length(word) >= %d) AND (length(word) <= %d) ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomWordCreationExerciseByAlphabetAndLength =
             "SELECT w._id, w.complexity, w.word " +
                     "FROM word_creation_exercise wce, word w " +
-                    "WHERE (wce.word_id = w._id) AND (w.alphabet_id = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) ORDER BY RANDOM() LIMIT 1";
+                    "WHERE (wce.word_id = w._id) AND (w.alphabet_type = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomWordAndImageByAlphabetAndLength =
             "SELECT w._id, w.word, w.complexity, img.file_name " +
                     "FROM word w, word_image_description wid, image img " +
-                    "WHERE (w.alphabet_id = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) " +
+                    "WHERE (w.alphabet_type = ?) AND (length(w.word) >= %d) AND (length(w.word) <= %d) " +
                     "AND (w._id = wid.word_id) AND (wid.image_id = img._id) " +
                     "ORDER BY RANDOM() LIMIT 1";
     private static final String ExtractRandomImageIdByWordId = "SELECT image_id FROM word_image_description wid " +
@@ -449,13 +432,13 @@ public final class AlphabetDatabase
     private static final String ExtractRandomWordAndImageByPatternAndAlphabetSqlStatement =
             "SELECT w._id, w.word, w.complexity, img.file_name " +
             "FROM word w, word_image_description wid, image img " +
-            "WHERE (w.alphabet_id = ?) AND (w._id = wid.word_id) AND (img._id = wid.image_id) " +
+            "WHERE (w.alphabet_type = ?) AND (w._id = wid.word_id) AND (img._id = wid.image_id) " +
             "AND (w.word LIKE ?) " +
             "ORDER BY RANDOM() LIMIT ?";
     private static final String ExtractRandomWordAndImageNotByPatternAndAlphabetSqlStatement =
             "SELECT w._id, w.word, w.complexity, img.file_name " +
             "FROM word w, word_image_description wid, image img " +
-            "WHERE (w.alphabet_id = ?) AND (w._id = wid.word_id) AND (img._id = wid.image_id) " +
+            "WHERE (w.alphabet_type = ?) AND (w._id = wid.word_id) AND (img._id = wid.image_id) " +
             "AND (NOT w.word LIKE ?) " +
             "ORDER BY RANDOM() LIMIT ?";
 
@@ -629,7 +612,7 @@ public final class AlphabetDatabase
             for (int i = 0; i < minSearchCharCount; ++i)
                 characterCountCondition = characterCountCondition + characterObject + "%";
 
-            dataReader = m_databaseConnection.rawQuery(ExtractVerseTextByAlphabetIdSqlStatement, new String[]
+            dataReader = m_databaseConnection.rawQuery(ExtractVerseTextByAlphabeTypeSqlStatement, new String[]
                     {
                             ((Integer) alphabetType.getValue()).toString(),
                             characterCountCondition,
@@ -1110,7 +1093,7 @@ public final class AlphabetDatabase
 
         try
         {
-            dataReader = m_databaseConnection.rawQuery(String.format(ExtractRandomWordByAlphabetIdAndLength, minWordLength, maxWordLength),
+            dataReader = m_databaseConnection.rawQuery(String.format(ExtractRandomWordByAlphabetTypeAndLength, minWordLength, maxWordLength),
                     new String[]{((Integer) alphabetType.getValue()).toString()});
 
             if (dataReader.moveToFirst())
@@ -1167,26 +1150,26 @@ public final class AlphabetDatabase
         return result;
     }
 
-    public Pair<WordInfo, String> getRandomWordAndImageByAlphabetAndLength(final AlphabetType alphabetId, int minWordLength, int maxWordLength)
+    public Pair<WordInfo, String> getRandomWordAndImageByAlphabetAndLength(final AlphabetType alphabetType, int minWordLength, int maxWordLength)
     {
         Pair<WordInfo, String> result = null;
         Cursor dataReader = null;
 
         try
         {
-            final Integer AlphabetIdObject = alphabetId.getValue();
+            final Integer alphabetTypeObject = alphabetType.getValue();
 
             dataReader = m_databaseConnection.rawQuery(String.format(ExtractRandomWordAndImageByAlphabetAndLength, minWordLength, maxWordLength),
                     new String[]
                             {
-                                    AlphabetIdObject.toString()
+                                    alphabetTypeObject.toString()
                             });
 
             if (dataReader.moveToFirst())
             {
                 WordInfo word = new WordInfo();
                 word.id = dataReader.getInt(0);
-                word.alphabetType = alphabetId;
+                word.alphabetType = alphabetType;
                 word.word = dataReader.getString(1);
                 word.complexity = dataReader.getInt(2);
 
@@ -1213,7 +1196,7 @@ public final class AlphabetDatabase
 
         try
         {
-            dataReader = m_databaseConnection.rawQuery(String.format(ExtractWordsByLengthAndAlphabetId, 0, wordInfo.word.length()),
+            dataReader = m_databaseConnection.rawQuery(String.format(ExtractWordsByLengthAndAlphabetType, 0, wordInfo.word.length()),
                     new String[]{((Integer) wordInfo.alphabetType.getValue()).toString()});
 
             if (dataReader.moveToFirst())
@@ -1389,7 +1372,7 @@ public final class AlphabetDatabase
             final Integer SoundFlagObject = soundFlag;
             final Integer CountObject = count;
 
-            // SELECT sw.id, sw.word_id, sw.sound_flag, w.alphabet_id, w.word, w.complexity
+            // SELECT sw.id, sw.word_id, sw.sound_flag, w.alphabet_type, w.word, w.complexity
             dataReader = m_databaseConnection.rawQuery(sqlExpression,
                     new String[] { CharacterExerciseIdObject.toString(), SoundFlagObject.toString(), CountObject.toString() });
 

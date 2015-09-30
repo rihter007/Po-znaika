@@ -9,19 +9,15 @@ public class CommonException extends ResultCodeException
     public CommonException(CommonResultCode value)
     {
         super(value.getValue());
-        m_value = value;
+    }
+
+    public CommonException(CommonResultCode resultCode, String message)
+    {
+        super(resultCode.getValue(), message);
     }
 
     public CommonResultCode getResultCode()
     {
-        return m_value;
+        return CommonResultCode.getTypeByValue(super.getRawResultCode());
     }
-
-    @Override
-    public String getMessage()
-    {
-        return "error code: " + m_value.name();
-    }
-
-    private CommonResultCode m_value;
 }

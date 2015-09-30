@@ -8,6 +8,12 @@ public class ResultCodeException extends Exception
 {
     public ResultCodeException(int resultCode)
     {
+        this(resultCode, null);
+    }
+
+    public ResultCodeException(int resultCode, String message)
+    {
+        super(message);
         m_resultCode = resultCode;
     }
 
@@ -19,7 +25,10 @@ public class ResultCodeException extends Exception
     @Override
     public String getMessage()
     {
-        return "error code: " + m_resultCode;
+        final String textMessage = super.getMessage();
+        if (textMessage == null)
+            return "error code: " + m_resultCode;
+        return String.format("Error code: \"%d\", message: \"%s\"", m_resultCode, textMessage);
     }
 
     @Override

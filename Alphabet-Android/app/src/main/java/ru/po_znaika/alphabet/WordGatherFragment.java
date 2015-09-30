@@ -458,8 +458,8 @@ public final class WordGatherFragment extends Fragment
     private RelativeLayout createResultFramedItem(char ch)
     {
         return  createInitialFramedItem(
-            m_displayHelper.getWidthInProportionDp(1.0 / MaxWordLength
-                    , 2*(int)getResources().getDimension(R.dimen.small_margin))
+            m_displayHelper.getWidthInProportionPx(1.0 / MaxWordLength
+                    , 2 * (int) getResources().getDimension(R.dimen.small_margin))
             , (int)getResources().getDimension(R.dimen.word_gather_small_text_size)
             , ch);
     }
@@ -467,8 +467,8 @@ public final class WordGatherFragment extends Fragment
     private RelativeLayout createSelectionFramedItem(char ch)
     {
         return  createInitialFramedItem(
-                m_displayHelper.getWidthInProportionDp(1.0 / CharactersPerRow
-                        , 2 * (int)getResources().getDimension(R.dimen.small_margin))
+                m_displayHelper.getWidthInProportionPx(1.0 / CharactersPerRow
+                        , 2 * (int) getResources().getDimension(R.dimen.small_margin))
                 , (int)getResources().getDimension(R.dimen.word_gather_small_text_size)
                 , ch);
     }

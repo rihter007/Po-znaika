@@ -1,5 +1,8 @@
 package com.arz_x;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Rihter on 18.01.2015.
  * Represents common operation result code
@@ -22,6 +25,19 @@ public enum CommonResultCode
     public int getValue()
     {
         return m_value;
+    }
+
+    private static final Map<Integer, CommonResultCode> TypesMap = new HashMap<Integer, CommonResultCode>()
+    {
+        {
+            for (CommonResultCode code : CommonResultCode.values())
+                put(code.getValue(), code);
+        }
+    };
+
+    public static CommonResultCode getTypeByValue(int value)
+    {
+        return TypesMap.get(value);
     }
 
     private int m_value;

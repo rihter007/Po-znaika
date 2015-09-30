@@ -176,15 +176,8 @@ public class SingleCharacterExerciseMenuActivity extends Activity
     protected void onResume()
     {
         super.onResume();
-        try
-        {
-            m_tracer.resume();
-        }
-        catch (CommonException exp)
-        {
-            // this should never happen
-            throw new AssertionError();
-        }
+
+        m_tracer.resume();
     }
 
     @Override

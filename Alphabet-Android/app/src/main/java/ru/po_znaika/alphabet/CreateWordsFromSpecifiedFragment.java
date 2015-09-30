@@ -379,8 +379,8 @@ public class  CreateWordsFromSpecifiedFragment extends Fragment
             });
 
             ViewGroup.LayoutParams layoutParams = finishButton.getLayoutParams();
-            layoutParams.width = m_displayMetrics.getWidthInProportionDp(0.45
-                    , 2 * (int)getResources().getDimension(R.dimen.small_margin));
+            layoutParams.width = m_displayMetrics.getWidthInProportionPx(0.45
+                    , 2 * (int) getResources().getDimension(R.dimen.small_margin));
             finishButton.setLayoutParams(layoutParams);
         }
 
@@ -418,8 +418,8 @@ public class  CreateWordsFromSpecifiedFragment extends Fragment
     {
         RelativeLayout characterLayout = (RelativeLayout)getActivity().getLayoutInflater().inflate(R.layout.framed_text_item, null, false);
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
-                m_displayMetrics.getWidthInProportionDp(1.0 / MaxWordLength
-                        , 2 * (int)getResources().getDimension(R.dimen.small_margin))
+                m_displayMetrics.getWidthInProportionPx(1.0 / MaxWordLength
+                        , 2 * (int) getResources().getDimension(R.dimen.small_margin))
                 , ViewGroup.LayoutParams.MATCH_PARENT);
         characterLayout.setLayoutParams(layoutParams);
         FramedTextItem.setInternalColorWithNoBorder(characterLayout, NoSelectionColor);

@@ -197,10 +197,17 @@ public class FileTracerInstance implements ITracer, Closeable
         close();
     }
 
-    public void resume() throws CommonException
+    public void resume()
     {
-        if (m_tracer == null)
-            m_tracer = ProductTracer.openExistingFileTracer(m_filePath, m_minTraceLevel, m_maxTraceFileSize);
+        try
+        {
+            if (m_tracer == null)
+                m_tracer = ProductTracer.openExistingFileTracer(m_filePath, m_minTraceLevel, m_maxTraceFileSize);
+        }
+        catch (CommonException exp)
+        {
+            // this should never happen
+        }
     }
 
     public void close()

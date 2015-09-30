@@ -27,7 +27,6 @@ import com.arz_x.tracer.ITracer;
 import com.arz_x.tracer.ProductTracer;
 import com.arz_x.tracer.TraceLevel;
 
-import ru.po_znaika.common.ExerciseScore;
 import ru.po_znaika.common.IExerciseStepCallback;
 import ru.po_znaika.alphabet.database.exercise.AlphabetDatabase;
 
@@ -193,15 +192,8 @@ public class CreateWordsFromSpecifiedActivity extends Activity
     protected void onResume()
     {
         super.onResume();
-        try
-        {
-            m_tracer.resume();
-        }
-        catch (CommonException exp)
-        {
-            // this should never happen
-            throw new AssertionError();
-        }
+
+        m_tracer.resume();
     }
 
     private void restoreInternalState(Bundle savedInstanceState) throws CommonException

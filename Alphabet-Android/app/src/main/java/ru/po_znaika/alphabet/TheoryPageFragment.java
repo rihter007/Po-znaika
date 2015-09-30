@@ -308,7 +308,7 @@ public class TheoryPageFragment extends Fragment
             // programmatically scale to square size
             {
                 DisplayMetricsHelper displayMetricsHelper = new DisplayMetricsHelper(getActivity());
-                final int imageHeight = displayMetricsHelper.getHeightInProportionDp(3 * (1.0 / 7.0), 0);
+                final int imageHeight = displayMetricsHelper.getHeightInProportionPx(3 * (1.0 / 7.0), 0);
                 final int imageWidth = displayMetricsHelper.getDisplayWidth()
                         - 2 * (int) getResources().getDimension(R.dimen.small_margin);
 
